@@ -1,2 +1,2 @@
 # BBDataProcessing
-BeagleBone data processing, such vibrate and heart rate
+BeagleBone data processing, such as vibrate and heart rate
