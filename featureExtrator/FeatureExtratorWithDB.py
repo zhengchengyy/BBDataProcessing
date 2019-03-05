@@ -1,4 +1,4 @@
-from FeatureModules import VarianceModule
+from FeatureModules import *
 from feature_extractor import FeatureExtractor
 import time
 
@@ -51,9 +51,18 @@ if __name__=='__main__':
                                tag_collection=config['tag_collection'],
                                volt_collection=config['volt_collection'])
 
-    variancemodule = VarianceModule(5, 3)
+    maxsize = 5
+    leapsize = 3
+
     extractor = FeatureExtractor()
+
+    variancemodule = VarianceModule(5, 3)
+    averagemodule = AverageModule(5, 3)
+    thresholdcounter = ThresholdCounterModule(5, 3)
+
     extractor.register(variancemodule)
+    extractor.register(averagemodule)
+    extractor.register(thresholdcounter)
     for volt in volts[1]:
         #print(volt)
         time.sleep(1)

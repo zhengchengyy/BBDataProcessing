@@ -3,7 +3,8 @@ from queue import Queue
 
 
 class ProcessModule(ABC):
-    """抽象类，表示处理数据的模块。每一个继承ProcessModule的类都包含一个存储数据的队列queue。
+    """抽象类，表示处理数据的模块。
+    每一个继承ProcessModule的类都包含一个存储数据的队列queue。
     继承该类需要重写processFullQueue方法。
     """
 
@@ -11,6 +12,11 @@ class ProcessModule(ABC):
         """构造方法中，参数中的maxsize表示队列的最大长度，
         leapsize表示在两次处理队列的间隔内，队列中新增元素的个数
         """
+        if isinstance(maxsize, int) and isinstance(leapsize, int):
+            if leapsize < 1 or maxsize < 1 or leapsize > maxsize - 1:
+                raise ModuleProcessException("Illegal leapsize or maxsize.")
+        else:
+            raise ModuleProcessException("Maxsize and leapsize both should be integers.")
         self.maxsize = maxsize
         self.leapsize = leapsize
         self.queue = Queue(maxsize=maxsize)
@@ -25,7 +31,6 @@ class ProcessModule(ABC):
         """接收一个值，将其添加到队列中，如果队列已满，则移除队列中的leapsize个元素再添加。
         如果添加后队列为满队列，则执行processFullQueue方法。
         """
-        # print(self.queue.queue)
         if not self.queue.full():
             self.queue.put(value)
         else:
@@ -49,17 +54,20 @@ class FeatureExtractor:
         """添加一个ProcessModule"""
         self.modules.append(processModule)
 
-    def process(self, value, func=lambda x: print(x)):
+    def process(self, value):
         """接收一个value值，让self.modules中的每一个ProcessModule处理该值，
         并调用func函数处理每一个ProcessModule的返回值。
         这里的func默认为简单的打印函数，可以设置为通过socket发送到其他设备的函数。"""
         for module in self.modules:
             output = module.process(value)
-            func(output)
+            if(output!=None):
+                print(module.MODULE_NAME ,": " ,output)
 
 
 class SumModule(ProcessModule):
     """一个简单的ProcessModule，功能是对满队列中的所有数据求和。返回和。"""
+
+    MODULE_NAME = "SumModule"
 
     def processFullQueue(self):
         sum = 0
@@ -67,3 +75,6 @@ class SumModule(ProcessModule):
             sum = sum + value
         return sum
 
+
+class ModuleProcessException(Exception):
+    pass

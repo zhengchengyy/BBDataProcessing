@@ -19,7 +19,7 @@ class NumberGenerator(Thread):
             time.sleep(1)
 
 
-summodule = SumModule(5, 2)
+summodule = SumModule(3, 2)
 extractor = FeatureExtractor()
 extractor.register(summodule)
 mainThread = NumberGenerator(extractor)
