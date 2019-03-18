@@ -4,7 +4,7 @@ import time
 
 from pymongo import MongoClient
 from exceptions import CollectionError
-
+from pymongo import MongoClient
 
 config = {'action':'uneasy',
           'db':'beaglebone',
@@ -51,19 +51,40 @@ if __name__=='__main__':
                                tag_collection=config['tag_collection'],
                                volt_collection=config['volt_collection'])
 
+    # 配置队列信息，maxsize表示队列最大长度，leapsize表示每次移动长度
     maxsize = 5
     leapsize = 3
 
+    # 定义特征提取器
     extractor = FeatureExtractor()
 
-    variancemodule = VarianceModule(5, 3)
-    averagemodule = AverageModule(5, 3)
-    thresholdcounter = ThresholdCounterModule(5, 3)
+    # 定义特征提取模块
+    variancemodule = VarianceModule(maxsize, leapsize)
+    averagemodule = AverageModule(maxsize, leapsize)
+    thresholdcounter = ThresholdCounterModule(maxsize, leapsize)
 
+    # 注册特征提取模块
     extractor.register(variancemodule)
     extractor.register(averagemodule)
     extractor.register(thresholdcounter)
-    for volt in volts[1]:
+
+    # 启动Mongo客户端
+    client = MongoClient()
+    db = client.beaglebone
+    collection = db.features_6
+
+    for i in range(len(volts[1])):
         #print(volt)
+        #print(times[1][i])
         time.sleep(1)
-        extractor.process(volt)
+        deviceNo = 1
+        featureName,t,output = extractor.process(volts[1][i],times[1][i])
+        if(output):
+            features = {
+                            "device_no": deviceNo,
+                            "feature_name":featureName,
+                            "time": t,
+                            "feature": output
+                       }
+            collection.insert_one(features)
+            print(deviceNo,moduleName,t,output)
