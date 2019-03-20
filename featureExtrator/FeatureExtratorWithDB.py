@@ -1,4 +1,4 @@
-from FeatureModules import *
+from feature_modules import *
 from feature_extractor import FeatureExtractor
 import time
 
@@ -55,6 +55,11 @@ if __name__=='__main__':
     maxsize = 5
     leapsize = 3
 
+    # 根据时间采集数据，基本单位为s，比如一分钟，十分钟，75次/s
+    interval = 60
+    maxsize = 75*interval
+    leapsize = maxsize-1
+
     # 定义特征提取器
     extractor = FeatureExtractor()
 
@@ -64,8 +69,8 @@ if __name__=='__main__':
     thresholdcounter = ThresholdCounterModule(maxsize, leapsize)
 
     # 注册特征提取模块
-    extractor.register(variancemodule)
-    extractor.register(averagemodule)
+    # extractor.register(variancemodule)
+    # extractor.register(averagemodule)
     extractor.register(thresholdcounter)
 
     # 启动Mongo客户端
@@ -74,9 +79,9 @@ if __name__=='__main__':
     collection = db.features_6
 
     for i in range(len(volts[1])):
-        #print(volt)
-        #print(times[1][i])
-        time.sleep(1)
+        # print(volt)
+        # print(times[1][i])
+        # time.sleep(1)
         deviceNo = 1
         featureName,t,output = extractor.process(volts[1][i],times[1][i])
         if(output):
@@ -84,7 +89,8 @@ if __name__=='__main__':
                             "device_no": deviceNo,
                             "feature_name":featureName,
                             "time": t,
-                            "feature": output
+                            "feature_value": output,
+                            "interval": interval
                        }
-            collection.insert_one(features)
-            print(deviceNo,moduleName,t,output)
+            # collection.insert_one(features)
+            print(features)
