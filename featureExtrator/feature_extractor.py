@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from queue import Queue
-# from pymongo import MongoClient
+
 
 class ProcessModule(ABC):
     """抽象类，表示处理数据的模块。
@@ -62,20 +62,15 @@ class FeatureExtractor:
         # db = client.beaglebone
         # collection = db.feature_5
         for module in self.modules:
-            output = module.process(value)
-            if (output != None):
-                return module.FEATURE_NAME,time,output
-            else:
-                return None,None,None
-            # if(output!=None):
-            #     features = {
-            #                 "device_no": deviceNo,
-            #                 "module_name":module.MODULE_NAME,
-            #                 "time": time,
-            #                 "feature": output
-            #                }
-            #     collection.insert_one(features)
-            #     print(module.MODULE_NAME, ": ", time, output)
+            result = {}
+            for module in self.modules:
+                # feature_name = module.FEATURE_NAME
+                output = module.process(value)
+                if (output != None):
+                    # result.append(module.FEATURE_NAME,output)
+                    result[module.FEATURE_NAME] = output
+            return result
+
 
 class SumModule(ProcessModule):
     """一个简单的ProcessModule，功能是对满队列中的所有数据求和。返回和。"""

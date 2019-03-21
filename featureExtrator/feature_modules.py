@@ -22,9 +22,6 @@ class VarianceModule(ProcessModule):
 
     FEATURE_NAME = "Variance"
 
-    # def __init__(self,a,b):
-    #     super(ProcessModule, self).__init__()
-
     def processFullQueue(self):
         sum = 0
         variance = 0
