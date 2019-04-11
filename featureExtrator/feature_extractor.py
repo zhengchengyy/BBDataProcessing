@@ -56,11 +56,7 @@ class FeatureExtractor:
 
     def process(self, value, time):
         """接收一个value值，让self.modules中的每一个ProcessModule处理该值，
-        并调用func函数处理每一个ProcessModule的返回值。
-        这里的func默认为简单的打印函数，可以设置为通过socket发送到其他设备的函数。"""
-        # client = MongoClient()
-        # db = client.beaglebone
-        # collection = db.feature_5
+        处理的结果用字典保存"""
         for module in self.modules:
             result = {}
             for module in self.modules:
