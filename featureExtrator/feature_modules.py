@@ -1,20 +1,22 @@
-from feature_extractor import SumModule
 from feature_extractor import FeatureExtractor
 from feature_extractor import ProcessModule
 
 
-class AverageModule(ProcessModule):
-    """功能是对满队列中的所有数据求平均值。返回平均值。
-    表示震动幅度的平均情况"""
-    # 优化，不用重复计算值，只计算增加和减少的数据；可以从其它组件获取数据
+class ThresholdCounterModule(ProcessModule):
+    """求超过指定阈值的个数"""
 
-    FEATURE_NAME = "Average"
+    FEATURE_NAME = "ThresholdCounter"
+    UPPER_THRESHOLD = 1.10
+    LOWER_THRESHOLD = 0.70
 
     def processFullQueue(self):
-        sum = 0
+        count = 0
         for value in self.queue.queue:
-            sum = sum + value
-        return sum/self.queue.maxsize
+            #仅在次数将value改为value['volt']
+            if value['volt'] > self.UPPER_THRESHOLD or value['volt'] < self.LOWER_THRESHOLD:
+                count = count + 1
+        return count
+
 
 class VarianceModule(ProcessModule):
     """功能是对满队列中的所有数据求方差。返回方差。
@@ -26,23 +28,21 @@ class VarianceModule(ProcessModule):
         sum = 0
         variance = 0
         for value in self.queue.queue:
-            sum = sum + value
-        average = sum/self.queue.maxsize
+            sum = sum + value['volt']
+        average = sum/self.size
         for value in self.queue.queue:
-            variance = variance + (value - average) ** 2
-        return variance/self.queue.maxsize
+            variance = variance + (value['volt'] - average) ** 2
+        return variance/self.size
 
+class AverageModule(ProcessModule):
+    """功能是对满队列中的所有数据求平均值。返回平均值。
+    表示震动幅度的平均情况"""
+    # 优化，不用重复计算值，只计算增加和减少的数据；可以从其它组件获取数据
 
-class ThresholdCounterModule(ProcessModule):
-    """求超过指定阈值的个数"""
-
-    FEATURE_NAME = "ThresholdCounter"
-    UPPER_THRESHOLD = 0.77
-    LOWER_THRESHOLD = 0.65
+    FEATURE_NAME = "Average"
 
     def processFullQueue(self):
-        count = 0
+        sum = 0
         for value in self.queue.queue:
-            if value > self.UPPER_THRESHOLD or value < self.LOWER_THRESHOLD:
-                count = count + 1
-        return count
+            sum = sum + value['volt']
+        return sum/self.size

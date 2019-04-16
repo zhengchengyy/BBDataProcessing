@@ -6,10 +6,10 @@ from pymongo import MongoClient
 from exceptions import CollectionError
 from pymongo import MongoClient
 
-config = {'action':'uneasy',
+config = {'action':'legs_stretch',
           'db':'beaglebone',
-          'tag_collection':'tags_5',
-          'volt_collection':'volts_5'}
+          'tag_collection':'tags_411',
+          'volt_collection':'volts_411'}
 
 def read_from_db(action, db, volt_collection, tag_collection,port=27017, host='localhost', ndevices=3):
     client = MongoClient(port=port, host=host)
@@ -46,51 +46,55 @@ def read_from_db(action, db, volt_collection, tag_collection,port=27017, host='l
 
 
 if __name__=='__main__':
-    times, volts= read_from_db(action=config['action'],
-                               db=config['db'],
-                               tag_collection=config['tag_collection'],
-                               volt_collection=config['volt_collection'])
+    times, volts = read_from_db(action=config['action'],
+                                db=config['db'],
+                                tag_collection=config['tag_collection'],
+                                volt_collection=config['volt_collection'])
 
-    # 配置队列信息，maxsize表示队列最大长度，leapsize表示每次移动长度
-    maxsize = 5
-    leapsize = 3
-
-    # 根据时间采集数据，基本单位为s，比如一分钟，十分钟，75次/s
-    interval = 60
-    maxsize = 75*interval
-    leapsize = maxsize-1
+    # 根据时间采集数据，基本单位为s，比如1s、10s、30s、60s
+    # interval表示每次分析的时间跨度，rate表示间隔多长时间进行一次分析
+    interval = 0.1
+    rate = 0.05
 
     # 定义特征提取器
     extractor = FeatureExtractor()
 
     # 定义特征提取模块
-    variancemodule = VarianceModule(maxsize, leapsize)
-    averagemodule = AverageModule(maxsize, leapsize)
-    thresholdcounter = ThresholdCounterModule(maxsize, leapsize)
+    variancemodule = VarianceModule(interval, rate)
+    averagemodule = AverageModule(interval, rate)
+    thresholdcounter = ThresholdCounterModule(interval, rate)
 
     # 注册特征提取模块
-    # extractor.register(variancemodule)
-    # extractor.register(averagemodule)
+    extractor.register(variancemodule)
+    extractor.register(averagemodule)
     extractor.register(thresholdcounter)
 
     # 启动Mongo客户端
     client = MongoClient()
     db = client.beaglebone
-    collection = db.features_6
+    collection = db.features_416
 
-    for i in range(len(volts[1])):
-        # print(volt)
-        # print(times[1][i])
-        # time.sleep(1)
-        deviceNo = 1
-        featureName,t,output = extractor.process(volts[1][i],times[1][i])
-        if(output):
-            features = {
-                            "device_no": deviceNo,
-                            "feature_name":featureName,
-                            "time": t,
-                            "feature_value": output,
-                            "interval": interval
-                       }
-            # collection.insert_one(features)
-            print(features)
+    # 定义设备数
+    ndevices = 3
+
+    # 对每个采集设备进行特征提取
+    for i in range(1, ndevices + 1):
+        print(len(times[i]))
+        for j in range(len(times[i])):
+            value = {
+                "time" : times[i][j],
+                "volt" : volts[i][j]
+            }
+            output = extractor.process(value)
+            if (output):
+                features = {
+                    "device_no": i,
+                    "time": times[i][j],
+                    "feature_value": output,
+                    "interval": interval,
+                    "rate": rate
+                }
+                print(features)
+
+                # 把特征数据存入数据库
+                # collection.insert_one(features)

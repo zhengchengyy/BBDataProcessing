@@ -1,6 +1,10 @@
+'''
+修改原有的feature_extractor文件，将按次数处理获得的数据改为按时间段处理
+新增以及改变的代码均使用两行------标识
+'''
+
 from abc import ABC, abstractmethod
 from queue import Queue
-
 
 class ProcessModule(ABC):
     """抽象类，表示处理数据的模块。
@@ -8,37 +12,48 @@ class ProcessModule(ABC):
     继承该类需要重写processFullQueue方法。
     """
 
-    def __init__(self, maxsize, leapsize):
-        """构造方法中，参数中的maxsize表示队列的最大长度，
-        leapsize表示在两次处理队列的间隔内，队列中新增元素的个数
+#改变为时间存储后，构造函数改变为如下
+#------
+    def __init__(self, interval = 1, rate = 0.5, size = 0):
+        """构造方法中，参数中的interval表示每次分析的时间跨度，
+        rate表示间隔多长时间进行一次分析
+        上述参数的单位均为秒
         """
-        if isinstance(maxsize, int) and isinstance(leapsize, int):
-            if leapsize < 1 or maxsize < 1 or leapsize > maxsize - 1:
-                raise ModuleProcessException("Illegal leapsize or maxsize.")
+        if (isinstance(interval, float) or isinstance(interval, int)) and (isinstance(rate, float) or isinstance(rate, int)):
+            if interval <= 0 or rate <=0 or rate > interval:
+                raise ModuleProcessException("Illegal rate or interval.")
         else:
-            raise ModuleProcessException("Maxsize and leapsize both should be integers.")
-        self.maxsize = maxsize
-        self.leapsize = leapsize
-        self.queue = Queue(maxsize=maxsize)
+            raise ModuleProcessException("Interval and rate both should be float or int.")
+        self.interval = interval
+        self.rate = rate
+        self.size = size
+        # 考虑采集数据频率可能变化,且分析时间会变化，因此不设定队列最大长度
+        self.queue = Queue(maxsize = 0)
         super(ProcessModule, self).__init__()
+#------
+
 
     @abstractmethod
     def processFullQueue(self):
         """处理满队列中的所有元素，通常为统计值。需要返回值。"""
         pass
 
+
     def process(self, value):
-        """接收一个值，将其添加到队列中，如果队列已满，则移除队列中的leapsize个元素再添加。
-        如果添加后队列为满队列，则执行processFullQueue方法。
+        """接收一个值，将其添加到队列中，如果队列中头尾的数据达到了interval定义的时间差，则进行处理，
+        并在处理后移除rate定义的时间差的。
         """
-        if not self.queue.full():
-            self.queue.put(value)
-        else:
-            for i in range(0, self.leapsize):
+        self.queue.put(value)
+        self.size +=1
+        if value['time'] - self.queue.queue[0]['time'] > self.interval:
+            result = self.processFullQueue()
+            t = value['time']
+            t_0 = self.queue.queue[0]['time']
+            t_interval = self.interval - self.rate
+            while value['time'] - self.queue.queue[0]['time'] > self.interval - self.rate:
                 self.queue.get()
-            self.queue.put(value)
-        if self.queue.full():
-            return self.processFullQueue()
+                self.size -= 1
+            return result
 
 
 class FeatureExtractor:
@@ -54,30 +69,14 @@ class FeatureExtractor:
         """添加一个ProcessModule"""
         self.modules.append(processModule)
 
-    def process(self, value, time):
-        """接收一个value值，让self.modules中的每一个ProcessModule处理该值，
-        处理的结果用字典保存"""
+    def process(self, value):
+        """接收一个value值，让self.modules中的每一个ProcessModule处理该值"""
+        result = {}
         for module in self.modules:
-            result = {}
-            for module in self.modules:
-                # feature_name = module.FEATURE_NAME
-                output = module.process(value)
-                if (output != None):
-                    # result.append(module.FEATURE_NAME,output)
-                    result[module.FEATURE_NAME] = output
-            return result
-
-
-class SumModule(ProcessModule):
-    """一个简单的ProcessModule，功能是对满队列中的所有数据求和。返回和。"""
-
-    FEATURE_NAME = "SumModule"
-
-    def processFullQueue(self):
-        sum = 0
-        for value in self.queue.queue:
-            sum = sum + value
-        return sum
+            output = module.process(value)
+            if (output != None):
+                result[module.FEATURE_NAME] = output
+        return result
 
 
 class ModuleProcessException(Exception):
