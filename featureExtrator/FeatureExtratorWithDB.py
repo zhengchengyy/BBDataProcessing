@@ -53,8 +53,8 @@ if __name__=='__main__':
 
     # 根据时间采集数据，基本单位为s，比如1s、10s、30s、60s
     # interval表示每次分析的时间跨度，rate表示间隔多长时间进行一次分析
-    interval = 0.1
-    rate = 0.05
+    interval = 30
+    rate = 30
 
     # 定义特征提取器
     extractor = FeatureExtractor()
@@ -79,8 +79,7 @@ if __name__=='__main__':
 
     # 对每个采集设备进行特征提取
     for i in range(1, ndevices + 1):
-        print(len(times[i]))
-        for j in range(len(times[i])):
+        for j in range(len(volts[i])):
             value = {
                 "time" : times[i][j],
                 "volt" : volts[i][j]
@@ -95,6 +94,10 @@ if __name__=='__main__':
                     "rate": rate
                 }
                 print(features)
-
                 # 把特征数据存入数据库
                 # collection.insert_one(features)
+
+        #清理组件
+        variancemodule.clear()
+        averagemodule.clear()
+        thresholdcounter.clear()

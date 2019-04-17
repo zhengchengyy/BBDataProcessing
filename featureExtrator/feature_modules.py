@@ -17,6 +17,10 @@ class ThresholdCounterModule(ProcessModule):
                 count = count + 1
         return count
 
+    def clear(self):
+        """清理组件中的队列"""
+        self.queue.queue.clear()
+
 
 class VarianceModule(ProcessModule):
     """功能是对满队列中的所有数据求方差。返回方差。
@@ -34,6 +38,11 @@ class VarianceModule(ProcessModule):
             variance = variance + (value['volt'] - average) ** 2
         return variance/self.size
 
+    def clear(self):
+        """清理组件中的队列"""
+        self.queue.queue.clear()
+
+
 class AverageModule(ProcessModule):
     """功能是对满队列中的所有数据求平均值。返回平均值。
     表示震动幅度的平均情况"""
@@ -46,3 +55,7 @@ class AverageModule(ProcessModule):
         for value in self.queue.queue:
             sum = sum + value['volt']
         return sum/self.size
+
+    def clear(self):
+        """清理组件中的队列"""
+        self.queue.queue.clear()

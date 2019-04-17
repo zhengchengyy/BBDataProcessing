@@ -32,12 +32,10 @@ class ProcessModule(ABC):
         super(ProcessModule, self).__init__()
 #------
 
-
     @abstractmethod
     def processFullQueue(self):
         """处理满队列中的所有元素，通常为统计值。需要返回值。"""
         pass
-
 
     def process(self, value):
         """接收一个值，将其添加到队列中，如果队列中头尾的数据达到了interval定义的时间差，则进行处理，
