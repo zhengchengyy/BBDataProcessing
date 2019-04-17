@@ -5,10 +5,10 @@ from pymongo import MongoClient
 from exceptions import *
 from openpyxl import Workbook
 
-config = {'action':'easy',
+config = {'action':'turn_over',
           'db':'beaglebone',
-          'tag_collection':'tags_5',
-          'volt_collection':'volts_5'}
+          'tag_collection':'tags_411',
+          'volt_collection':'volts_411'}
 
 # 合并两个设备的有序时间列表
 def merge(time1,time2):
@@ -109,7 +109,7 @@ def save_to_excel(action, db, volt_collection, tag_collection,port=27017, host='
             for row in range(len(volts[col])):
                 booksheet.cell(row + 2, col + 1).value = str(volts[col][row])
 
-        workbook.save(action + '.xlsx')
+        workbook.save(action + "_syn" + '.xlsx')
 
 
 save_to_excel(action=config['action'],
