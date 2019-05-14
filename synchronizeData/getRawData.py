@@ -1,6 +1,6 @@
 # 从mongodb读取数据，用openpyxl写入表格
 # （xlrd和xlwt处理的是xls文件，单个sheet最大行数是65535,openpyxl函数最大行数达到1048576）
-# 对表格中三块板子的电压数据进行数据对齐（如果其中一块板子没有相应时间点的电压值，就对其就近插值处理）
+
 from pymongo import MongoClient
 from exceptions import *
 from openpyxl import Workbook
