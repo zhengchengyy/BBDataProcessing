@@ -8,10 +8,10 @@ from pymongo import MongoClient
 
 config = {'action':'legs_stretch',
           'db':'beaglebone',
-          'tag_collection':'tags_411',
-          'volt_collection':'volts_411'}
+          'tag_collection':'tags_517',
+          'volt_collection':'volts_517'}
 
-def read_from_db(action, db, volt_collection, tag_collection,port=27017, host='localhost', ndevices=3):
+def read_from_db(action, db, volt_collection, tag_collection,port=27017, host='localhost', ndevices=5):
     client = MongoClient(port=port, host=host)
     database = client[db]
     tag_collection = database[tag_collection]
@@ -53,8 +53,8 @@ if __name__=='__main__':
 
     # 根据时间采集数据，基本单位为s，比如1s、10s、30s、60s
     # interval表示每次分析的时间跨度，rate表示间隔多长时间进行一次分析
-    interval = 30
-    rate = 30
+    interval = 1
+    rate = 1
 
     # 定义特征提取器
     extractor = FeatureExtractor()
@@ -72,10 +72,10 @@ if __name__=='__main__':
     # 启动Mongo客户端
     client = MongoClient()
     db = client.beaglebone
-    collection = db.features_416
+    collection = db.features_411
 
     # 定义设备数
-    ndevices = 3
+    ndevices = 5
 
     # 对每个采集设备进行特征提取
     for i in range(1, ndevices + 1):
