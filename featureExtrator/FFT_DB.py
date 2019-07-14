@@ -8,8 +8,8 @@ import numpy as np
 
 config = {'action':'turn_over',
           'db':'beaglebone',
-          'tag_collection':'tags_424',
-          'volt_collection':'volts_424',
+          'tag_collection':'tags_411',
+          'volt_collection':'volts_411',
           'offset':0}
 
 def timeToFormat(t):
@@ -34,10 +34,12 @@ def plot_from_db(action, db, volt_collection, tag_collection,port=27017, host='l
 
     ntags = tag_collection.count_documents({'tag':action})
     n = 1
+    # 用于查看几号设备的图
+    start = 2
 
-    title =config['volt_collection'][6:] + "" + action +"_fft"
+    title =config['volt_collection'][6:] + "" + action +"_fft_"+str(start)
     fig = plt.figure(title, figsize=(6,8))
-    fig.suptitle(action+"_fft")
+    fig.suptitle(action+"_fft_"+str(start))
 
     # plot the data that is of a certain action one by one
     for tag in tag_collection.find({'tag': action}):
@@ -70,8 +72,6 @@ def plot_from_db(action, db, volt_collection, tag_collection,port=27017, host='l
         ax.set_ylim(0, 0.0001)
         ax.set_ylabel('Amplitude')
 
-        # 用于查看几号设备的图
-        start = 1
         for i in range(start, start + 1):
             # [v + i*0.2 for v in volts[i]]为了把多个设备的数据隔离开
             # ax.plot(times[i], volts[i], label='device_' + str(i), color=colors[i - 1], alpha=0.9)
