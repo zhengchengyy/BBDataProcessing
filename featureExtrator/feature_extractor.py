@@ -1,13 +1,15 @@
 '''
 修改原有的feature_extractor文件，将按次数处理获得的数据改为按时间段处理
 新增以及改变的代码均使用两行------标识
+使用观察者模式实现特征提取，特征提取器(Subject)依赖于多个特征提取模块(Observer)，特征提取器注册了多个特征提取模块，
+当特征提取器状态改变(获取到新数据)，通知所有特征模块更新状态(计算新的特征值)。
 '''
 
 from abc import ABC, abstractmethod
 from queue import Queue
 
 class ProcessModule(ABC):
-    """抽象类，表示处理数据的模块。
+    """Observer的抽象类，表示处理数据的模块。
     每一个继承ProcessModule的类都包含一个存储数据的队列queue。
     继承该类需要重写processFullQueue方法。
     """
@@ -38,7 +40,7 @@ class ProcessModule(ABC):
         pass
 
     def process(self, value):
-        """接收一个值，将其添加到队列中，如果队列中头尾的数据达到了interval定义的时间差，则进行处理，
+        """Observer的update()，接收一个值，将其添加到队列中，如果队列中头尾的数据达到了interval定义的时间差，则进行处理，
         并在处理后移除rate定义的时间差的。
         """
         self.queue.put(value)
@@ -55,7 +57,7 @@ class ProcessModule(ABC):
 
 
 class FeatureExtractor:
-    """提取特征值的类，该类需要配合ProcessModule使用。
+    """Subject提取特征值的类，该类需要配合ProcessModule使用。
     FeatureExtractor中有一个用于存储ProcessModule的列表，使用register函数可以向列表中添加ProcessModule。
     当FeatureExtractor接受到一个数据的时候，会让该列表中的所有PrcessModule接收这个数据并分别处理。
     """
@@ -68,7 +70,7 @@ class FeatureExtractor:
         self.modules.append(processModule)
 
     def process(self, value):
-        """接收一个value值，让self.modules中的每一个ProcessModule处理该值"""
+        """Subject的notify(),接收一个value值，让self.modules中的每一个ProcessModule处理该值"""
         result = {}
         for module in self.modules:
             output = module.process(value)
