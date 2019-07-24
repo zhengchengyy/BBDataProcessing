@@ -59,3 +59,18 @@ class AverageModule(ProcessModule):
     def clear(self):
         """清理组件中的队列"""
         self.queue.queue.clear()
+
+class RangeModule(ProcessModule):
+    """计算检测到的电压中的极差"""
+
+    FEATURE_NAME = "Range"
+
+    def processFullQueue(self):
+        range = []
+        for i in self.queue.queue:
+            range.append(i['volt'])
+        return max(range) - min(range)
+
+    def clear(self):
+        """清理组件中的队列"""
+        self.queue.queue.clear()

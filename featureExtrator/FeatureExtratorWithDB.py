@@ -97,8 +97,6 @@ if __name__=='__main__':
                 # 把特征数据存入数据库
                 # collection.insert_one(features)
 
-        #清理组件
-        variancemodule.clear()
-        averagemodule.clear()
-        thresholdcounter.clear()
+        # 清理所有模块，防止过期数据
+        extractor.clear()
     

@@ -50,12 +50,12 @@ def read_from_db(action, db, volt_collection, tag_collection,port=27017, host='l
     extractor = FeatureExtractor()
 
     # 定义特征提取模块
-    variancemodule = VarianceModule(interval, rate)
+    rangemodule = RangeModule(interval, rate)
     averagemodule = AverageModule(interval, rate)
     thresholdcounter = ThresholdCounterModule(interval, rate)
 
     # 注册特征提取模块
-    extractor.register(variancemodule)
+    extractor.register(rangemodule)
     extractor.register(averagemodule)
     extractor.register(thresholdcounter)
 
@@ -83,7 +83,7 @@ def read_from_db(action, db, volt_collection, tag_collection,port=27017, host='l
         feature_times, feature_values = {}, {}
         for i in range(1, ndevices + 1):
             feature_times[i] = []
-            feature_values[i] = {'Variance': [], 'Average': [], 'ThresholdCounter': []}
+            feature_values[i] = {'Range': [], 'Average': [], 'ThresholdCounter': []}
 
         # 对每个采集设备进行特征提取
         for i in range(1, ndevices + 1):
@@ -105,10 +105,8 @@ def read_from_db(action, db, volt_collection, tag_collection,port=27017, host='l
                     for feature_type in feature_values[i].keys():
                         feature_values[i][feature_type].append(features['feature_value'][feature_type])
 
-            # 清理组件
-            variancemodule.clear()
-            averagemodule.clear()
-            thresholdcounter.clear()
+            # 清理所有模块，防止过期数据
+            extractor.clear()
 
         # 定义特征数量
         nfeatures = 3
@@ -153,14 +151,6 @@ def read_from_db(action, db, volt_collection, tag_collection,port=27017, host='l
 
         tag_acc += 1
 
-    plt.show()
-
-def draw_from_data(feature_type, feature_time, feature_values, ndevices=5):
-    style.use('default')
-    colors = ['r', 'b', 'g', 'c', 'm']  # m c
-    for i in range(1, ndevices + 1):
-        plt.plot(feature_times[i], feature_values[i]['Variance'], label='device_' + str(i), color=colors[i - 1],
-                 alpha=0.9)
     plt.show()
 
 

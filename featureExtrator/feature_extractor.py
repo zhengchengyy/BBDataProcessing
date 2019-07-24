@@ -78,6 +78,10 @@ class FeatureExtractor:
                 result[module.FEATURE_NAME] = output
         return result
 
+    def clear(self):
+        """清理所有的ProcessModule"""
+        for module in self.modules:
+            module.clear()
 
 class ModuleProcessException(Exception):
     pass
