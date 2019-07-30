@@ -9,7 +9,7 @@ from pymongo import MongoClient
 from matplotlib import pyplot as plt
 from matplotlib import style
 
-config = {'action':'legs_stretch',
+config = {'action':'turn_over',
           'db':'beaglebone',
           'tag_collection':'tags_411',
           'volt_collection':'volts_411'}
@@ -71,14 +71,14 @@ if __name__=='__main__':
     extractor = FeatureExtractor()
 
     # 定义特征提取模块
-    variancemodule = VarianceModule(interval, rate)
+    rangemodule = RangeModule(interval, rate)
     averagemodule = AverageModule(interval, rate)
-    thresholdcounter = ThresholdCounterModule(interval, rate)
+    samplingcounter = SamplingCounterModule(interval, rate)
 
     # 注册特征提取模块
-    extractor.register(variancemodule)
+    extractor.register(rangemodule)
     extractor.register(averagemodule)
-    extractor.register(thresholdcounter)
+    extractor.register(samplingcounter)
 
     # 启动Mongo客户端
     client = MongoClient()
@@ -95,7 +95,7 @@ if __name__=='__main__':
     feature_times, feature_values = {}, {}
     for i in range(1, ndevices + 1):
         feature_times[i] = []
-        feature_values[i] = {'Variance':[],'Average':[],'ThresholdCounter':[]}
+        feature_values[i] = {'Range':[],'Average':[],'SamplingCounter':[]}
 
     # 对每个采集设备进行特征提取
     for i in range(1, ndevices + 1):

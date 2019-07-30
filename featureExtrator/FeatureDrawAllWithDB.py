@@ -23,7 +23,7 @@ def timeToSecond(t):
     stime = time.strftime("%M:%S", time.localtime(t))
     return stime
 
-def read_from_db(action, db, volt_collection, tag_collection,port=27017, host='localhost', ndevices=3, offset=0):
+def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017, host='localhost', ndevices=3, offset=0):
     client = MongoClient(port=port, host=host)
     database = client[db]
     tag_collection = database[tag_collection]
@@ -51,12 +51,12 @@ def read_from_db(action, db, volt_collection, tag_collection,port=27017, host='l
 
     # 定义特征提取模块
     rangemodule = RangeModule(interval, rate)
-    averagemodule = AverageModule(interval, rate)
+    vibrationfreq = VibrationFreqModule(interval, rate)
     thresholdcounter = ThresholdCounterModule(interval, rate)
 
     # 注册特征提取模块
     extractor.register(rangemodule)
-    extractor.register(averagemodule)
+    extractor.register(vibrationfreq)
     extractor.register(thresholdcounter)
 
     # 定义画布左右位置的计数：标签累加，即人数累加
@@ -83,7 +83,7 @@ def read_from_db(action, db, volt_collection, tag_collection,port=27017, host='l
         feature_times, feature_values = {}, {}
         for i in range(1, ndevices + 1):
             feature_times[i] = []
-            feature_values[i] = {'Range': [], 'Average': [], 'ThresholdCounter': []}
+            feature_values[i] = {'Range': [], 'VibrationFreq': [], 'ThresholdCounter': []}
 
         # 对每个采集设备进行特征提取
         for i in range(1, ndevices + 1):
@@ -155,7 +155,7 @@ def read_from_db(action, db, volt_collection, tag_collection,port=27017, host='l
 
 
 if __name__=='__main__':
-    times, volts = read_from_db(action=config['action'],
+    draw_features_from_db(action=config['action'],
                                 db=config['db'],
                                 tag_collection=config['tag_collection'],
                                 volt_collection=config['volt_collection'],

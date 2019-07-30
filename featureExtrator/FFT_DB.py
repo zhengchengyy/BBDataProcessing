@@ -73,10 +73,8 @@ def plot_from_db(action, db, volt_collection, tag_collection,port=27017, host='l
         ax.set_ylabel('Amplitude')
 
         for i in range(start, start + 1):
-            # [v + i*0.2 for v in volts[i]]为了把多个设备的数据隔离开
-            # ax.plot(times[i], volts[i], label='device_' + str(i), color=colors[i - 1], alpha=0.9)
-            result = np.fft.fft(volts[i]) / len(volts[i])
-            ax.plot(range(len(result)), result, label='device_' + str(i), color=colors[i - 1], alpha=0.9)
+            result = np.fft.fft(volts[i]) / len(volts[i])  # 除以长度表示归一化处理
+            ax.plot(range(len(result)), result.real, label='device_' + str(i), color=colors[i - 1], alpha=0.9)
 
         if n  == 1:
             ax.legend(loc='upper right')
