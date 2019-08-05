@@ -6,7 +6,7 @@ import time
 
 import numpy as np
 
-config = {'action':'turn_over',
+config = {'action':'hands_twitch',
           'db':'beaglebone',
           'tag_collection':'tags_411',
           'volt_collection':'volts_411',
@@ -35,7 +35,7 @@ def plot_from_db(action, db, volt_collection, tag_collection,port=27017, host='l
     ntags = tag_collection.count_documents({'tag':action})
     n = 1
     # 用于查看几号设备的图
-    start = 2
+    start = 1
 
     title =config['volt_collection'][6:] + "" + action +"_fft_"+str(start)
     fig = plt.figure(title, figsize=(6,8))
@@ -70,11 +70,13 @@ def plot_from_db(action, db, volt_collection, tag_collection,port=27017, host='l
 
         # 自定义y轴的区间范围，可以使图放大或者缩小
         ax.set_ylim(0, 0.0001)
+        # ax.set_ylim(0, 0.0003)
         ax.set_ylabel('Amplitude')
 
         for i in range(start, start + 1):
             result = np.fft.fft(volts[i]) / len(volts[i])  # 除以长度表示归一化处理
-            ax.plot(range(len(result)), result.real, label='device_' + str(i), color=colors[i - 1], alpha=0.9)
+            freq = np.fft.fftfreq(len(result))
+            ax.plot(abs(freq), result.real, label='device_' + str(i), color=colors[i - 1], alpha=0.9)
 
         if n  == 1:
             ax.legend(loc='upper right')
