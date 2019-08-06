@@ -6,10 +6,10 @@ import time
 
 import numpy as np
 
-config = {'action':'hands_twitch',
+config = {'action':'kick',
           'db':'beaglebone',
-          'tag_collection':'tags_411',
-          'volt_collection':'volts_411',
+          'tag_collection':'tags_424',
+          'volt_collection':'volts_424',
           'offset':0}
 
 def timeToFormat(t):
@@ -20,7 +20,8 @@ def timeToSecond(t):
     stime = time.strftime("%M:%S", time.localtime(t))
     return stime
 
-def plot_from_db(action, db, volt_collection, tag_collection,port=27017, host='localhost', ndevices=5, offset=0):
+def plot_from_db(action, db, volt_collection, tag_collection,port=27017, host='localhost',
+                 ndevices=5, offset=0):
     client = MongoClient(port=port, host=host)
     database = client[db]
     tag_collection = database[tag_collection]
@@ -28,7 +29,7 @@ def plot_from_db(action, db, volt_collection, tag_collection,port=27017, host='l
 
     try:
         if volt_collection.count_documents({}) + tag_collection.count_documents({}) < 2:
-            raise CollectionError('Collection not found, please check names of the collection and database')
+            raise CollectionError('Collection not found!')
     except CollectionError as e:
         print(e.message)
 
@@ -66,17 +67,21 @@ def plot_from_db(action, db, volt_collection, tag_collection,port=27017, host='l
         # plot, add_subplot(211)将画布分割成2行1列，图像画在从左到右从上到下的第1块
         ax = fig.add_subplot(base+n)
         plt.subplots_adjust(hspace=0.5)  # 函数中的wspace是子图之间的垂直间距，hspace是子图的上下间距
-        ax.set_title("Person" + subtitle[n - 1] + ": " + timeToFormat(inittime + offset) + " ~ " + timeToFormat(termtime + offset))
+        ax.set_title("Person" + subtitle[n - 1] + ": " + timeToFormat(inittime + offset)
+                     + " ~ " + timeToFormat(termtime + offset))
 
         # 自定义y轴的区间范围，可以使图放大或者缩小
         ax.set_ylim(0, 0.0001)
         # ax.set_ylim(0, 0.0003)
+        # ax.set_ylim(0, 1)
         ax.set_ylabel('Amplitude')
 
         for i in range(start, start + 1):
             result = np.fft.fft(volts[i]) / len(volts[i])  # 除以长度表示归一化处理
+            print(result)
             freq = np.fft.fftfreq(len(result))
-            ax.plot(abs(freq), result.real, label='device_' + str(i), color=colors[i - 1], alpha=0.9)
+            ax.plot(abs(freq), result.real, label='device_' + str(i),
+                    color=colors[i - 1], alpha=0.9)
 
         if n  == 1:
             ax.legend(loc='upper right')

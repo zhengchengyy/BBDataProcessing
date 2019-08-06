@@ -13,7 +13,8 @@ class VibrationFreqModule(ProcessModule):
             volts.append(i['volt'])
         import numpy as np
         result = np.fft.fft(volts) / len(volts)
-        return self.get_average(result.real)
+        # return self.get_average(result.real)
+        return max(result.real)-min(result.real)
 
     def get_average(self, list):
         sum = 0

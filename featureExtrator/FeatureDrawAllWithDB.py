@@ -12,8 +12,8 @@ import numpy as np
 
 config = {'action':'turn_over',
           'db':'beaglebone',
-          'tag_collection':'tags_411',
-          'volt_collection':'volts_411',
+          'tag_collection':'tags_424',
+          'volt_collection':'volts_424',
           'offset':0}
 
 def timeToFormat(t):
@@ -25,7 +25,7 @@ def timeToSecond(t):
     return stime
 
 def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017,
-                          host='localhost', ndevices=3, offset=0):
+                          host='localhost', ndevices=5, offset=0):
     client = MongoClient(port=port, host=host)
     database = client[db]
     tag_collection = database[tag_collection]
@@ -133,21 +133,21 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
                 ax.plot(feature_times[i], feature_values[i][feature_type],
                         label='device_' + str(i), color=colors[i - 1], alpha=0.9)
 
-                # 获取最大最小值，并且打上标记
-                max_index = np.argmax(feature_values[i][feature_type])
-                min_index = np.argmin(feature_values[i][feature_type])
-                ax.plot(feature_times[i][max_index],feature_values[i][feature_type][max_index],'rs')
-                show_max = str(i)+":"+str(round(feature_values[i][feature_type][max_index],6))
-                # xy=(横坐标，纵坐标)  箭头尖端, xytext=(横坐标，纵坐标) 文字的坐标，指的是最左边的坐标
-                # https://blog.csdn.net/qq_30638831/article/details/79938967
-                plt.annotate(show_max, xy=(feature_times[i][max_index],
-                    feature_values[i][feature_type][max_index]),
-                    xytext=(feature_times[i][max_index], feature_values[i][feature_type][max_index]))
-                ax.plot(feature_times[i][min_index], feature_values[i][feature_type][min_index], 'gs')
-                show_min = str(i)+":"+str(round(feature_values[i][feature_type][min_index],6))
-                plt.annotate(show_min, xy=(feature_times[i][min_index],
-                    feature_values[i][feature_type][min_index]),
-                    xytext=(feature_times[i][min_index], feature_values[i][feature_type][min_index]))
+                # # 获取最大最小值，并且打上标记
+                # max_index = np.argmax(feature_values[i][feature_type])
+                # min_index = np.argmin(feature_values[i][feature_type])
+                # ax.plot(feature_times[i][max_index],feature_values[i][feature_type][max_index],'rs')
+                # show_max = str(i)+":"+str(round(feature_values[i][feature_type][max_index],6))
+                # # xy=(横坐标，纵坐标)  箭头尖端, xytext=(横坐标，纵坐标) 文字的坐标，指的是最左边的坐标
+                # # https://blog.csdn.net/qq_30638831/article/details/79938967
+                # plt.annotate(show_max, xy=(feature_times[i][max_index],
+                #     feature_values[i][feature_type][max_index]),
+                #     xytext=(feature_times[i][max_index], feature_values[i][feature_type][max_index]))
+                # ax.plot(feature_times[i][min_index], feature_values[i][feature_type][min_index], 'gs')
+                # show_min = str(i)+":"+str(round(feature_values[i][feature_type][min_index],6))
+                # plt.annotate(show_min, xy=(feature_times[i][min_index],
+                #     feature_values[i][feature_type][min_index]),
+                #     xytext=(feature_times[i][min_index], feature_values[i][feature_type][min_index]))
 
             # 设置每个数据对应的图像名称
             if fea_acc == 1 and tag_acc == 2:
