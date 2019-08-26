@@ -9,7 +9,7 @@ from pymongo import MongoClient
 from matplotlib import pyplot as plt
 from matplotlib import style
 
-config = {'action':'turn_over',
+config = {'action':'head_move',
           'db':'beaglebone',
           'tag_collection':'tags_411',
           'volt_collection':'volts_411'}

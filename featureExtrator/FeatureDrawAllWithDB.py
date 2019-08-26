@@ -12,8 +12,8 @@ import numpy as np
 
 config = {'action':'turn_over',
           'db':'beaglebone',
-          'tag_collection':'tags_424',
-          'volt_collection':'volts_424',
+          'tag_collection':'tags_411',
+          'volt_collection':'volts_411',
           'offset':0}
 
 def timeToFormat(t):
@@ -54,12 +54,12 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
     # 定义特征提取模块
     rangemodule = RangeModule(interval, rate)
     vibrationfreq = VibrationFreqModule(interval, rate)
-    thresholdcounter = ThresholdCounterModule(interval, rate)
+    duration = DurationModule(interval, rate)
 
     # 注册特征提取模块
     extractor.register(rangemodule)
     extractor.register(vibrationfreq)
-    extractor.register(thresholdcounter)
+    extractor.register(duration)
 
     # 定义画布左右位置的计数：标签累加，即人数累加
     tag_acc = 1
@@ -85,10 +85,13 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
         feature_times, feature_values = {}, {}
         for i in range(1, ndevices + 1):
             feature_times[i] = []
-            feature_values[i] = {'Range': [], 'VibrationFreq': [], 'ThresholdCounter': []}
+            feature_values[i] = {'Range': [], 'VibrationFreq': [], 'Duration': []}
 
-        # 对每个采集设备进行特征提取
-        for i in range(1, ndevices + 1):
+        # 提取第几个设备的特征
+        start = 3
+
+        # 对每个采集设备进行特征提取 ndevices
+        for i in range(start, start + 1):
             for j in range(len(volts[i])):
                 value = {
                     "time": times[i][j],
@@ -121,14 +124,13 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
         # fig.suptitle("Person" + subtitle[tag_acc - 1] + ": " + timeToFormat(inittime + offset)
         #              + " ~ " + timeToFormat(termtime + offset))
 
-
         for feature_type in feature_values[1].keys():
             # plot, add_subplot(311)将画布分割成3行1列，图像画在从左到右从上到下的第1块
             ax = fig.add_subplot(base + tag_acc + (fea_acc-1) * ntags)
             plt.subplots_adjust(hspace=0.5)  # 函数中的wspace是子图之间的垂直间距，hspace是子图的上下间距
             ax.set_title(feature_type)
 
-            for i in range(1, ndevices + 1):
+            for i in range(start, start + 1):
                 ax.set_xlim(feature_times[i][0], feature_times[i][-1])
                 ax.plot(feature_times[i], feature_values[i][feature_type],
                         label='device_' + str(i), color=colors[i - 1], alpha=0.9)
@@ -159,11 +161,11 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
             # 以第一个设备的时间数据为准，数据的每1/10添加一个x轴标签
             xticks = []
             xticklabels = []
-            length = len(feature_times[1])
-            interval = length // 10 - 1
-            for i in range(0, length, interval):
-                xticks.append(feature_times[1][i])
-                xticklabels.append(timeToSecond(feature_times[1][i] + offset))
+            length = len(feature_times[i])
+            interval = length // 8 - 1
+            for k in range(0, length, interval):
+                xticks.append(feature_times[i][k])
+                xticklabels.append(timeToSecond(feature_times[i][k] + offset))
             # 设定标签的实际数字，数据类型必须和原数据一致
             ax.set_xticks(xticks)
             # 设定我们希望它显示的结果，xticks和xticklabels的元素一一对应

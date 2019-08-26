@@ -43,6 +43,28 @@ class RangeModule(ProcessModule):
         self.queue.queue.clear()
 
 
+class DurationModule(ProcessModule):
+    """计算从最大值到最小值所花的时间"""
+
+    FEATURE_NAME = "Duration"
+
+    def processFullQueue(self):
+        import sys
+        max = 0
+        min = sys.maxsize
+        for i in self.queue.queue:
+            if(i['volt']>max):
+                max = i['volt']
+                max_time = i['time']
+            if(i['volt']<min):
+                min = i['volt']
+                min_time = i['time']
+        return 2-abs(max_time-min_time)
+
+    def clear(self):
+        """清理组件中的队列"""
+        self.queue.queue.clear()
+
 class SamplingCounterModule(ProcessModule):
     """计算设备指定采样时间间隔内采样的数量"""
 

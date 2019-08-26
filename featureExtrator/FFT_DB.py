@@ -6,10 +6,10 @@ import time
 
 import numpy as np
 
-config = {'action':'kick',
+config = {'action':'turn_over',
           'db':'beaglebone',
-          'tag_collection':'tags_424',
-          'volt_collection':'volts_424',
+          'tag_collection':'tags_411',
+          'volt_collection':'volts_411',
           'offset':0}
 
 def timeToFormat(t):
@@ -36,7 +36,7 @@ def plot_from_db(action, db, volt_collection, tag_collection,port=27017, host='l
     ntags = tag_collection.count_documents({'tag':action})
     n = 1
     # 用于查看几号设备的图
-    start = 1
+    start = 3
 
     title =config['volt_collection'][6:] + "" + action +"_fft_"+str(start)
     fig = plt.figure(title, figsize=(6,8))
@@ -71,16 +71,19 @@ def plot_from_db(action, db, volt_collection, tag_collection,port=27017, host='l
                      + " ~ " + timeToFormat(termtime + offset))
 
         # 自定义y轴的区间范围，可以使图放大或者缩小
-        ax.set_ylim(0, 0.0001)
+        ax.set_ylim(0, 0.001)
         # ax.set_ylim(0, 0.0003)
         # ax.set_ylim(0, 1)
         ax.set_ylabel('Amplitude')
 
         for i in range(start, start + 1):
-            result = np.fft.fft(volts[i]) / len(volts[i])  # 除以长度表示归一化处理
-            print(result)
-            freq = np.fft.fftfreq(len(result))
-            ax.plot(abs(freq), result.real, label='device_' + str(i),
+            # fft返回值实部表示
+            result = np.fft.fft(volts[i]) # 除以长度表示归一化处理
+            # fftfreq第一个参数n是FFT的点数，一般取FFT之后的数据的长度（size）
+            # 第二个参数d是采样周期，其倒数就是采样频率Fs，即d=1/Fs
+            freq = np.fft.fftfreq(len(result), d=1/70)
+            amplitude = np.sqrt(result.real**2+result.imag**2) / (len(volts[i])/2)
+            ax.plot(abs(freq), amplitude, label='device_' + str(i),
                     color=colors[i - 1], alpha=0.9)
 
         if n  == 1:

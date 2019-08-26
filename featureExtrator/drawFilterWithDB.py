@@ -2,6 +2,7 @@ from pymongo import MongoClient
 from matplotlib import pyplot as plt
 from matplotlib import style
 from exceptions import CollectionError
+from scipy import signal
 import time
 
 config = {'action':'legs_stretch',
@@ -33,19 +34,20 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
     ntags = tag_collection.count_documents({'tag':action})
     n = 1
 
-    title =config['volt_collection'][6:] + "" + action
+    title =config['volt_collection'][6:] + "" + action + "_filter"
     fig = plt.figure(title, figsize=(6,8))
-    fig.suptitle(action)
+    fig.suptitle(action+"_filter")
 
     # plot the data that is of a certain action one by one
     for tag in tag_collection.find({'tag': action}):
         # inittime
         inittime, termtime = tag['inittime']-offset, tag['termtime']-offset
         # get the arrays according to which we will plot later
-        times, volts = {}, {}
+        times, volts, filter_volts = {}, {}, {}
         for i in range(1, ndevices + 1):
             times[i] = []
             volts[i] = []
+            filter_volts[i] = []
 
         for volt in volt_collection.find({'time': {'$gt': inittime,'$lt': termtime}}):
             device_no = int(volt['device_no'])
@@ -73,8 +75,13 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
 
         for i in range(1, ndevices + 1):
             # [v + i*0.2 for v in volts[i]]为了把多个设备的数据隔离开
-            ax.plot(times[i], volts[i], label='device_' + str(i), color=colors[i - 1], alpha=0.9)
+            b, a = signal.butter(4, 2/7, 'lowpass') #配置滤波器，8表示滤波器的阶数
+            filter_volts[i] = signal.lfilter(b, a, volts[i])
+            # b, a = signal.butter(4, 6/70, 'highpass')
+            # filter_volts[i] = signal.lfilter(b, a, volts[i])
+            ax.plot(times[i], filter_volts[i], label='device_' + str(i), color=colors[i - 1], alpha=0.9)
 
+        # print(str(volts[1][3])+"&&"+str(filter_volts[1][3]))
         if n  == 1:
             ax.legend(loc='upper right')
         if n == ntags:
