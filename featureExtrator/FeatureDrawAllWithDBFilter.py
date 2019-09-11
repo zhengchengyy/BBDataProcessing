@@ -8,6 +8,9 @@ from pymongo import MongoClient
 
 from matplotlib import pyplot as plt
 from matplotlib import style
+import numpy as np
+
+from scipy import signal
 
 config = {'action':'turn_over',
           'db':'beaglebone',
@@ -23,7 +26,8 @@ def timeToSecond(t):
     stime = time.strftime("%M:%S", time.localtime(t))
     return stime
 
-def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017, host='localhost', ndevices=3, offset=0):
+def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017,
+                          host='localhost', ndevices=5, offset=0):
     client = MongoClient(port=port, host=host)
     database = client[db]
     tag_collection = database[tag_collection]
@@ -31,7 +35,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
 
     try:
         if volt_collection.count_documents({}) + tag_collection.count_documents({}) < 2:
-            raise CollectionError('Collection not found, please check names of the collection and database')
+            raise CollectionError('Collection not found！')
     except CollectionError as e:
         print(e.message)
 
@@ -43,8 +47,8 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
 
     # 根据时间采集数据，基本单位为s，比如1s、10s、30s、60s
     # interval表示每次分析的时间跨度，rate表示间隔多长时间进行一次分析
-    interval = 1
-    rate = 1
+    interval = 2
+    rate = 2
 
     # 定义特征提取器
     extractor = FeatureExtractor()
@@ -52,12 +56,12 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
     # 定义特征提取模块
     rangemodule = RangeModule(interval, rate)
     vibrationfreq = VibrationFreqModule(interval, rate)
-    thresholdcounter = ThresholdCounterModule(interval, rate)
+    samplingcounter = SamplingCounterModule(interval, rate)
 
     # 注册特征提取模块
     extractor.register(rangemodule)
     extractor.register(vibrationfreq)
-    extractor.register(thresholdcounter)
+    extractor.register(samplingcounter)
 
     # 定义画布左右位置的计数：标签累加，即人数累加
     tag_acc = 1
@@ -67,10 +71,11 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
         inittime, termtime = tag['inittime'], tag['termtime']
 
         # get the arrays according to which we will plot later
-        times, volts = {}, {}
+        times, volts, filter_volts = {}, {}, {}
         for i in range(1, ndevices + 1):
             times[i] = []
             volts[i] = []
+            filter_volts[i] = []
 
         for volt in volt_collection.find({'time': {'$gt': inittime,'$lt': termtime}}):
             device_no = int(volt['device_no'])
@@ -79,18 +84,26 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
             times[device_no].append(time)
             volts[device_no].append(v)
 
+        # 滤波
+        for i in range(1, ndevices + 1):
+            b, a = signal.butter(1, 4 / 7, 'lowpass')  # 配置滤波器，8表示滤波器的阶数
+            filter_volts[i] = signal.lfilter(b, a, volts[i])
+
         # 定义存储时间、特征列表
         feature_times, feature_values = {}, {}
         for i in range(1, ndevices + 1):
             feature_times[i] = []
-            feature_values[i] = {'Range': [], 'VibrationFreq': [], 'ThresholdCounter': []}
+            feature_values[i] = {'Range': [], 'VibrationFreq': [], 'SamplingCounter': []}
 
-        # 对每个采集设备进行特征提取
-        for i in range(1, ndevices + 1):
+        # 提取第几个设备的特征
+        start = 3
+
+        # 对每个采集设备进行特征提取 ndevices
+        for i in range(start, start + 1):
             for j in range(len(volts[i])):
                 value = {
                     "time": times[i][j],
-                    "volt": volts[i][j]
+                    "volt": filter_volts[i][j]
                 }
                 output = extractor.process(value)
                 if (output):
@@ -119,17 +132,32 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
         # fig.suptitle("Person" + subtitle[tag_acc - 1] + ": " + timeToFormat(inittime + offset)
         #              + " ~ " + timeToFormat(termtime + offset))
 
-
         for feature_type in feature_values[1].keys():
             # plot, add_subplot(311)将画布分割成3行1列，图像画在从左到右从上到下的第1块
             ax = fig.add_subplot(base + tag_acc + (fea_acc-1) * ntags)
             plt.subplots_adjust(hspace=0.5)  # 函数中的wspace是子图之间的垂直间距，hspace是子图的上下间距
             ax.set_title(feature_type)
 
-            for i in range(1, ndevices + 1):
+            for i in range(start, start + 1):
                 ax.set_xlim(feature_times[i][0], feature_times[i][-1])
                 ax.plot(feature_times[i], feature_values[i][feature_type],
                         label='device_' + str(i), color=colors[i - 1], alpha=0.9)
+
+                # # 获取最大最小值，并且打上标记
+                # max_index = np.argmax(feature_values[i][feature_type])
+                # min_index = np.argmin(feature_values[i][feature_type])
+                # ax.plot(feature_times[i][max_index],feature_values[i][feature_type][max_index],'rs')
+                # show_max = str(i)+":"+str(round(feature_values[i][feature_type][max_index],6))
+                # # xy=(横坐标，纵坐标)  箭头尖端, xytext=(横坐标，纵坐标) 文字的坐标，指的是最左边的坐标
+                # # https://blog.csdn.net/qq_30638831/article/details/79938967
+                # plt.annotate(show_max, xy=(feature_times[i][max_index],
+                #     feature_values[i][feature_type][max_index]),
+                #     xytext=(feature_times[i][max_index], feature_values[i][feature_type][max_index]))
+                # ax.plot(feature_times[i][min_index], feature_values[i][feature_type][min_index], 'gs')
+                # show_min = str(i)+":"+str(round(feature_values[i][feature_type][min_index],6))
+                # plt.annotate(show_min, xy=(feature_times[i][min_index],
+                #     feature_values[i][feature_type][min_index]),
+                #     xytext=(feature_times[i][min_index], feature_values[i][feature_type][min_index]))
 
             # 设置每个数据对应的图像名称
             if fea_acc == 1 and tag_acc == 2:
@@ -141,13 +169,15 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
             # 以第一个设备的时间数据为准，数据的每1/10添加一个x轴标签
             xticks = []
             xticklabels = []
-            length = len(feature_times[1])
-            interval = length // 10 - 1
-            for i in range(0, length, interval):
-                xticks.append(feature_times[1][i])
-                xticklabels.append(timeToSecond(feature_times[1][i] + offset))
-            ax.set_xticks(xticks)  # 设定标签的实际数字，数据类型必须和原数据一致
-            ax.set_xticklabels(xticklabels, rotation=15)  # 设定我们希望它显示的结果，xticks和xticklabels的元素一一对应
+            length = len(feature_times[i])
+            interval = length // 8 - 1
+            for k in range(0, length, interval):
+                xticks.append(feature_times[i][k])
+                xticklabels.append(timeToSecond(feature_times[i][k] + offset))
+            # 设定标签的实际数字，数据类型必须和原数据一致
+            ax.set_xticks(xticks)
+            # 设定我们希望它显示的结果，xticks和xticklabels的元素一一对应
+            ax.set_xticklabels(xticklabels, rotation=15)
 
         tag_acc += 1
 

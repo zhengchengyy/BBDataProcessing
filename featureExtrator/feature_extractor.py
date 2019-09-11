@@ -17,11 +17,12 @@ class ProcessModule(ABC):
 #改变为时间存储后，构造函数改变为如下
 #------
     def __init__(self, interval = 1, rate = 0.5, size = 0):
-        """构造方法中，参数中的interval表示每次分析的时间跨度，
-        rate表示间隔多长时间进行一次分析
+        """构造方法中，参数中的interval表示每次特征提取的时间跨度，
+        rate表示间隔多长时间进行一次特征提取，
         上述参数的单位均为秒
         """
-        if (isinstance(interval, float) or isinstance(interval, int)) and (isinstance(rate, float) or isinstance(rate, int)):
+        if (isinstance(interval, float) or isinstance(interval, int)) \
+                and (isinstance(rate, float) or isinstance(rate, int)):
             if interval <= 0 or rate <=0 or rate > interval:
                 raise ModuleProcessException("Illegal rate or interval.")
         else:
@@ -40,8 +41,9 @@ class ProcessModule(ABC):
         pass
 
     def process(self, value):
-        """Observer的update()，接收一个值，将其添加到队列中，如果队列中头尾的数据达到了interval定义的时间差，则进行处理，
-        并在处理后移除rate定义的时间差的。
+        """Observer的update()，接收一个字典值{time:t,volt:v}，将其添加到队列中，
+        如果队列中头尾的数据达到了interval定义的时间差，则进行处理，
+        并在处理后移除rate定义的时间差的数据。
         """
         self.queue.put(value)
         self.size +=1

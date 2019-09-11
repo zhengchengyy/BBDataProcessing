@@ -54,12 +54,12 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
     # 定义特征提取模块
     rangemodule = RangeModule(interval, rate)
     vibrationfreq = VibrationFreqModule(interval, rate)
-    duration = DurationModule(interval, rate)
+    samplingcounter = SamplingCounterModule(interval, rate)
 
     # 注册特征提取模块
     extractor.register(rangemodule)
     extractor.register(vibrationfreq)
-    extractor.register(duration)
+    extractor.register(samplingcounter)
 
     # 定义画布左右位置的计数：标签累加，即人数累加
     tag_acc = 1
@@ -85,13 +85,13 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
         feature_times, feature_values = {}, {}
         for i in range(1, ndevices + 1):
             feature_times[i] = []
-            feature_values[i] = {'Range': [], 'VibrationFreq': [], 'Duration': []}
+            feature_values[i] = {'Range': [], 'VibrationFreq': [], 'SamplingCounter': []}
 
         # 提取第几个设备的特征
-        start = 3
+        start = 1
 
         # 对每个采集设备进行特征提取 ndevices
-        for i in range(start, start + 1):
+        for i in range(start, 5 + 1):
             for j in range(len(volts[i])):
                 value = {
                     "time": times[i][j],
@@ -130,7 +130,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
             plt.subplots_adjust(hspace=0.5)  # 函数中的wspace是子图之间的垂直间距，hspace是子图的上下间距
             ax.set_title(feature_type)
 
-            for i in range(start, start + 1):
+            for i in range(start, 3 + 1):
                 ax.set_xlim(feature_times[i][0], feature_times[i][-1])
                 ax.plot(feature_times[i], feature_values[i][feature_type],
                         label='device_' + str(i), color=colors[i - 1], alpha=0.9)

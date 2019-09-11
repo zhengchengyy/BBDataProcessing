@@ -12,9 +12,16 @@ class VibrationFreqModule(ProcessModule):
         for i in self.queue.queue:
             volts.append(i['volt'])
         import numpy as np
-        result = np.fft.fft(volts) / len(volts)
-        # return self.get_average(result.real)
-        return max(result.real)-min(result.real)
+        # fft返回值实部表示
+        result = np.fft.fft(volts)  # 除以长度表示归一化处理
+        # fftfreq第一个参数n是FFT的点数，一般取FFT之后的数据的长度（size）
+        # 第二个参数d是采样周期，其倒数就是采样频率Fs，即d=1/Fs
+        freq = np.fft.fftfreq(len(result), d = 1/70)
+        amplitude = np.sqrt(result.real ** 2 + result.imag ** 2) / (len(volts) / 2)
+        sum = 0
+        for i in abs(amplitude):
+            sum += i
+        return sum/len(volts)
 
     def get_average(self, list):
         sum = 0
@@ -71,10 +78,8 @@ class SamplingCounterModule(ProcessModule):
     FEATURE_NAME = "SamplingCounter"
 
     def processFullQueue(self):
-        sampling = []
-        for i in self.queue.queue:
-            sampling.append(i['volt'])
-        return len(sampling)
+        # 使用self.size得到了不一样的容量大小
+        return len(self.queue.queue)/self.interval
 
     def clear(self):
         """清理组件中的队列"""
