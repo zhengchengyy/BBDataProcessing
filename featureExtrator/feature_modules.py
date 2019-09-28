@@ -16,12 +16,44 @@ class VibrationFreqModule(ProcessModule):
         result = np.fft.fft(volts)  # 除以长度表示归一化处理
         # fftfreq第一个参数n是FFT的点数，一般取FFT之后的数据的长度（size）
         # 第二个参数d是采样周期，其倒数就是采样频率Fs，即d=1/Fs
-        freq = np.fft.fftfreq(len(result), d = 1/70)
+        freq = np.fft.fftfreq(len(result), d=1 / 70)
+        amplitude = np.sqrt(result.real ** 2 + result.imag ** 2) / (len(volts) / 2)
+        sum = 0
+        for f, a in zip(freq, amplitude):
+            sum += abs(f) * a
+        return sum / len(freq)
+
+    def get_average(self, list):
+        sum = 0
+        for item in list:
+            sum += item
+        return sum / len(list)
+
+    def clear(self):
+        """清理组件中的队列"""
+        self.queue.queue.clear()
+
+
+class EnergyModule(ProcessModule):
+    """计算检测到的电压中的能量：指定时间间隔内不同频率对应的幅值之和"""
+
+    FEATURE_NAME = "Energy"
+
+    def processFullQueue(self):
+        volts = []
+        for i in self.queue.queue:
+            volts.append(i['volt'])
+        import numpy as np
+        # fft返回值实部表示
+        result = np.fft.fft(volts)  # 除以长度表示归一化处理
+        # fftfreq第一个参数n是FFT的点数，一般取FFT之后的数据的长度（size）
+        # 第二个参数d是采样周期，其倒数就是采样频率Fs，即d=1/Fs
+        freq = np.fft.fftfreq(len(result), d=1 / 70)
         amplitude = np.sqrt(result.real ** 2 + result.imag ** 2) / (len(volts) / 2)
         sum = 0
         for i in abs(amplitude):
             sum += i
-        return sum/len(volts)
+        return sum
 
     def get_average(self, list):
         sum = 0
@@ -60,26 +92,27 @@ class DurationModule(ProcessModule):
         max = 0
         min = sys.maxsize
         for i in self.queue.queue:
-            if(i['volt']>max):
+            if (i['volt'] > max):
                 max = i['volt']
                 max_time = i['time']
-            if(i['volt']<min):
+            if (i['volt'] < min):
                 min = i['volt']
                 min_time = i['time']
-        return 2-abs(max_time-min_time)
+        return 2 - abs(max_time - min_time)
 
     def clear(self):
         """清理组件中的队列"""
         self.queue.queue.clear()
 
-class SamplingCounterModule(ProcessModule):
+
+class SamplingFreqModule(ProcessModule):
     """计算设备指定采样时间间隔内采样的数量"""
 
-    FEATURE_NAME = "SamplingCounter"
+    FEATURE_NAME = "SamplingFreq"
 
     def processFullQueue(self):
         # 使用self.size得到了不一样的容量大小
-        return len(self.queue.queue)/self.interval
+        return len(self.queue.queue) / self.interval
 
     def clear(self):
         """清理组件中的队列"""
@@ -96,11 +129,14 @@ class ThresholdCounterModule(ProcessModule):
     def processFullQueue(self):
         count = 0
         sum = 0
+        # for value in self.queue.queue:
+        #     sum = sum + value['volt']
+        # average = sum / self.size
+        # for value in self.queue.queue:
+        #     if value['volt'] > average:
+        #         count += 1
         for value in self.queue.queue:
-            sum = sum + value['volt']
-        average = sum / self.size
-        for value in self.queue.queue:
-            if value['volt'] > average:
+            if value['volt'] >= self.UPPER_THRESHOLD or value['volt'] <= self.LOWER_THRESHOLD:
                 count += 1
         return count
 
@@ -120,7 +156,7 @@ class AverageModule(ProcessModule):
         sum = 0
         for value in self.queue.queue:
             sum = sum + value['volt']
-        return sum/self.size
+        return sum / self.size
 
     def clear(self):
         """清理组件中的队列"""
@@ -138,12 +174,11 @@ class VarianceModule(ProcessModule):
         variance = 0
         for value in self.queue.queue:
             sum = sum + value['volt']
-        average = sum/self.size
+        average = sum / self.size
         for value in self.queue.queue:
             variance = variance + (value['volt'] - average) ** 2
-        return variance/self.size
+        return variance / self.size
 
     def clear(self):
         """清理组件中的队列"""
         self.queue.queue.clear()
-

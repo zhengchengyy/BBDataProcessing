@@ -8,22 +8,23 @@
 from abc import ABC, abstractmethod
 from queue import Queue
 
+
 class ProcessModule(ABC):
     """Observer的抽象类，表示处理数据的模块。
     每一个继承ProcessModule的类都包含一个存储数据的队列queue。
     继承该类需要重写processFullQueue方法。
     """
 
-#改变为时间存储后，构造函数改变为如下
-#------
-    def __init__(self, interval = 1, rate = 0.5, size = 0):
+    # 改变为时间存储后，构造函数改变为如下
+    # ------
+    def __init__(self, interval=1, rate=0.5, size=0):
         """构造方法中，参数中的interval表示每次特征提取的时间跨度，
         rate表示间隔多长时间进行一次特征提取，
         上述参数的单位均为秒
         """
         if (isinstance(interval, float) or isinstance(interval, int)) \
                 and (isinstance(rate, float) or isinstance(rate, int)):
-            if interval <= 0 or rate <=0 or rate > interval:
+            if interval <= 0 or rate <= 0 or rate > interval:
                 raise ModuleProcessException("Illegal rate or interval.")
         else:
             raise ModuleProcessException("Interval and rate both should be float or int.")
@@ -31,9 +32,10 @@ class ProcessModule(ABC):
         self.rate = rate
         self.size = size
         # 考虑采集数据频率可能变化,且分析时间会变化，因此不设定队列最大长度
-        self.queue = Queue(maxsize = 0)
+        self.queue = Queue(maxsize=0)
         super(ProcessModule, self).__init__()
-#------
+
+    # ------
 
     @abstractmethod
     def processFullQueue(self):
@@ -46,8 +48,8 @@ class ProcessModule(ABC):
         并在处理后移除rate定义的时间差的数据。
         """
         self.queue.put(value)
-        self.size +=1
-        if value['time'] - self.queue.queue[0]['time'] > self.interval:
+        self.size += 1
+        if value['time'] - self.queue.queue[0]['time'] >= self.interval:
             result = self.processFullQueue()
             t = value['time']
             t_0 = self.queue.queue[0]['time']
@@ -84,6 +86,7 @@ class FeatureExtractor:
         """清理所有的ProcessModule"""
         for module in self.modules:
             module.clear()
+
 
 class ModuleProcessException(Exception):
     pass

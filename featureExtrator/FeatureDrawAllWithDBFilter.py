@@ -12,21 +12,24 @@ import numpy as np
 
 from scipy import signal
 
-config = {'action':'turn_over',
-          'db':'beaglebone',
-          'tag_collection':'tags_411',
-          'volt_collection':'volts_411',
-          'offset':0}
+config = {'action': 'turn_over',
+          'db': 'beaglebone',
+          'tag_collection': 'tags_411',
+          'volt_collection': 'volts_411',
+          'offset': 0}
+
 
 def timeToFormat(t):
     ftime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t))
     return ftime
 
+
 def timeToSecond(t):
     stime = time.strftime("%M:%S", time.localtime(t))
     return stime
 
-def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017,
+
+def draw_features_from_db(action, db, volt_collection, tag_collection, port=27017,
                           host='localhost', ndevices=5, offset=0):
     client = MongoClient(port=port, host=host)
     database = client[db]
@@ -39,7 +42,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
     except CollectionError as e:
         print(e.message)
 
-    ntags = tag_collection.count_documents({'tag':action})
+    ntags = tag_collection.count_documents({'tag': action})
 
     title = config['volt_collection'][6:] + "" + action + "_features"
     fig = plt.figure(title, figsize=(6, 8))
@@ -56,12 +59,12 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
     # 定义特征提取模块
     rangemodule = RangeModule(interval, rate)
     vibrationfreq = VibrationFreqModule(interval, rate)
-    samplingcounter = SamplingCounterModule(interval, rate)
+    samplingfreq = SamplingFreqModule(interval, rate)
 
     # 注册特征提取模块
     extractor.register(rangemodule)
     extractor.register(vibrationfreq)
-    extractor.register(samplingcounter)
+    extractor.register(samplingfreq)
 
     # 定义画布左右位置的计数：标签累加，即人数累加
     tag_acc = 1
@@ -77,7 +80,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
             volts[i] = []
             filter_volts[i] = []
 
-        for volt in volt_collection.find({'time': {'$gt': inittime,'$lt': termtime}}):
+        for volt in volt_collection.find({'time': {'$gt': inittime, '$lt': termtime}}):
             device_no = int(volt['device_no'])
             v = volt['voltage']
             time = volt['time']
@@ -86,14 +89,14 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
 
         # 滤波
         for i in range(1, ndevices + 1):
-            b, a = signal.butter(1, 4 / 7, 'lowpass')  # 配置滤波器，8表示滤波器的阶数
+            b, a = signal.butter(8, 4 / 7, 'lowpass')  # 配置滤波器，8表示滤波器的阶数
             filter_volts[i] = signal.lfilter(b, a, volts[i])
 
         # 定义存储时间、特征列表
         feature_times, feature_values = {}, {}
         for i in range(1, ndevices + 1):
             feature_times[i] = []
-            feature_values[i] = {'Range': [], 'VibrationFreq': [], 'SamplingCounter': []}
+            feature_values[i] = {'Range': [], 'VibrationFreq': [], 'SamplingFreq': []}
 
         # 提取第几个设备的特征
         start = 3
@@ -125,7 +128,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
         nfeatures = 3
         # 定义画布上下位置的计数，即特征累加
         fea_acc = 1
-        base = nfeatures * 100 + ntags*10
+        base = nfeatures * 100 + ntags * 10
         style.use('default')
         colors = ['r', 'b', 'g', 'c', 'm']  # m c
         # subtitle = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
@@ -134,7 +137,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
 
         for feature_type in feature_values[1].keys():
             # plot, add_subplot(311)将画布分割成3行1列，图像画在从左到右从上到下的第1块
-            ax = fig.add_subplot(base + tag_acc + (fea_acc-1) * ntags)
+            ax = fig.add_subplot(base + tag_acc + (fea_acc - 1) * ntags)
             plt.subplots_adjust(hspace=0.5)  # 函数中的wspace是子图之间的垂直间距，hspace是子图的上下间距
             ax.set_title(feature_type)
 
@@ -184,9 +187,9 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
     plt.show()
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
     draw_features_from_db(action=config['action'],
-                                db=config['db'],
-                                tag_collection=config['tag_collection'],
-                                volt_collection=config['volt_collection'],
-                                offset=config['offset'])
+                          db=config['db'],
+                          tag_collection=config['tag_collection'],
+                          volt_collection=config['volt_collection'],
+                          offset=config['offset'])

@@ -6,12 +6,13 @@ from pymongo import MongoClient
 from exceptions import CollectionError
 from pymongo import MongoClient
 
-config = {'action':'legs_stretch',
-          'db':'beaglebone',
-          'tag_collection':'tags_517',
-          'volt_collection':'volts_517'}
+config = {'action': 'turn_over',
+          'db': 'beaglebone',
+          'tag_collection': 'tags_411',
+          'volt_collection': 'volts_411'}
 
-def read_from_db(action, db, volt_collection, tag_collection,port=27017, host='localhost', ndevices=5):
+
+def read_from_db(action, db, volt_collection, tag_collection, port=27017, host='localhost', ndevices=5):
     client = MongoClient(port=port, host=host)
     database = client[db]
     tag_collection = database[tag_collection]
@@ -23,7 +24,7 @@ def read_from_db(action, db, volt_collection, tag_collection,port=27017, host='l
     except CollectionError as e:
         print(e.message)
 
-    ntags = tag_collection.count_documents({'tag':action})
+    ntags = tag_collection.count_documents({'tag': action})
 
     # read the data that is of a certain action one by one
     for tag in tag_collection.find({'tag': action}):
@@ -35,17 +36,17 @@ def read_from_db(action, db, volt_collection, tag_collection,port=27017, host='l
             times[i] = []
             volts[i] = []
 
-        for volt in volt_collection.find({'time': {'$gt': inittime,'$lt': termtime}}):
+        for volt in volt_collection.find({'time': {'$gt': inittime, '$lt': termtime}}):
             device_no = int(volt['device_no'])
             v = volt['voltage']
             time = volt['time']
             times[device_no].append(time)
             volts[device_no].append(v)
 
-    return times,volts
+    return times, volts
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
     times, volts = read_from_db(action=config['action'],
                                 db=config['db'],
                                 tag_collection=config['tag_collection'],
@@ -81,8 +82,8 @@ if __name__=='__main__':
     for i in range(1, ndevices + 1):
         for j in range(len(volts[i])):
             value = {
-                "time" : times[i][j],
-                "volt" : volts[i][j]
+                "time": times[i][j],
+                "volt": volts[i][j]
             }
             output = extractor.process(value)
             if (output):
@@ -99,4 +100,3 @@ if __name__=='__main__':
 
         # 清理所有模块，防止过期数据
         extractor.clear()
-    

@@ -45,8 +45,8 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
 
     # 根据时间采集数据，基本单位为s，比如1s、10s、30s、60s
     # interval表示每次分析的时间跨度，rate表示间隔多长时间进行一次分析
-    interval = 2
-    rate = 2
+    interval = 3
+    rate = 3
 
     # 定义特征提取器
     extractor = FeatureExtractor()
@@ -54,12 +54,12 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
     # 定义特征提取模块
     rangemodule = RangeModule(interval, rate)
     vibrationfreq = VibrationFreqModule(interval, rate)
-    samplingcounter = SamplingCounterModule(interval, rate)
+    samplingfreq = SamplingFreqModule(interval, rate)
 
     # 注册特征提取模块
     extractor.register(rangemodule)
     extractor.register(vibrationfreq)
-    extractor.register(samplingcounter)
+    extractor.register(samplingfreq)
 
     # 定义画布左右位置的计数：标签累加，即人数累加
     tag_acc = 1
@@ -85,7 +85,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
         feature_times, feature_values = {}, {}
         for i in range(1, ndevices + 1):
             feature_times[i] = []
-            feature_values[i] = {'Range': [], 'VibrationFreq': [], 'SamplingCounter': []}
+            feature_values[i] = {'Range': [], 'VibrationFreq': [], 'SamplingFreq': []}
 
         # 提取第几个设备的特征
         start = 1
@@ -153,7 +153,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
 
             # 设置每个数据对应的图像名称
             if fea_acc == 1 and tag_acc == 2:
-                ax.legend(loc='best')
+                ax.legend(loc='upper right')
             if fea_acc == nfeatures:
                 ax.set_xlabel('Time')
             fea_acc += 1
@@ -165,7 +165,9 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
             interval = length // 8 - 1
             for k in range(0, length, interval):
                 xticks.append(feature_times[i][k])
-                xticklabels.append(timeToSecond(feature_times[i][k] + offset))
+                # xticklabels.append(timeToSecond(feature_times[i][k] + offset))
+
+                xticklabels.append(int(feature_times[i][k] - inittime)) # 图中的开始时间表示时间间隔interval
             # 设定标签的实际数字，数据类型必须和原数据一致
             ax.set_xticks(xticks)
             # 设定我们希望它显示的结果，xticks和xticklabels的元素一一对应
