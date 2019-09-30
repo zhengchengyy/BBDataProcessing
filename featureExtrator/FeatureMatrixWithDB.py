@@ -10,21 +10,24 @@ from matplotlib import pyplot as plt
 from matplotlib import style
 import numpy as np
 
-config = {'action':'turn_over',
-          'db':'beaglebone',
-          'tag_collection':'tags_411',
-          'volt_collection':'volts_411',
-          'offset':0}
+config = {'action': 'grasp',
+          'db': 'beaglebone',
+          'tag_collection': 'tags_411',
+          'volt_collection': 'volts_411',
+          'offset': 0}
+
 
 def timeToFormat(t):
     ftime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t))
     return ftime
 
+
 def timeToSecond(t):
     stime = time.strftime("%M:%S", time.localtime(t))
     return stime
 
-def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017,
+
+def draw_features_from_db(action, db, volt_collection, tag_collection, port=27017,
                           host='localhost', ndevices=5, offset=0):
     client = MongoClient(port=port, host=host)
     database = client[db]
@@ -37,7 +40,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
     except CollectionError as e:
         print(e.message)
 
-    ntags = tag_collection.count_documents({'tag':action})
+    ntags = tag_collection.count_documents({'tag': action})
 
     title = config['volt_collection'][6:] + "" + action + "_features"
     fig = plt.figure(title, figsize=(6, 8))
@@ -53,17 +56,17 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
 
     # 定义特征提取模块
     rangemodule = RangeModule(interval, rate)
-    vibrationfreq = VibrationFreqModule(interval, rate)
-    samplingfreq = SamplingFreqModule(interval, rate)
+    standarddeviation = StandardDeviationModule(interval, rate)
+    energe = EnergyModule(interval, rate)
 
     # 注册特征提取模块
     extractor.register(rangemodule)
-    extractor.register(vibrationfreq)
-    extractor.register(samplingfreq)
+    extractor.register(standarddeviation)
+    extractor.register(energe)
 
     # 定义画布左右位置的计数：标签累加，即人数累加
     tag_acc = 1
-    
+
     # read the data that is of a certain action one by one
     for tag in tag_collection.find({'tag': action}):
         inittime, termtime = tag['inittime'], tag['termtime']
@@ -74,7 +77,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
             times[i] = []
             volts[i] = []
 
-        for volt in volt_collection.find({'time': {'$gt': inittime,'$lt': termtime}}):
+        for volt in volt_collection.find({'time': {'$gt': inittime, '$lt': termtime}}):
             device_no = int(volt['device_no'])
             v = volt['voltage']
             time = volt['time']
@@ -85,7 +88,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
         feature_times, feature_values = {}, {}
         for i in range(1, ndevices + 1):
             feature_times[i] = []
-            feature_values[i] = {'Range': [], 'VibrationFreq': [], 'SamplingFreq': []}
+            feature_values[i] = {'Range': [], 'StandardDeviation': [], 'Energy': []}
 
         # 提取第几个设备的特征
         start = 1
@@ -117,36 +120,46 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
         nfeatures = 3
         # 定义画布上下位置的计数，即特征累加
         fea_acc = 1
-        base = nfeatures * 100 + ntags*10
+        base = nfeatures * 100 + ntags * 10
         style.use('default')
         colors = ['r', 'b', 'g', 'c', 'm']  # m c
 
+        # 定义特征矩阵
+        feature_matrix = np.zeros((len(feature_times[1]), nfeatures), dtype=float)
+        feature_type = list(feature_values[1].keys())  # keys()方法虽然返回的是列表，但是不可以索引
+
+        # 定义标签矩阵
+        label_matrix = np.zeros((len(feature_times[1]), 1), dtype=float)
+        # 传入动作参数
+        action_num = 1
+
+        for i in range(start, 3 + 1):
+            for j in range(len(feature_times[1])):
+                for k in range(nfeatures):
+                    feature_matrix[j][k] = feature_values[i][feature_type[k]][j]
+                label_matrix[j] = action_num
+            np.save('feature_matrix_' + str(i), feature_matrix)
+            np.save('label_matrix_' + str(i), label_matrix)
+
+        # 特征遍历
         for feature_type in feature_values[1].keys():
-            # plot, add_subplot(311)将画布分割成3行1列，图像画在从左到右从上到下的第1块
-            ax = fig.add_subplot(base + tag_acc + (fea_acc-1) * ntags)
+            # plot, add_subplot(a311)将画布分割成3行1列，图像画在从左到右从上到下的第1块
+            ax = fig.add_subplot(base + tag_acc + (fea_acc - 1) * ntags)
             plt.subplots_adjust(hspace=0.5)  # 函数中的wspace是子图之间的垂直间距，hspace是子图的上下间距
             ax.set_title(feature_type)
 
+            # 设备遍历
             for i in range(start, 3 + 1):
                 ax.set_xlim(feature_times[i][0], feature_times[i][-1])
                 ax.plot(feature_times[i], feature_values[i][feature_type],
                         label='device_' + str(i), color=colors[i - 1], alpha=0.9)
 
-                # # 获取最大最小值，并且打上标记
-                # max_index = np.argmax(feature_values[i][feature_type])
-                # min_index = np.argmin(feature_values[i][feature_type])
-                # ax.plot(feature_times[i][max_index],feature_values[i][feature_type][max_index],'rs')
-                # show_max = str(i)+":"+str(round(feature_values[i][feature_type][max_index],6))
-                # # xy=(横坐标，纵坐标)  箭头尖端, xytext=(横坐标，纵坐标) 文字的坐标，指的是最左边的坐标
-                # # https://blog.csdn.net/qq_30638831/article/details/79938967
-                # plt.annotate(show_max, xy=(feature_times[i][max_index],
-                #     feature_values[i][feature_type][max_index]),
-                #     xytext=(feature_times[i][max_index], feature_values[i][feature_type][max_index]))
-                # ax.plot(feature_times[i][min_index], feature_values[i][feature_type][min_index], 'gs')
-                # show_min = str(i)+":"+str(round(feature_values[i][feature_type][min_index],6))
-                # plt.annotate(show_min, xy=(feature_times[i][min_index],
-                #     feature_values[i][feature_type][min_index]),
-                #     xytext=(feature_times[i][min_index], feature_values[i][feature_type][min_index]))
+                # for sampleacc in range(len(feature_times[i])):
+                #     feature_matrix[sample_acc][fea_acc-1] = feature_values[i][feature_type]
+                #
+                # feature_matrix[fea_acc-1] = np.asarray(feature_values[i][feature_type])
+                #
+                # np.save('feature_matrix_' + str(i), feature_matrix)
 
             # 设置每个数据对应的图像名称
             if fea_acc == 1 and tag_acc == 1:
@@ -156,8 +169,8 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
                 # 设置人员
                 person = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
                 ax.set_xlabel("Person" + person[tag_acc - 1] + ": " + timeToFormat(inittime + offset)
-                             + " ~ " + timeToFormat(termtime + offset))
-                
+                              + " ~ " + timeToFormat(termtime + offset))
+
             fea_acc += 1
 
             # 以第一个设备的时间数据为准，数据的每1/10添加一个x轴标签
@@ -169,7 +182,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
                 xticks.append(feature_times[i][k])
                 # xticklabels.append(timeToSecond(feature_times[i][k] + offset))
 
-                xticklabels.append(int(feature_times[i][k] - inittime)) # 图中的开始时间表示时间间隔interval
+                xticklabels.append(int(feature_times[i][k] - inittime))  # 图中的开始时间表示时间间隔interval
             # 设定标签的实际数字，数据类型必须和原数据一致
             ax.set_xticks(xticks)
             # 设定我们希望它显示的结果，xticks和xticklabels的元素一一对应
@@ -180,9 +193,9 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
     plt.show()
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
     draw_features_from_db(action=config['action'],
-                                db=config['db'],
-                                tag_collection=config['tag_collection'],
-                                volt_collection=config['volt_collection'],
-                                offset=config['offset'])
+                          db=config['db'],
+                          tag_collection=config['tag_collection'],
+                          volt_collection=config['volt_collection'],
+                          offset=config['offset'])

@@ -73,15 +73,16 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
 
         # 自定义y轴的区间范围，可以使图放大或者缩小
         # ax.set_ylim([0.8,1.8])
-        ax.set_ylim([0.75, 0.90])
+        # ax.set_ylim([0.75, 0.90])
         # ax.set_ylim([0.82, 0.83])
+        ax.set_ylim(-0.1,0.1)
         ax.set_ylabel('voltage')
 
         for i in range(1, ndevices + 1):
             # [v + i*0.2 for v in volts[i]]为了把多个设备的数据隔离开
-            b, a = signal.butter(8, 4 / 7, 'lowpass')  # 配置滤波器，8表示滤波器的阶数
-            filter_volts[i] = signal.lfilter(b, a, volts[i])
-            # b, a = signal.butter(8, [1/7,2/7], 'bandpass')  # 带通滤波
+            # b, a = signal.butter(8, 4 / 7, 'lowpass')  # 配置滤波器，8表示滤波器的阶数
+            # filter_volts[i] = signal.lfilter(b, a, volts[i])
+            b, a = signal.butter(8, [1/7,2/7], 'bandpass')  # 带通滤波
             filter_volts[i] = signal.lfilter(b, a, volts[i])
             ax.plot(times[i], filter_volts[i], label='device_' + str(i), color=colors[i - 1], alpha=0.9)
 

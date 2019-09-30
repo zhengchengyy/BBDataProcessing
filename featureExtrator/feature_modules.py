@@ -75,7 +75,8 @@ class RangeModule(ProcessModule):
         range = []
         for i in self.queue.queue:
             range.append(i['volt'])
-        return max(range) - min(range)
+        import math
+        return math.sqrt(max(range) - min(range))
 
     def clear(self):
         """清理组件中的队列"""
@@ -83,7 +84,7 @@ class RangeModule(ProcessModule):
 
 
 class DurationModule(ProcessModule):
-    """计算从最大值到最小值所花的时间"""
+    """计算从最大值到最小值所花的时间???"""
 
     FEATURE_NAME = "Duration"
 
@@ -178,6 +179,28 @@ class VarianceModule(ProcessModule):
         for value in self.queue.queue:
             variance = variance + (value['volt'] - average) ** 2
         return variance / self.size
+
+    def clear(self):
+        """清理组件中的队列"""
+        self.queue.queue.clear()
+
+
+class StandardDeviationModule(ProcessModule):
+    """功能是对满队列中的所有数据求标准差。返回标准差。
+    表示震动频率的平均情况"""
+
+    FEATURE_NAME = "StandardDeviation"
+
+    def processFullQueue(self):
+        sum = 0
+        variance = 0
+        for value in self.queue.queue:
+            sum = sum + value['volt']
+        average = sum / self.size
+        for value in self.queue.queue:
+            variance = variance + (value['volt'] - average) ** 2
+        import math
+        return math.sqrt(variance / self.size)
 
     def clear(self):
         """清理组件中的队列"""

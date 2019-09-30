@@ -73,7 +73,7 @@ if __name__=='__main__':
     # 定义特征提取模块
     rangemodule = RangeModule(interval, rate)
     averagemodule = AverageModule(interval, rate)
-    samplingcounter = SamplingCounterModule(interval, rate)
+    samplingcounter = SamplingFreqModule(interval, rate)
 
     # 注册特征提取模块
     extractor.register(rangemodule)
@@ -95,7 +95,7 @@ if __name__=='__main__':
     feature_times, feature_values = {}, {}
     for i in range(1, ndevices + 1):
         feature_times[i] = []
-        feature_values[i] = {'Range':[],'Average':[],'SamplingCounter':[]}
+        feature_values[i] = {'Range':[],'Average':[],'SamplingFreq':[]}
 
     # 对每个采集设备进行特征提取
     for i in range(1, ndevices + 1):

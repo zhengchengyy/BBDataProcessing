@@ -73,7 +73,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         # ax.set_ylim([0.8,1.8])
         ax.set_ylim([0.75, 0.90])
         # ax.set_ylim([0.82, 0.83])
-        ax.set_ylabel('voltage')
+        ax.set_ylabel('Voltage(mv)')
 
         for i in range(1, ndevices + 1):
             # [v + i*0.2 for v in volts[i]]为了把多个设备的数据隔离开
@@ -82,14 +82,14 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         if n == 1:
             ax.legend(loc='upper right')
         if n == ntags:
-            ax.set_xlabel('time')
+            ax.set_xlabel('Time(mm:ss)')
         n += 1
 
         # 以第一个设备的时间数据为准，数据的每1/10添加一个x轴标签
         xticks = []
         xticklabels = []
         length = len(times[1])
-        interval = length // 30 - 1
+        interval = length // 50 - 1
         for i in range(0, length, interval):
             xticks.append(times[1][i])
             xticklabels.append(timeToSecond(times[1][i] + offset))
