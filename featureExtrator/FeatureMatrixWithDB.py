@@ -9,9 +9,9 @@ from pymongo import MongoClient
 from matplotlib import pyplot as plt
 from matplotlib import style
 import numpy as np
+import os
 
-config = {'action': 'grasp',
-          'db': 'beaglebone',
+config = {'db': 'beaglebone',
           'tag_collection': 'tags_411',
           'volt_collection': 'volts_411',
           'offset': 0}
@@ -28,7 +28,7 @@ def timeToSecond(t):
 
 
 def draw_features_from_db(action, db, volt_collection, tag_collection, port=27017,
-                          host='localhost', ndevices=5, offset=0):
+                          host='localhost', ndevices=5, offset=0, action_num=0):
     client = MongoClient(port=port, host=host)
     database = client[db]
     tag_collection = database[tag_collection]
@@ -118,84 +118,65 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
 
         # 定义特征数量
         nfeatures = 3
-        # 定义画布上下位置的计数，即特征累加
-        fea_acc = 1
-        base = nfeatures * 100 + ntags * 10
-        style.use('default')
-        colors = ['r', 'b', 'g', 'c', 'm']  # m c
 
-        # 定义特征矩阵
-        feature_matrix = np.zeros((len(feature_times[1]), nfeatures), dtype=float)
+        # 定义特征类型
         feature_type = list(feature_values[1].keys())  # keys()方法虽然返回的是列表，但是不可以索引
 
-        # 定义标签矩阵
-        label_matrix = np.zeros((len(feature_times[1]), 1), dtype=float)
-        # 传入动作参数
-        action_num = 1
-
         for i in range(start, 3 + 1):
-            for j in range(len(feature_times[1])):
-                for k in range(nfeatures):
-                    feature_matrix[j][k] = feature_values[i][feature_type[k]][j]
-                label_matrix[j] = action_num
-            np.save('feature_matrix_' + str(i), feature_matrix)
-            np.save('label_matrix_' + str(i), label_matrix)
 
-        # 特征遍历
-        for feature_type in feature_values[1].keys():
-            # plot, add_subplot(a311)将画布分割成3行1列，图像画在从左到右从上到下的第1块
-            ax = fig.add_subplot(base + tag_acc + (fea_acc - 1) * ntags)
-            plt.subplots_adjust(hspace=0.5)  # 函数中的wspace是子图之间的垂直间距，hspace是子图的上下间距
-            ax.set_title(feature_type)
+            # 如果文件存在，则以添加的方式打开
+            if (os.path.exists("feature_matrix" + str(i) + ".npy")):
+                feature_matrix = np.load("feature_matrix" + str(i) + ".npy")
+                label_matrix = np.load("label_matrix" + str(i) + ".npy")
+                temp_matrix = np.zeros((len(feature_times[i]), nfeatures), dtype=float)
 
-            # 设备遍历
-            for i in range(start, 3 + 1):
-                ax.set_xlim(feature_times[i][0], feature_times[i][-1])
-                ax.plot(feature_times[i], feature_values[i][feature_type],
-                        label='device_' + str(i), color=colors[i - 1], alpha=0.9)
+                os.remove("feature_matrix" + str(i) + ".npy")
+                os.remove("label_matrix" + str(i) + ".npy")
 
-                # for sampleacc in range(len(feature_times[i])):
-                #     feature_matrix[sample_acc][fea_acc-1] = feature_values[i][feature_type]
-                #
-                # feature_matrix[fea_acc-1] = np.asarray(feature_values[i][feature_type])
-                #
-                # np.save('feature_matrix_' + str(i), feature_matrix)
+                for j in range(len(feature_times[i])):
+                    for k in range(nfeatures):
+                        temp_matrix[j][k] = feature_values[i][feature_type[k]][j]
+                    label_matrix = np.append(label_matrix,[action_num])
 
-            # 设置每个数据对应的图像名称
-            if fea_acc == 1 and tag_acc == 1:
-                ax.legend(loc='upper right')
-                ax.set_xlabel('Time(s)')
-            if fea_acc == nfeatures:
-                # 设置人员
-                person = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
-                ax.set_xlabel("Person" + person[tag_acc - 1] + ": " + timeToFormat(inittime + offset)
-                              + " ~ " + timeToFormat(termtime + offset))
+                # np.append(feature_matrix, [temp_matrix], axis=0)
+                feature_matrix = np.insert(feature_matrix, feature_matrix.shape[0],
+                                           values=temp_matrix, axis=0)
 
-            fea_acc += 1
+                np.save('feature_matrix' + str(i), feature_matrix)
+                np.save('label_matrix' + str(i), label_matrix)
 
-            # 以第一个设备的时间数据为准，数据的每1/10添加一个x轴标签
-            xticks = []
-            xticklabels = []
-            length = len(feature_times[i])
-            interval = length // 8 - 1
-            for k in range(0, length, interval):
-                xticks.append(feature_times[i][k])
-                # xticklabels.append(timeToSecond(feature_times[i][k] + offset))
+                print(feature_matrix.shape)
 
-                xticklabels.append(int(feature_times[i][k] - inittime))  # 图中的开始时间表示时间间隔interval
-            # 设定标签的实际数字，数据类型必须和原数据一致
-            ax.set_xticks(xticks)
-            # 设定我们希望它显示的结果，xticks和xticklabels的元素一一对应
-            ax.set_xticklabels(xticklabels, rotation=15)
+
+            # 如果文件不存在，则定义特征矩阵和标签矩阵
+            else:
+                feature_matrix = np.zeros((len(feature_times[i]), nfeatures), dtype=float)
+                label_matrix = np.zeros((len(feature_times[i]), 1), dtype=int)
+
+                for j in range(len(feature_times[i])):
+                    for k in range(nfeatures):
+                        feature_matrix[j][k] = feature_values[i][feature_type[k]][j]
+                    label_matrix[j] = action_num
+                np.save('feature_matrix' + str(i), feature_matrix)
+                np.save('label_matrix' + str(i), label_matrix)
 
         tag_acc += 1
 
-    plt.show()
-
 
 if __name__ == '__main__':
-    draw_features_from_db(action=config['action'],
-                          db=config['db'],
-                          tag_collection=config['tag_collection'],
-                          volt_collection=config['volt_collection'],
-                          offset=config['offset'])
+    # 清除文件
+    start = 1
+    if (os.path.exists("feature_matrix1.npy")):
+        for i in range(start, 3 + 1):
+            os.remove("feature_matrix" + str(i) + ".npy")
+            os.remove("label_matrix" + str(i) + ".npy")
+
+    action = ["turn_over", "legs_stretch", "hands_stretch",
+              "legs_twitch", "hands_twitch", "head_move", "grasp", "kick"]
+    for i in range(len(action)):
+        draw_features_from_db(action=action[i],
+                              db=config['db'],
+                              tag_collection=config['tag_collection'],
+                              volt_collection=config['volt_collection'],
+                              offset=config['offset'],
+                              action_num=i)

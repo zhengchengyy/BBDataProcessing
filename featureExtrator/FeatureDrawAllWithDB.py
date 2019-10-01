@@ -10,21 +10,24 @@ from matplotlib import pyplot as plt
 from matplotlib import style
 import numpy as np
 
-config = {'action':'turn_over',
-          'db':'beaglebone',
-          'tag_collection':'tags_411',
-          'volt_collection':'volts_411',
-          'offset':0}
+config = {'action': 'turn_over',
+          'db': 'beaglebone',
+          'tag_collection': 'tags_411',
+          'volt_collection': 'volts_411',
+          'offset': 0}
+
 
 def timeToFormat(t):
     ftime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t))
     return ftime
 
+
 def timeToSecond(t):
     stime = time.strftime("%M:%S", time.localtime(t))
     return stime
 
-def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017,
+
+def draw_features_from_db(action, db, volt_collection, tag_collection, port=27017,
                           host='localhost', ndevices=5, offset=0):
     client = MongoClient(port=port, host=host)
     database = client[db]
@@ -37,7 +40,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
     except CollectionError as e:
         print(e.message)
 
-    ntags = tag_collection.count_documents({'tag':action})
+    ntags = tag_collection.count_documents({'tag': action})
 
     title = config['volt_collection'][6:] + "" + action + "_features"
     fig = plt.figure(title, figsize=(6, 8))
@@ -63,7 +66,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
 
     # 定义画布左右位置的计数：标签累加，即人数累加
     tag_acc = 1
-    
+
     # read the data that is of a certain action one by one
     for tag in tag_collection.find({'tag': action}):
         inittime, termtime = tag['inittime'], tag['termtime']
@@ -74,7 +77,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
             times[i] = []
             volts[i] = []
 
-        for volt in volt_collection.find({'time': {'$gt': inittime,'$lt': termtime}}):
+        for volt in volt_collection.find({'time': {'$gt': inittime, '$lt': termtime}}):
             device_no = int(volt['device_no'])
             v = volt['voltage']
             time = volt['time']
@@ -117,13 +120,13 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
         nfeatures = 3
         # 定义画布上下位置的计数，即特征累加
         fea_acc = 1
-        base = nfeatures * 100 + ntags*10
+        base = nfeatures * 100 + ntags * 10
         style.use('default')
         colors = ['r', 'b', 'g', 'c', 'm']  # m c
 
         for feature_type in feature_values[1].keys():
             # plot, add_subplot(311)将画布分割成3行1列，图像画在从左到右从上到下的第1块
-            ax = fig.add_subplot(base + tag_acc + (fea_acc-1) * ntags)
+            ax = fig.add_subplot(base + tag_acc + (fea_acc - 1) * ntags)
             plt.subplots_adjust(hspace=0.5)  # 函数中的wspace是子图之间的垂直间距，hspace是子图的上下间距
             ax.set_title(feature_type)
 
@@ -156,8 +159,8 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
                 # 设置人员
                 person = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
                 ax.set_xlabel("Person" + person[tag_acc - 1] + ": " + timeToFormat(inittime + offset)
-                             + " ~ " + timeToFormat(termtime + offset))
-                
+                              + " ~ " + timeToFormat(termtime + offset))
+
             fea_acc += 1
 
             # 以第一个设备的时间数据为准，数据的每1/10添加一个x轴标签
@@ -169,7 +172,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
                 xticks.append(feature_times[i][k])
                 # xticklabels.append(timeToSecond(feature_times[i][k] + offset))
 
-                xticklabels.append(int(feature_times[i][k] - inittime)) # 图中的开始时间表示时间间隔interval
+                xticklabels.append(int(feature_times[i][k] - inittime))  # 图中的开始时间表示时间间隔interval
             # 设定标签的实际数字，数据类型必须和原数据一致
             ax.set_xticks(xticks)
             # 设定我们希望它显示的结果，xticks和xticklabels的元素一一对应
@@ -177,12 +180,21 @@ def draw_features_from_db(action, db, volt_collection, tag_collection,port=27017
 
         tag_acc += 1
 
+    figure = plt.gcf()  # get current figure
+    figure.set_size_inches(20, 10)
+    plt.savefig("feature_images/" + title + ".png", dpi=200)
+
+    # 最大化显示图像窗口
+    plt.get_current_fig_manager().window.showMaximized()
     plt.show()
 
 
-if __name__=='__main__':
-    draw_features_from_db(action=config['action'],
-                                db=config['db'],
-                                tag_collection=config['tag_collection'],
-                                volt_collection=config['volt_collection'],
-                                offset=config['offset'])
+if __name__ == '__main__':
+    action = ["turn_over", "legs_stretch", "hands_stretch",
+              "legs_twitch", "hands_twitch", "head_move", "grasp", "kick"]
+    for i in range(7, len(action)):
+        draw_features_from_db(action=action[i],
+                              db=config['db'],
+                              tag_collection=config['tag_collection'],
+                              volt_collection=config['volt_collection'],
+                              offset=config['offset'])
