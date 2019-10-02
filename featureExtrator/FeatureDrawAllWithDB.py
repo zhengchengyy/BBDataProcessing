@@ -10,7 +10,11 @@ from matplotlib import pyplot as plt
 from matplotlib import style
 import numpy as np
 
-config = {'action': 'turn_over',
+
+action = ["turn_over", "legs_stretch", "hands_stretch",
+              "legs_twitch", "hands_twitch", "head_move", "grasp", "kick"]
+
+config = {'action': action[0],
           'db': 'beaglebone',
           'tag_collection': 'tags_411',
           'volt_collection': 'volts_411',
@@ -117,7 +121,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
             extractor.clear()
 
         # 定义特征数量
-        nfeatures = 3
+        nfeatures = len(feature_values[1])
         # 定义画布上下位置的计数，即特征累加
         fea_acc = 1
         base = nfeatures * 100 + ntags * 10
@@ -180,21 +184,14 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
 
         tag_acc += 1
 
-    figure = plt.gcf()  # get current figure
-    figure.set_size_inches(20, 10)
-    plt.savefig("feature_images/" + title + ".png", dpi=200)
-
     # 最大化显示图像窗口
     plt.get_current_fig_manager().window.showMaximized()
     plt.show()
 
 
 if __name__ == '__main__':
-    action = ["turn_over", "legs_stretch", "hands_stretch",
-              "legs_twitch", "hands_twitch", "head_move", "grasp", "kick"]
-    for i in range(7, len(action)):
-        draw_features_from_db(action=action[i],
-                              db=config['db'],
-                              tag_collection=config['tag_collection'],
-                              volt_collection=config['volt_collection'],
-                              offset=config['offset'])
+    draw_features_from_db(action=config['action'],
+                          db=config['db'],
+                          tag_collection=config['tag_collection'],
+                          volt_collection=config['volt_collection'],
+                          offset=config['offset'])

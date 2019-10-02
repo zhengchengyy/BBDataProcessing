@@ -9,7 +9,9 @@ from pymongo import MongoClient
 from matplotlib import pyplot as plt
 from matplotlib import style
 import numpy as np
-import os
+
+action = ["turn_over", "legs_stretch", "hands_stretch",
+          "legs_twitch", "hands_twitch", "head_move", "grasp", "kick"]
 
 config = {'db': 'beaglebone',
           'tag_collection': 'tags_411',
@@ -28,7 +30,7 @@ def timeToSecond(t):
 
 
 def draw_features_from_db(action, db, volt_collection, tag_collection, port=27017,
-                          host='localhost', ndevices=5, offset=0, action_num=0):
+                          host='localhost', ndevices=5, offset=0):
     client = MongoClient(port=port, host=host)
     database = client[db]
     tag_collection = database[tag_collection]
@@ -118,65 +120,81 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
 
         # 定义特征数量
         nfeatures = 3
+        # 定义画布上下位置的计数，即特征累加
+        fea_acc = 1
+        base = nfeatures * 100 + ntags * 10
+        style.use('default')
+        colors = ['r', 'b', 'g', 'c', 'm']  # m c
 
-        # 定义特征类型
-        feature_type = list(feature_values[1].keys())  # keys()方法虽然返回的是列表，但是不可以索引
+        for feature_type in feature_values[1].keys():
+            # plot, add_subplot(311)将画布分割成3行1列，图像画在从左到右从上到下的第1块
+            ax = fig.add_subplot(base + tag_acc + (fea_acc - 1) * ntags)
+            plt.subplots_adjust(hspace=0.5)  # 函数中的wspace是子图之间的垂直间距，hspace是子图的上下间距
+            ax.set_title(feature_type)
 
-        for i in range(start, 3 + 1):
+            for i in range(start, 3 + 1):
+                ax.set_xlim(feature_times[i][0], feature_times[i][-1])
+                ax.plot(feature_times[i], feature_values[i][feature_type],
+                        label='device_' + str(i), color=colors[i - 1], alpha=0.9)
 
-            # 如果文件存在，则以添加的方式打开
-            if (os.path.exists("feature_matrix" + str(i) + ".npy")):
-                feature_matrix = np.load("feature_matrix" + str(i) + ".npy")
-                label_matrix = np.load("label_matrix" + str(i) + ".npy")
-                temp_matrix = np.zeros((len(feature_times[i]), nfeatures), dtype=float)
+                # # 获取最大最小值，并且打上标记
+                # max_index = np.argmax(feature_values[i][feature_type])
+                # min_index = np.argmin(feature_values[i][feature_type])
+                # ax.plot(feature_times[i][max_index],feature_values[i][feature_type][max_index],'rs')
+                # show_max = str(i)+":"+str(round(feature_values[i][feature_type][max_index],6))
+                # # xy=(横坐标，纵坐标)  箭头尖端, xytext=(横坐标，纵坐标) 文字的坐标，指的是最左边的坐标
+                # # https://blog.csdn.net/qq_30638831/article/details/79938967
+                # plt.annotate(show_max, xy=(feature_times[i][max_index],
+                #     feature_values[i][feature_type][max_index]),
+                #     xytext=(feature_times[i][max_index], feature_values[i][feature_type][max_index]))
+                # ax.plot(feature_times[i][min_index], feature_values[i][feature_type][min_index], 'gs')
+                # show_min = str(i)+":"+str(round(feature_values[i][feature_type][min_index],6))
+                # plt.annotate(show_min, xy=(feature_times[i][min_index],
+                #     feature_values[i][feature_type][min_index]),
+                #     xytext=(feature_times[i][min_index], feature_values[i][feature_type][min_index]))
 
-                os.remove("feature_matrix" + str(i) + ".npy")
-                os.remove("label_matrix" + str(i) + ".npy")
+            # 设置每个数据对应的图像名称
+            if fea_acc == 1 and tag_acc == 1:
+                ax.legend(loc='upper right')
+                ax.set_xlabel('Time(s)')
+            if fea_acc == nfeatures:
+                # 设置人员
+                person = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
+                ax.set_xlabel("Person" + person[tag_acc - 1] + ": " + timeToFormat(inittime + offset)
+                              + " ~ " + timeToFormat(termtime + offset))
 
-                for j in range(len(feature_times[i])):
-                    for k in range(nfeatures):
-                        temp_matrix[j][k] = feature_values[i][feature_type[k]][j]
-                    label_matrix = np.append(label_matrix,[action_num])
+            fea_acc += 1
 
-                # np.append(feature_matrix, [temp_matrix], axis=0)
-                feature_matrix = np.insert(feature_matrix, feature_matrix.shape[0],
-                                           values=temp_matrix, axis=0)
+            # 以第一个设备的时间数据为准，数据的每1/10添加一个x轴标签
+            xticks = []
+            xticklabels = []
+            length = len(feature_times[i])
+            interval = length // 8 - 1
+            for k in range(0, length, interval):
+                xticks.append(feature_times[i][k])
+                # xticklabels.append(timeToSecond(feature_times[i][k] + offset))
 
-                np.save('feature_matrix' + str(i), feature_matrix)
-                np.save('label_matrix' + str(i), label_matrix)
-
-                print(feature_matrix.shape)
-
-
-            # 如果文件不存在，则定义特征矩阵和标签矩阵
-            else:
-                feature_matrix = np.zeros((len(feature_times[i]), nfeatures), dtype=float)
-                label_matrix = np.zeros((len(feature_times[i]), 1), dtype=int)
-
-                for j in range(len(feature_times[i])):
-                    for k in range(nfeatures):
-                        feature_matrix[j][k] = feature_values[i][feature_type[k]][j]
-                    label_matrix[j] = action_num
-                np.save('feature_matrix' + str(i), feature_matrix)
-                np.save('label_matrix' + str(i), label_matrix)
+                xticklabels.append(int(feature_times[i][k] - inittime))  # 图中的开始时间表示时间间隔interval
+            # 设定标签的实际数字，数据类型必须和原数据一致
+            ax.set_xticks(xticks)
+            # 设定我们希望它显示的结果，xticks和xticklabels的元素一一对应
+            ax.set_xticklabels(xticklabels, rotation=15)
 
         tag_acc += 1
 
+    figure = plt.gcf()  # get current figure
+    figure.set_size_inches(20, 10)
+    plt.savefig("feature_images/" + title + ".png", dpi=200)
+
+    # 最大化显示图像窗口
+    # plt.get_current_fig_manager().window.showMaximized()
+    # plt.show()
+
 
 if __name__ == '__main__':
-    # 清除文件
-    start = 1
-    if (os.path.exists("feature_matrix1.npy")):
-        for i in range(start, 3 + 1):
-            os.remove("feature_matrix" + str(i) + ".npy")
-            os.remove("label_matrix" + str(i) + ".npy")
-
-    action = ["turn_over", "legs_stretch", "hands_stretch",
-              "legs_twitch", "hands_twitch", "head_move", "grasp", "kick"]
     for i in range(len(action)):
         draw_features_from_db(action=action[i],
                               db=config['db'],
                               tag_collection=config['tag_collection'],
                               volt_collection=config['volt_collection'],
-                              offset=config['offset'],
-                              action_num=i)
+                              offset=config['offset'])
