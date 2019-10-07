@@ -2,17 +2,17 @@ from pymongo import MongoClient
 from matplotlib import pyplot as plt
 from matplotlib import style
 from exceptions import CollectionError
-from scipy import signal
 import time
 
 action = ["still", "turn_over", "legs_stretch", "hands_stretch",
               "legs_twitch", "hands_twitch", "head_move", "grasp", "kick"]
 
-config = {'action': action[8],
+config = {'action': action[1],
           'db': 'beaglebone',
           'tag_collection': 'tags_411',
           'volt_collection': 'volts_411',
           'offset': 0}
+
 
 def timeToFormat(t):
     ftime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t))
@@ -39,20 +39,19 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
     ntags = tag_collection.count_documents({'tag': action})
     n = 1
 
-    title = config['volt_collection'][6:] + "" + action + "_filter"
+    title = config['volt_collection'][6:] + "" + action
     fig = plt.figure(title, figsize=(6, 8))
-    fig.suptitle(action + "_filter")
+    fig.suptitle(action)
 
     # plot the data that is of a certain action one by one
     for tag in tag_collection.find({'tag': action}):
         # inittime
         inittime, termtime = tag['inittime'] - offset, tag['termtime'] - offset
         # get the arrays according to which we will plot later
-        times, volts, filter_volts = {}, {}, {}
+        times, volts = {}, {}
         for i in range(1, ndevices + 1):
             times[i] = []
             volts[i] = []
-            filter_volts[i] = []
 
         for volt in volt_collection.find({'time': {'$gt': inittime, '$lt': termtime}}):
             device_no = int(volt['device_no'])
@@ -81,9 +80,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
 
         for i in range(1, ndevices + 1):
             # [v + i*0.2 for v in volts[i]]为了把多个设备的数据隔离开
-            b, a = signal.butter(8, 3 / 7, 'lowpass')  # 配置滤波器，8表示滤波器的阶数
-            filter_volts[i] = signal.filtfilt(b, a, volts[i])
-            ax.plot(times[i], filter_volts[i], label='device_' + str(i), color=colors[i - 1], alpha=0.9)
+            ax.plot(times[i], volts[i], label='device_' + str(i), color=colors[i - 1], alpha=0.9)
 
         if n == 1:
             ax.legend(loc='upper right')
@@ -95,21 +92,26 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         xticks = []
         xticklabels = []
         length = len(times[1])
-        interval = length // 10 - 1
+        interval = length // 8 - 1
         for i in range(0, length, interval):
             xticks.append(times[1][i])
             xticklabels.append(timeToSecond(times[1][i] + offset))
         ax.set_xticks(xticks)  # 设定标签的实际数字，数据类型必须和原数据一致
         ax.set_xticklabels(xticklabels, rotation=15)  # 设定我们希望它显示的结果，xticks和xticklabels的元素一一对应
 
+    figure = plt.gcf()  # get current figure
+    figure.set_size_inches(20, 10)
+    plt.savefig("action_images/" + title + ".png", dpi=200)
+
     # 最大化显示图像窗口
-    plt.get_current_fig_manager().window.showMaximized()
-    plt.show()
+    # plt.get_current_fig_manager().window.showMaximized()
+    # plt.show()
 
 
 if __name__ == '__main__':
-    plot_from_db(action=config['action'],
-                 db=config['db'],
-                 tag_collection=config['tag_collection'],
-                 volt_collection=config['volt_collection'],
-                 offset=config['offset'])
+    for i in range(len(action)):
+        plot_from_db(action=action[i],
+                      db=config['db'],
+                      tag_collection=config['tag_collection'],
+                      volt_collection=config['volt_collection'],
+                      offset=config['offset'])

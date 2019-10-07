@@ -20,8 +20,12 @@ plt.plot(t, y1)
 plt.title('signal_1 in time domain')
 plt.xlabel('Time/second')
 
+from scipy import signal
+b, a = signal.butter(8, 100*2/400, 'lowpass')   #配置滤波器 8 表示滤波器的阶数
+filtedData = signal.filtfilt(b, a, Y1)  #data为要过滤的信号
+
 plt.subplot(222)
-plt.plot(range(400), Y1)
+plt.plot(range(400), filtedData)
 plt.title('signal_1 in frequency domain')
 plt.xlabel('Frequency/Hz')
 

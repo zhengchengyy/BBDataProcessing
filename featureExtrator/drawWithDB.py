@@ -4,7 +4,10 @@ from matplotlib import style
 from exceptions import CollectionError
 import time
 
-config = {'action': 'turn_over',
+action = ["still", "turn_over", "legs_stretch", "hands_stretch",
+              "legs_twitch", "hands_twitch", "head_move", "grasp", "kick"]
+
+config = {'action': action[1],
           'db': 'beaglebone',
           'tag_collection': 'tags_411',
           'volt_collection': 'volts_411',
@@ -21,7 +24,7 @@ def timeToSecond(t):
     return stime
 
 
-def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='localhost', ndevices=5, offset=0):
+def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='localhost', ndevices=3, offset=0):
     client = MongoClient(port=port, host=host)
     database = client[db]
     tag_collection = database[tag_collection]
@@ -71,7 +74,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
 
         # 自定义y轴的区间范围，可以使图放大或者缩小
         # ax.set_ylim([0.8,1.8])
-        ax.set_ylim([0.75, 0.90])
+        # ax.set_ylim([0.75, 0.90])
         # ax.set_ylim([0.82, 0.83])
         ax.set_ylabel('Voltage(mv)')
 
@@ -89,13 +92,15 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         xticks = []
         xticklabels = []
         length = len(times[1])
-        interval = length // 50 - 1
+        interval = length // 8 - 1
         for i in range(0, length, interval):
             xticks.append(times[1][i])
             xticklabels.append(timeToSecond(times[1][i] + offset))
         ax.set_xticks(xticks)  # 设定标签的实际数字，数据类型必须和原数据一致
         ax.set_xticklabels(xticklabels, rotation=15)  # 设定我们希望它显示的结果，xticks和xticklabels的元素一一对应
 
+    # 最大化显示图像窗口
+    plt.get_current_fig_manager().window.showMaximized()
     plt.show()
 
 

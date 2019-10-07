@@ -6,7 +6,10 @@ from scipy import signal
 import numpy as np
 import time
 
-config = {'action': 'turn_over',
+action = ["still", "turn_over", "legs_stretch", "hands_stretch",
+              "legs_twitch", "hands_twitch", "head_move", "grasp", "kick"]
+
+config = {'action': action[1],
           'db': 'beaglebone',
           'tag_collection': 'tags_411',
           'volt_collection': 'volts_411',
@@ -24,7 +27,7 @@ def timeToSecond(t):
 
 
 def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='localhost',
-                 ndevices=5, offset=0):
+                 ndevices=3, offset=0):
     client = MongoClient(port=port, host=host)
     database = client[db]
     tag_collection = database[tag_collection]
@@ -82,8 +85,9 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
 
         for i in range(start, start + 1):
             # 滤除20Hz以上的频率成分，wn = 2 * 20 / 70
-            b, a = signal.butter(8, 4 / 7, 'lowpass')  # 配置滤波器，8表示滤波器的阶数
-            filter_volts[i] = signal.lfilter(b, a, volts[i])
+            # b, a = signal.butter(8, 3 / 7, 'lowpass')  # 配置滤波器，8表示滤波器的阶数
+            b, a = signal.butter(8, [1 / 7, 4 / 7], 'bandpass')
+            filter_volts[i] = signal.filtfilt(b, a, volts[i])
 
             # fft返回值实部表示
             result = np.fft.fft(filter_volts[i])  # 除以长度表示归一化处理
@@ -100,6 +104,8 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
             ax.set_xlabel('Frequency')
         n += 1
 
+    # 最大化显示图像窗口
+    plt.get_current_fig_manager().window.showMaximized()
     plt.show()
 
 

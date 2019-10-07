@@ -11,13 +11,13 @@ from matplotlib import style
 import numpy as np
 
 
-action = ["turn_over", "legs_stretch", "hands_stretch",
+action = ["still", "turn_over", "legs_stretch", "hands_stretch",
               "legs_twitch", "hands_twitch", "head_move", "grasp", "kick"]
 
 config = {'action': action[0],
           'db': 'beaglebone',
-          'tag_collection': 'tags_411',
-          'volt_collection': 'volts_411',
+          'tag_collection': 'tags_424',
+          'volt_collection': 'volts_424',
           'offset': 0}
 
 
@@ -181,6 +181,9 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
             ax.set_xticks(xticks)
             # 设定我们希望它显示的结果，xticks和xticklabels的元素一一对应
             ax.set_xticklabels(xticklabels, rotation=15)
+
+            # 显示网格
+            # ax.grid(True, which='both')
 
         tag_acc += 1
 
