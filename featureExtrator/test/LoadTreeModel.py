@@ -6,7 +6,7 @@ feature_matrix = np.load('feature_matrixs/feature_random_matrix2.npy')
 label_matrix = np.load('feature_matrixs/label_random_matrix2.npy')
 
 # 定义训练集和测试集
-train_size = feature_matrix.shape[0] // 5 * 4
+train_size = feature_matrix.shape[0] // 4 * 3
 test_size = feature_matrix.shape[0] - train_size
 
 trainfea_matrix = feature_matrix[0:train_size]
