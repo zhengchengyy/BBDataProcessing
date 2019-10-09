@@ -10,15 +10,16 @@ from matplotlib import pyplot as plt
 from matplotlib import style
 import numpy as np
 
-
 action = ["still", "turn_over", "legs_stretch", "hands_stretch",
-              "legs_twitch", "hands_twitch", "head_move", "grasp", "kick"]
+          "legs_twitch", "hands_twitch", "head_move", "grasp", "kick"]
 
-config = {'action': action[0],
+config = {'action': action[1],
           'db': 'beaglebone',
           'tag_collection': 'tags_424',
           'volt_collection': 'volts_424',
           'offset': 0}
+
+feature_names = ["RangeModule", "EnergyModule", "DurationModule", "RMSModule"]
 
 
 def timeToFormat(t):
@@ -58,15 +59,11 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
     # 定义特征提取器
     extractor = FeatureExtractor()
 
-    # 定义特征提取模块
-    rangemodule = RangeModule(interval, rate)
-    vibrationfreq = VibrationFreqModule(interval, rate)
-    samplingfreq = SamplingFreqModule(interval, rate)
-
-    # 注册特征提取模块
-    extractor.register(rangemodule)
-    extractor.register(vibrationfreq)
-    extractor.register(samplingfreq)
+    for feature in feature_names:
+        # 定义特征提取模块
+        module = eval(feature + "(" + str(interval) + "," + str(rate) + ")")
+        # 注册特征提取模块
+        extractor.register(module)
 
     # 定义画布左右位置的计数：标签累加，即人数累加
     tag_acc = 1
@@ -92,7 +89,10 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
         feature_times, feature_values = {}, {}
         for i in range(1, ndevices + 1):
             feature_times[i] = []
-            feature_values[i] = {'Range': [], 'VibrationFreq': [], 'SamplingFreq': []}
+            from collections import defaultdict
+            feature_values[i] = defaultdict(list)
+            for feature in feature_names:
+                feature_values[i][feature[:-6]] = []
 
         # 提取第几个设备的特征
         start = 1

@@ -20,6 +20,11 @@ config = {'db': 'beaglebone',
           'offset': 0}
 
 
+# feature_names = ["RangeModule", "EnergyModule", "StandardDeviationModule",
+#                  "RMSModule", "VarianceModule", "AverageModule", "SamplingFreqModule"]
+
+feature_names = ["StandardDeviationModule", "VarianceModule", "AverageModule"]
+
 def timeToFormat(t):
     ftime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t))
     return ftime
@@ -57,15 +62,11 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
     # 定义特征提取器
     extractor = FeatureExtractor()
 
-    # 定义特征提取模块
-    rangemodule = RangeModule(interval, rate)
-    standarddeviation = StandardDeviationModule(interval, rate)
-    energe = EnergyModule(interval, rate)
-
-    # 注册特征提取模块
-    extractor.register(rangemodule)
-    extractor.register(standarddeviation)
-    extractor.register(energe)
+    for feature in feature_names:
+        # 定义特征提取模块
+        module = eval(feature + "(" + str(interval) + "," + str(rate) + ")")
+        # 注册特征提取模块
+        extractor.register(module)
 
     # 定义画布左右位置的计数：标签累加，即人数累加
     tag_acc = 1
@@ -91,7 +92,10 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
         feature_times, feature_values = {}, {}
         for i in range(1, ndevices + 1):
             feature_times[i] = []
-            feature_values[i] = {'Range': [], 'StandardDeviation': []}
+            from collections import defaultdict
+            feature_values[i] = defaultdict(list)
+            for feature in feature_names:
+                feature_values[i][feature[:-6]] = []
 
         # 提取第几个设备的特征
         start = 1

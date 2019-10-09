@@ -1,6 +1,29 @@
 from feature_extractor import FeatureExtractor
 from feature_extractor import ProcessModule
+import numpy as np
+import math
 
+
+class StandardDeviationModule(ProcessModule):
+    """功能是对满队列中的所有数据求标准差。返回标准差。
+    表示震动频率的平均情况"""
+
+    FEATURE_NAME = "StandardDeviation"
+
+    def processFullQueue(self):
+        sum = 0
+        variance = 0
+        for value in self.queue.queue:
+            sum = sum + value['volt']
+        average = sum / self.size
+        for value in self.queue.queue:
+            variance = variance + (value['volt'] - average) ** 2
+        import math
+        return math.sqrt(variance / self.size)
+
+    def clear(self):
+        """清理组件中的队列"""
+        self.queue.queue.clear()
 
 class VibrationFreqModule(ProcessModule):
     """计算检测到的电压中的频率"""
@@ -43,7 +66,7 @@ class EnergyModule(ProcessModule):
         volts = []
         for i in self.queue.queue:
             volts.append(i['volt'])
-        import numpy as np
+
         # fft返回值实部表示
         result = np.fft.fft(volts)  # 除以长度表示归一化处理
         # fftfreq第一个参数n是FFT的点数，一般取FFT之后的数据的长度（size）
@@ -52,7 +75,7 @@ class EnergyModule(ProcessModule):
         amplitude = np.sqrt(result.real ** 2 + result.imag ** 2) / (len(volts) / 2)
         sum = 0
         for i in abs(amplitude):
-            sum += i
+            sum += i ** 2
         return sum
 
     def get_average(self, list):
@@ -75,8 +98,23 @@ class RangeModule(ProcessModule):
         range = []
         for i in self.queue.queue:
             range.append(i['volt'])
-        import math
         return math.sqrt(max(range) - min(range))
+
+    def clear(self):
+        """清理组件中的队列"""
+        self.queue.queue.clear()
+
+
+class RMSModule(ProcessModule):
+    """计算检测到的电压中的均方根"""
+
+    FEATURE_NAME = "RMS"
+
+    def processFullQueue(self):
+        sum = 0
+        for i in self.queue.queue:
+            sum += i['volt'] ** 2
+        return math.sqrt(sum / len(self.queue.queue))
 
     def clear(self):
         """清理组件中的队列"""
@@ -99,7 +137,7 @@ class DurationModule(ProcessModule):
             if (i['volt'] < min):
                 min = i['volt']
                 min_time = i['time']
-        return 2 - abs(max_time - min_time)
+        return abs(max_time - min_time)
 
     def clear(self):
         """清理组件中的队列"""
@@ -184,24 +222,3 @@ class VarianceModule(ProcessModule):
         """清理组件中的队列"""
         self.queue.queue.clear()
 
-
-class StandardDeviationModule(ProcessModule):
-    """功能是对满队列中的所有数据求标准差。返回标准差。
-    表示震动频率的平均情况"""
-
-    FEATURE_NAME = "StandardDeviation"
-
-    def processFullQueue(self):
-        sum = 0
-        variance = 0
-        for value in self.queue.queue:
-            sum = sum + value['volt']
-        average = sum / self.size
-        for value in self.queue.queue:
-            variance = variance + (value['volt'] - average) ** 2
-        import math
-        return math.sqrt(variance / self.size)
-
-    def clear(self):
-        """清理组件中的队列"""
-        self.queue.queue.clear()

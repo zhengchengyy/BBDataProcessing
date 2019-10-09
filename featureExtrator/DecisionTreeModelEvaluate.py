@@ -14,6 +14,8 @@ trainlab_matrix = label_matrix[0:train_size]
 test_fea_matrix = feature_matrix[train_size:]
 test_lab_matrix = label_matrix[train_size:]
 
+# print(test_lab_matrix)
+
 # 读取模型
 import pickle
 
@@ -44,18 +46,3 @@ print("kappa:", metrics.cohen_kappa_score(y_test, y_pred))
 print("ham_distance:", metrics.hamming_loss(y_test, y_pred))
 # print("jaccrd_score:", metrics.jaccard_similarity_score(y_test, y_pred))
 # print("hinger:", metrics.hinge_loss(y_test, y_pred))
-
-
-# 特征重要性
-feature_names = ["Range", "StandardDeviation"]
-import matplotlib.pyplot as plt  # 导入图形展示库
-feature_importance = model.feature_importances_  # 获得指标重要性
-color_list = ['r', 'c', 'b', 'g']  # 颜色列表
-# 画出条形图
-plt.bar(np.arange(feature_importance.shape[0]), feature_importance,
-        tick_label=feature_names, color=color_list)
-plt.title('feature importance')  # 子网格标题
-plt.xlabel('features')  # x轴标题
-plt.ylabel('importance')  # y轴标题
-plt.suptitle('classification result')  # 图形总标题
-plt.show()  # 展示图形
