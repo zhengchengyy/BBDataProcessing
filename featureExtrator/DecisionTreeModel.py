@@ -28,7 +28,7 @@ with open('models/' + str(round(score,3)) + 'Acc_' + str(feature_num) + 'Fea.pic
     pickle.dump(clf, f)
 
 # 决策树可视化
-feature_names = ["RangeModule", "EnergyModule", "StandardDeviationModule"]
+feature_names = ["StandardDeviationModule", "AverageModule"]
 action_names = ["turn_over", "legs_stretch", "hands_stretch",
                 "legs_twitch", "hands_twitch", "head_move", "grasp", "kick"]
 

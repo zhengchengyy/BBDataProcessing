@@ -23,7 +23,9 @@ config = {'db': 'beaglebone',
 # feature_names = ["RangeModule", "EnergyModule", "StandardDeviationModule",
 #                  "RMSModule", "VarianceModule", "AverageModule", "SamplingFreqModule"]
 
-feature_names = ["StandardDeviationModule", "VarianceModule", "AverageModule"]
+# feature_names = ["StandardDeviationModule", "VarianceModule", "AverageModule"]
+
+feature_names = ["StandardDeviationModule", "AverageModule"]
 
 def timeToFormat(t):
     ftime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t))
