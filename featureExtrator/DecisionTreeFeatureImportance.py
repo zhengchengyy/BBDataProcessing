@@ -15,7 +15,7 @@ test_fea_matrix = feature_matrix[train_size:]
 test_lab_matrix = label_matrix[train_size:]
 
 # 训练和预测
-clf = DecisionTreeClassifier()
+clf = DecisionTreeClassifier(min_samples_leaf = 10)
 clf.fit(trainfea_matrix, trainlab_matrix)
 result = clf.predict(test_fea_matrix)
 score = clf.score(test_fea_matrix, test_lab_matrix)
@@ -52,6 +52,10 @@ dot_data = tree.export_graphviz(clf, out_file=None,
 graph = pydotplus.graph_from_dot_data(dot_data)
 # Image(graph.create_png())
 graph.write_pdf("result.pdf")
+
+# 直接画出决策树，但是很小看不清
+# from sklearn.tree import plot_tree
+# plot_tree(clf, filled=True)
 
 
 #————特征重要性————

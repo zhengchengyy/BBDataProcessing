@@ -23,11 +23,12 @@ print(score)
 
 # 保存模型
 import pickle
-with open('models/' + str(round(score,3)) + 'models.pickle', 'wb') as f:
+feature_num = feature_matrix.shape[1]
+with open('models/' + str(round(score,3)) + 'Acc_' + str(feature_num) + 'Fea.pickle', 'wb') as f:
     pickle.dump(clf, f)
 
 # 决策树可视化
-feature_names = ["RangeModule", "EnergyModule", "StandardDeviationModule", "RMSModule"]
+feature_names = ["RangeModule", "EnergyModule", "StandardDeviationModule"]
 action_names = ["turn_over", "legs_stretch", "hands_stretch",
                 "legs_twitch", "hands_twitch", "head_move", "grasp", "kick"]
 

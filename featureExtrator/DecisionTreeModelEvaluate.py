@@ -19,7 +19,7 @@ test_lab_matrix = label_matrix[train_size:]
 # 读取模型
 import pickle
 
-with open('models/0.943models.pickle', 'rb') as f:
+with open('models/0.978models.pickle', 'rb') as f:
     model = pickle.load(f)
 train_score = model.score(trainfea_matrix, trainlab_matrix)
 test_score = model.score(test_fea_matrix, test_lab_matrix)
@@ -37,7 +37,12 @@ y_test = test_lab_matrix
 
 y_pred = model.predict(X_test)
 
-print("准确率:", metrics.accuracy_score(y_test, y_pred))
+
+print(metrics.classification_report(y_test,y_pred))
+#法二：通过混淆矩阵验证（横轴：实际值，纵轴：预测值）（理想情况下是个对角阵）
+print(metrics.confusion_matrix(y_test, y_pred))
+
+print("精确率:", metrics.accuracy_score(y_test, y_pred))
 print("查准率:", metrics.precision_score(y_test, y_pred, average='macro'))
 print("召回率:", metrics.recall_score(y_test, y_pred, average='macro'))
 print("F1_score:", metrics.f1_score(y_test, y_pred, average='macro'))
