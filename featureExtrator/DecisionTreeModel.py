@@ -46,4 +46,4 @@ dot_data = tree.export_graphviz(clf, out_file=None,
                                 special_characters=True)
 graph = pydotplus.graph_from_dot_data(dot_data)
 # Image(graph.create_png())
-graph.write_pdf("result.pdf")
+graph.write_pdf('trees/' + str(round(score,3)) + 'Acc_' + str(feature_num) + 'Fea.pdf')

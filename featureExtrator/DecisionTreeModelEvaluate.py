@@ -19,7 +19,7 @@ test_lab_matrix = label_matrix[train_size:]
 # 读取模型
 import pickle
 
-with open('models/0.978models.pickle', 'rb') as f:
+with open('models/0.968Acc_2Fea.pickle', 'rb') as f:
     model = pickle.load(f)
 train_score = model.score(trainfea_matrix, trainlab_matrix)
 test_score = model.score(test_fea_matrix, test_lab_matrix)
@@ -51,3 +51,12 @@ print("kappa:", metrics.cohen_kappa_score(y_test, y_pred))
 print("ham_distance:", metrics.hamming_loss(y_test, y_pred))
 # print("jaccrd_score:", metrics.jaccard_similarity_score(y_test, y_pred))
 # print("hinger:", metrics.hinge_loss(y_test, y_pred))
+
+# 交叉验证
+from sklearn.model_selection import cross_val_score
+print("交叉验证:", cross_val_score(model, X_train, y=y_train, cv=5))  # cv表示几倍交叉验证
+from sklearn.model_selection import validation_curve
+# 检验曲线，传入不同参数和对应参数范围
+train_score, test_score = validation_curve(model, X_train, y_train,
+                        "max_depth", range(1,10), cv=5, scoring=None, n_jobs=1)
+print(train_score)
