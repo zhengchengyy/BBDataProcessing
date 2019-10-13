@@ -1,5 +1,3 @@
 [
-  "DecisionTreeModelParam.py::test_DecisionTreeClassifiter_depth",
-  "DecisionTreeModelParam.py::test_DecisionTreeClassifier_criterion",
-  "DecisionTreeModelParam.py::test_DecisionTreeClassifier_splitter"
+  "DecisionTreeModelParam.py::test_DecisionTreeClassifier_criterion"
 ]

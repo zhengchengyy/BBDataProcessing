@@ -2,23 +2,20 @@ from sklearn.tree import DecisionTreeClassifier
 import numpy as np
 
 # 导入数据
-feature_matrix = np.load('feature_matrixs/feature_random_matrix2.npy')
-label_matrix = np.load('feature_matrixs/label_random_matrix2.npy')
+feature_matrix = np.load('feature_matrixs/feature_matrix2.npy')
+label_matrix = np.load('feature_matrixs/label_matrix2.npy')
 
 # 定义训练集和测试集
-train_size = feature_matrix.shape[0] // 4 * 3
-test_size = feature_matrix.shape[0] - train_size
-
-trainfea_matrix = feature_matrix[0:train_size]
-trainlab_matrix = label_matrix[0:train_size]
-test_fea_matrix = feature_matrix[train_size:]
-test_lab_matrix = label_matrix[train_size:]
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(
+    feature_matrix, label_matrix, test_size=0.25, random_state=0)
+# print(len(X_train),len(X_test))
+# print(y_test)
 
 # 训练和预测
-clf = DecisionTreeClassifier(max_depth=9, min_samples_split=10, max_leaf_nodes=15)
-clf.fit(trainfea_matrix, trainlab_matrix)
-result = clf.predict(test_fea_matrix)
-score = clf.score(test_fea_matrix, test_lab_matrix)
+clf = DecisionTreeClassifier()
+clf.fit(X_train, y_train)
+score = clf.score(X_test, y_test)
 print(score)
 
 # 保存模型

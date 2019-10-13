@@ -11,8 +11,8 @@ from scipy import interp
 from sklearn.tree import DecisionTreeClassifier
 
 # 导入数据
-feature_matrix = np.load('feature_matrixs/feature_matrix1.npy')
-label_matrix = np.load('feature_matrixs/label_matrix1.npy')
+feature_matrix = np.load('feature_matrixs/feature_matrix2.npy')
+label_matrix = np.load('feature_matrixs/label_matrix2.npy')
 
 # 绘制ROC曲线
 X = feature_matrix
@@ -28,13 +28,8 @@ n_samples, n_features = X.shape
 # shuffle and split training and test sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=0)
 
-# Learn to predict each class against the other
-# classifier = OneVsRestClassifier(svm.SVC(kernel='linear', probability=True,
-#                                          random_state=random_state))
-# y_score = clf.fit(X_train, y_train).decision_function(X_test)
-
 # 使用决策树训练
-clf = DecisionTreeClassifier()
+clf = DecisionTreeClassifier(max_depth=9, min_samples_split=10, max_leaf_nodes=15)
 clf.fit(X_train, y_train)
 y_score = clf.predict(X_test)
 score = clf.score(X_test, y_test)

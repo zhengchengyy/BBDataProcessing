@@ -6,23 +6,13 @@ action_names = ["turn_over", "legs_stretch", "hands_stretch",
                 "legs_twitch", "hands_twitch", "head_move", "grasp", "kick"]
 
 # 导入数据
-feature_matrix = np.load('feature_matrixs/feature_random_matrix2.npy')
-label_matrix = np.load('feature_matrixs/label_random_matrix2.npy')
+feature_matrix = np.load('feature_matrixs/feature_matrix2.npy')
+label_matrix = np.load('feature_matrixs/label_matrix2.npy')
 
 # 定义训练集和测试集
-train_size = feature_matrix.shape[0] // 4 * 3
-test_size = feature_matrix.shape[0] - train_size
-
-trainfea_matrix = feature_matrix[0:train_size]
-trainlab_matrix = label_matrix[0:train_size]
-test_fea_matrix = feature_matrix[train_size:]
-test_lab_matrix = label_matrix[train_size:]
-
-# 重新定义变量
-X_train = trainfea_matrix
-X_test = test_fea_matrix
-y_train = trainlab_matrix
-y_test = test_lab_matrix
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(
+    feature_matrix, label_matrix, test_size=0.25, random_state=0)
 
 # 画二维散点图
 import matplotlib.pyplot as plt
@@ -50,14 +40,15 @@ from sklearn.manifold import TSNE
 # X_train = min_max_scaler.fit_transform(X_train)
 
 # 增加噪音
-# X_train = np.random.normal(X_train, scale=0.002)
+X_train = np.random.normal(X_train, scale=0.002)
+X_test = np.random.normal(X_test, scale=0.002)
 # X_train = np.random.normal(X_train, scale=0.05)
 # print(X_train)
 
 # ax.scatter(X_train[:, 0], X_train[:, 1], X_train[:, 2], c=y_train, label=action_names,marker='*')
 # ax.legend(labels = action_names, loc='upper right')
 
-# 画二维散点图
+# 画训练数据的二维散点图
 n_classes = 8
 plot_colors = ['r', 'm', 'c', 'b', 'g', 'lime', 'y', 'peru', 'navy', 'orange']
 plot_markers = ['*', 'o', ',', 'v', 'D', 'h', 'd', 'p', 'H', 's']
@@ -70,18 +61,29 @@ for i in range(n_classes):
 plt.legend(loc='upper right')
 plt.xlabel(feature_names[0])
 plt.ylabel(feature_names[1])
-# plt.show()
+plt.show()
 
+# 画测试数据的二维散点图
+for i in range(n_classes):
+    idx = np.where(y_test == i)  # 返回满足条件的索引
+    plt.scatter(X_test[idx, 0], X_test[idx, 1], s=30,
+                c=plot_colors[i], label=action_names[i], marker=plot_markers[i])
 
+plt.legend(loc='upper right')
+plt.xlabel(feature_names[0])
+plt.ylabel(feature_names[1])
+plt.show()
+
+# 使用seaborn库画散点图
 import seaborn as sns
-
-# Plot miles per gallon against horsepower with other semantics
 import pandas as pd
-
-x = X_train[:, 0]
-y = X_train[:, 1]
+x = X_test[:, 0]
+y = X_test[:, 1]
 df = pd.DataFrame({feature_names[0]: x, feature_names[1]: y})
 sns.set(style="ticks", palette="muted")
-sns.relplot(feature_names[0], feature_names[1], style=y_train, hue=y_train, sizes=1000,
+sns.relplot(feature_names[0], feature_names[1], style=y_test, hue=y_test, sizes=1000,
             palette="Set2", data=df)
 plt.show()
+
+
+
