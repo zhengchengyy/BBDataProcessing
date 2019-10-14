@@ -15,9 +15,9 @@ test_fea_matrix = feature_matrix[train_size:]
 test_lab_matrix = label_matrix[train_size:]
 
 # 训练和预测
-clf = DecisionTreeClassifier(max_depth=9, min_samples_split=10, max_leaf_nodes=15)
+# clf = DecisionTreeClassifier(max_depth=9, min_samples_split=10, max_leaf_nodes=15)
+clf = DecisionTreeClassifier()
 clf.fit(trainfea_matrix, trainlab_matrix)
-result = clf.predict(test_fea_matrix)
 score = clf.score(test_fea_matrix, test_lab_matrix)
 print(score)
 

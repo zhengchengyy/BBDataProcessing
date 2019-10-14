@@ -69,9 +69,18 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
     # 定义画布左右位置的计数：标签累加，即人数累加
     tag_acc = 1
 
+    # 读取模型
+    import pickle
+    with open('models/0.973Acc_6Fea.pickle', 'rb') as f:
+        model = pickle.load(f)
+
     # read the data that is of a certain action one by one
     for tag in tag_collection.find({'tag': action}):
         inittime, termtime = tag['inittime'], tag['termtime']
+        # 定义总特征计数
+        feature_acc = 0
+        # 定义精确率计数
+        accuracy_acc = 0
 
         # get the arrays according to which we will plot later
         times, volts = {}, {}
@@ -82,8 +91,8 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
         for volt in volt_collection.find({'time': {'$gt': inittime, '$lt': termtime}}):
             device_no = int(volt['device_no'])
             v = volt['voltage']
-            time = volt['time']
-            times[device_no].append(time)
+            t = volt['time']
+            times[device_no].append(t)
             volts[device_no].append(v)
 
         # 定义存储时间、特征列表
@@ -107,6 +116,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
                 }
                 output = extractor.process(value)
                 if (output):
+                    feature_acc += 1
                     features = {
                         "device_no": i,
                         "feature_time": times[i][j],
@@ -115,74 +125,36 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
                         "rate": rate
                     }
                     feature_times[i].append(features['feature_time'])
+                    feature_temp = []  #存储实时计算的一条特征数据
                     for feature_type in feature_values[i].keys():
+                        # print(feature_type, features['feature_value'][feature_type])
+                        feature_temp.append(features['feature_value'][feature_type])
                         feature_values[i][feature_type].append(features['feature_value'][feature_type])
+
+                    # print(feature_temp)
+
+                    predict_result = model.predict([feature_temp])
+                    format_result = "person" + str(tag_acc) + " " + "device_" + str(i)
+                    # print(format_result, action_names[predict_result[0]])
+                    if(predict_result[0]==action_num):
+                        accuracy_acc += 1
 
             # 清理所有模块，防止过期数据
             extractor.clear()
 
-        # 定义特征数量
-        nfeatures = len(feature_values[1])
-
-        # 定义特征类型
-        feature_type = list(feature_values[1].keys())  # keys()方法虽然返回的是列表，但是不可以索引
-
-        for i in range(start, start + 1):
-
-            # 如果文件存在，则以添加的方式打开
-            if (os.path.exists("feature_matrixs/feature_matrix" + str(i) + ".npy")):
-                feature_matrix = np.load("feature_matrixs/feature_matrix" + str(i) + ".npy")
-                label_matrix = np.load("feature_matrixs/label_matrix" + str(i) + ".npy")
-                temp_matrix = np.zeros((len(feature_times[i]), nfeatures), dtype=float)
-
-                os.remove("feature_matrixs/feature_matrix" + str(i) + ".npy")
-                os.remove("feature_matrixs/label_matrix" + str(i) + ".npy")
-
-                for j in range(len(feature_times[i])):
-                    for k in range(nfeatures):
-                        temp_matrix[j][k] = feature_values[i][feature_type[k]][j]
-                    label_matrix = np.append(label_matrix, [action_num])
-
-                # np.append(feature_matrixs, [temp_matrix], axis=0)
-                feature_matrix = np.insert(feature_matrix, feature_matrix.shape[0],
-                                           values=temp_matrix, axis=0)
-
-                np.save('feature_matrixs/feature_matrix' + str(i), feature_matrix)
-                np.save('feature_matrixs/label_matrix' + str(i), label_matrix)
-
-                print("feature_matrix" + str(i) + ":" + str(feature_matrix.shape))
-
-
-            # 如果文件不存在，则定义特征矩阵和标签矩阵
-            else:
-                feature_matrix = np.zeros((len(feature_times[i]), nfeatures), dtype=float)
-                label_matrix = np.zeros((len(feature_times[i]), 1), dtype=int)
-
-                for j in range(len(feature_times[i])):
-                    for k in range(nfeatures):
-                        feature_matrix[j][k] = feature_values[i][feature_type[k]][j]
-                    label_matrix[j] = action_num
-                # np.save保存时自动为8位小数
-                np.save('feature_matrixs/feature_matrix' + str(i), feature_matrix)
-                np.save('feature_matrixs/label_matrix' + str(i), label_matrix)
-
-                print("feature_matrix" + str(i) + ":" + str(feature_matrix.shape))
+        print("action:", action_names[action_num])
+        print("person" + str(tag_acc) + "的精确率：", accuracy_acc/feature_acc)
 
         tag_acc += 1
 
 
 if __name__ == '__main__':
-    # 清除文件
-    start = 1
-    if (os.path.exists("feature_matrixs/feature_matrix1.npy")):
-        for i in range(start, 3 + 1):
-            os.remove("feature_matrixs/feature_matrix" + str(i) + ".npy")
-            os.remove("feature_matrixs/label_matrix" + str(i) + ".npy")
 
-    for i in range(len(action_names)):
-        draw_features_from_db(action=action_names[i],
-                              db=config['db'],
-                              tag_collection=config['tag_collection'],
-                              volt_collection=config['volt_collection'],
-                              offset=config['offset'],
-                              action_num=i)
+    for action_num in range(len(action_names)):
+    # action_num = 0
+        draw_features_from_db(action=action_names[action_num],
+                                  db=config['db'],
+                                  tag_collection=config['tag_collection'],
+                                  volt_collection=config['volt_collection'],
+                                  offset=config['offset'],
+                                  action_num=action_num)

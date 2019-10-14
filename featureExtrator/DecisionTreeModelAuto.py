@@ -4,6 +4,7 @@ import numpy as np
 # 导入数据
 feature_matrix = np.load('feature_matrixs/feature_matrix2.npy')
 label_matrix = np.load('feature_matrixs/label_matrix2.npy')
+# print(feature_matrix)
 
 # 定义训练集和测试集
 from sklearn.model_selection import train_test_split
@@ -24,11 +25,12 @@ feature_num = feature_matrix.shape[1]
 with open('models/' + str(round(score,3)) + 'Acc_' + str(feature_num) + 'Fea.pickle', 'wb') as f:
     pickle.dump(clf, f)
 
-# 决策树可视化
-feature_names = ["StandardDeviationModule", "AverageModule"]
-action_names = ["turn_over", "legs_stretch", "hands_stretch",
-                "legs_twitch", "hands_twitch", "head_move", "grasp", "kick"]
+# 导入全局变量
+import GlobalVariable as gv
+action_names = gv.action_names
+feature_names = gv.feature_names
 
+# 决策树可视化
 from IPython.display import Image
 from sklearn import tree
 import pydotplus

@@ -14,7 +14,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 # 读取模型
 import pickle
 
-with open('models/0.976Acc_2Fea.pickle', 'rb') as f:
+with open('models/0.973Acc_6Fea.pickle', 'rb') as f:
     model = pickle.load(f)
 train_score = model.score(X_train, y_train)
 test_score = model.score(X_test, y_test)

@@ -1,24 +1,19 @@
 from sklearn.tree import DecisionTreeClassifier
 import numpy as np
 
-# ————训练数据————
-feature_matrix = np.load('feature_matrixs/feature_random_matrix2.npy')
-label_matrix = np.load('feature_matrixs/label_random_matrix2.npy')
+# ————导入数据————
+feature_matrix = np.load('feature_matrixs/feature_matrix2.npy')
+label_matrix = np.load('feature_matrixs/label_matrix2.npy')
 
-# 定义训练集和测试集
-train_size = feature_matrix.shape[0] // 4 * 3
-test_size = feature_matrix.shape[0] - train_size
-
-trainfea_matrix = feature_matrix[0:train_size]
-trainlab_matrix = label_matrix[0:train_size]
-test_fea_matrix = feature_matrix[train_size:]
-test_lab_matrix = label_matrix[train_size:]
+# 划分训练集和测试集
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(
+    feature_matrix, label_matrix, test_size=0.25, random_state=0)
 
 # 训练和预测
-clf = DecisionTreeClassifier(min_samples_leaf=10)
-clf.fit(trainfea_matrix, trainlab_matrix)
-result = clf.predict(test_fea_matrix)
-score = clf.score(test_fea_matrix, test_lab_matrix)
+clf = DecisionTreeClassifier()
+clf.fit(X_train, y_train)
+score = clf.score(X_test, y_test)
 print(score)
 
 # ————保存模型————
@@ -28,13 +23,12 @@ with open('models/' + str(round(score,3)) + 'Acc_' + str(feature_num) + 'Fea.pic
     pickle.dump(clf, f)
 
 # ————决策树可视化————
-feature_names = ["StandardDeviationModule", "VarianceModule", "AverageModule"]
-
+# 导入全局变量
+import GlobalVariable as gv
+feature_names = gv.feature_names
 # 删除名字后缀
 feature_names = [feature[:-6] for feature in feature_names]
-
-action_names = ["turn_over", "legs_stretch", "hands_stretch",
-                "legs_twitch", "hands_twitch", "head_move", "grasp", "kick"]
+action_names = gv.action_names
 
 from IPython.display import Image
 from sklearn import tree
