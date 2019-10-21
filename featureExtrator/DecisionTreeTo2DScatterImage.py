@@ -1,9 +1,10 @@
 from sklearn.tree import _tree
 import numpy as np
 
-feature_names = ["StandardDeviationModule", "VarianceModule", "AverageModule"]
-action_names = ["turn_over", "legs_stretch", "hands_stretch",
-                "legs_twitch", "hands_twitch", "head_move", "grasp", "kick"]
+# 导入全局变量
+import GlobalVariable as gv
+action_names = gv.action_names
+feature_names = gv.feature_names
 
 # 导入数据
 feature_matrix = np.load('feature_matrixs/feature_matrix2.npy')
@@ -22,8 +23,8 @@ from sklearn.decomposition import PCA
 from sklearn import preprocessing
 from sklearn.manifold import TSNE
 
-# 如果超过三维则降维到三维数据
-# x_reduced = PCA(n_components=2).fit_transform(X_train)
+# 如果超过二维则降维到二维数据
+x_reduced = PCA(n_components=2).fit_transform(X_train)
 # x_reduced = TSNE(n_components=2).fit_transform(X_train)
 
 # 数据旋转

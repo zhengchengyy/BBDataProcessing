@@ -1,48 +1,58 @@
 from sklearn.tree import DecisionTreeClassifier
 import numpy as np
 
-# 导入数据
-feature_matrix = np.load('feature_matrixs/feature_matrix2.npy')
-label_matrix = np.load('feature_matrixs/label_matrix2.npy')
-# print(feature_matrix)
+ndevices = 3
+start = 1
+end = ndevices
 
-# 定义训练集和测试集
-from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    feature_matrix, label_matrix, test_size=0.25, random_state=0)
-# print(len(X_train),len(X_test))
-# print(y_test)
 
-# 训练和预测
-clf = DecisionTreeClassifier()
-clf.fit(X_train, y_train)
-score = clf.score(X_test, y_test)
-print(score)
+def save_model(device_no):
+    # 导入数据
+    feature_matrix = np.load('feature_matrixs/feature_matrix' + str(device_no) + '.npy')
+    label_matrix = np.load('feature_matrixs/label_matrix' + str(device_no) + '.npy')
+    # print(feature_matrix)
 
-# 保存模型
-import pickle
-feature_num = feature_matrix.shape[1]
-with open('models/' + str(round(score,3)) + 'Acc_' + str(feature_num) + 'Fea.pickle', 'wb') as f:
-    pickle.dump(clf, f)
+    # 定义训练集和测试集
+    from sklearn.model_selection import train_test_split
+    X_train, X_test, y_train, y_test = train_test_split(
+        feature_matrix, label_matrix, test_size=0.25, random_state=0)
 
-# 导入全局变量
-import GlobalVariable as gv
-action_names = gv.action_names
-feature_names = gv.feature_names
+    # 训练和预测
+    clf = DecisionTreeClassifier()
+    clf.fit(X_train, y_train)
+    score = clf.score(X_test, y_test)
+    print('device_' + str(device_no) +'\'s score:', score)
 
-# 决策树可视化
-from IPython.display import Image
-from sklearn import tree
-import pydotplus
-import os
+    # 保存模型
+    import pickle
+    feature_num = feature_matrix.shape[1]
+    with open('models/' + 'device_' + str(device_no) + 'Acc_' + str(round(score, 3))
+               + 'Fea_' + str(feature_num) + '.pickle', 'wb') as f:
+        pickle.dump(clf, f)
 
-os.environ["PATH"] += os.pathsep + 'D:/Anaconda3/Library/bin/graphviz'
+    # 导入全局变量
+    import GlobalVariable as gv
+    action_names = gv.action_names
+    feature_names = gv.feature_names
 
-dot_data = tree.export_graphviz(clf, out_file=None,
-                                feature_names=feature_names,
-                                class_names=action_names,
-                                filled=True, rounded=True,
-                                special_characters=True)
-graph = pydotplus.graph_from_dot_data(dot_data)
-# Image(graph.create_png())
-graph.write_pdf('trees/' + str(round(score,3)) + 'Acc_' + str(feature_num) + 'Fea.pdf')
+    # 决策树可视化
+    from IPython.display import Image
+    from sklearn import tree
+    import pydotplus
+    import os
+
+    os.environ["PATH"] += os.pathsep + 'D:/Anaconda3/Library/bin/graphviz'
+
+    dot_data = tree.export_graphviz(clf, out_file=None,
+                                    feature_names=feature_names,
+                                    class_names=action_names,
+                                    filled=True, rounded=True,
+                                    special_characters=True)
+    graph = pydotplus.graph_from_dot_data(dot_data)
+    # Image(graph.create_png())
+    graph.write_pdf('trees/' + 'device_' + str(device_no) + 'Acc_' + str(round(score, 3))
+               + 'Fea_' + str(feature_num) + '.pdf')
+
+
+for i in range(start, end + 1):
+    save_model(i)

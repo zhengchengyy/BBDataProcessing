@@ -8,6 +8,11 @@ action_names = ["turn_over", "legs_stretch", "hands_stretch",
 
 # 定义特征名称
 # feature_names = ["StandardDeviationModule", "VarianceModule", "AverageModule"]
+
 # feature_names = ["StandardDeviationModule", "AverageModule"]
+
 feature_names = ["RangeModule", "EnergyModule", "StandardDeviationModule",
-                 "RMSModule", "VarianceModule", "AverageModule"]
+                 "RMSModule", "VarianceModule", "AverageModule", "MaxModule", "MinModule"]
+
+# feature_names = ["RangeModule", "EnergyModule", "StandardDeviationModule",
+#                  "RMSModule", "VarianceModule", "AverageModule"]

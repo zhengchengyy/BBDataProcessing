@@ -13,14 +13,19 @@ import os
 
 from scipy import signal
 
-
-action = ["turn_over", "legs_stretch", "hands_stretch",
-          "legs_twitch", "hands_twitch", "head_move", "grasp", "kick"]
-
 config = {'db': 'beaglebone',
           'tag_collection': 'tags_411',
           'volt_collection': 'volts_411',
+          'device_num': 3,
           'offset': 0}
+
+weights = [65, 75]
+
+# 导入全局变量
+import GlobalVariable as gv
+
+action_names = gv.action_names
+feature_names = gv.feature_names
 
 
 def timeToFormat(t):
@@ -33,8 +38,18 @@ def timeToSecond(t):
     return stime
 
 
+def getNormalization(li):
+    temp = []
+    _max = max(li)
+    _min = min(li)
+    for i in li:
+        normal = (i - _min) / (_max - _min)
+        temp.append(normal)
+    return temp
+
+
 def draw_features_from_db(action, db, volt_collection, tag_collection, port=27017,
-                          host='localhost', ndevices=5, offset=0, action_num=0):
+                          host='localhost', ndevices=3, offset=0, action_num=0):
     client = MongoClient(port=port, host=host)
     database = client[db]
     tag_collection = database[tag_collection]
@@ -60,15 +75,11 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
     # 定义特征提取器
     extractor = FeatureExtractor()
 
-    # 定义特征提取模块
-    rangemodule = RangeModule(interval, rate)
-    standarddeviation = StandardDeviationModule(interval, rate)
-    energe = EnergyModule(interval, rate)
-
-    # 注册特征提取模块
-    extractor.register(rangemodule)
-    extractor.register(standarddeviation)
-    extractor.register(energe)
+    for feature in feature_names:
+        # 定义特征提取模块
+        module = eval(feature + "(" + str(interval) + "," + str(rate) + ")")
+        # 注册特征提取模块
+        extractor.register(module)
 
     # 定义画布左右位置的计数：标签累加，即人数累加
     tag_acc = 1
@@ -78,7 +89,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
         inittime, termtime = tag['inittime'], tag['termtime']
 
         # get the arrays according to which we will plot later
-        times, volts, filter_volts = {}, {}, {}
+        times, volts, filter_volts, normalize_volts = {}, {}, {}, {}
         for i in range(1, ndevices + 1):
             times[i] = []
             volts[i] = []
@@ -87,30 +98,38 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
         for volt in volt_collection.find({'time': {'$gt': inittime, '$lt': termtime}}):
             device_no = int(volt['device_no'])
             v = volt['voltage']
-            time = volt['time']
-            times[device_no].append(time)
+            t = volt['time']
+            times[device_no].append(t)
             volts[device_no].append(v)
 
-        # 滤波
         for i in range(1, ndevices + 1):
+            # 滤波
             b, a = signal.butter(8, 4 / 7, 'lowpass')  # 配置滤波器，8表示滤波器的阶数
             filter_volts[i] = signal.lfilter(b, a, volts[i])
+
+            # 除以体重，归一化数据
+            filter_volts[i] = list(map(lambda x: x / weights[tag_acc - 1], filter_volts[i]))
+            normalize_volts[i] = getNormalization(filter_volts[i])
 
         # 定义存储时间、特征列表
         feature_times, feature_values = {}, {}
         for i in range(1, ndevices + 1):
             feature_times[i] = []
-            feature_values[i] = {'Range': [], 'StandardDeviation': []}
+            from collections import defaultdict
+            feature_values[i] = defaultdict(list)
+            for feature in feature_names:
+                feature_values[i][feature[:-6]] = []
 
         # 提取第几个设备的特征
         start = 1
+        end = ndevices
 
-        # 对每个采集设备进行特征提取 ndevices
-        for i in range(start, 5 + 1):
-            for j in range(len(volts[i])):
+        # 对每个采集设备进行特征提取
+        for i in range(start, end + 1):
+            for j in range(len(normalize_volts[i])):
                 value = {
                     "time": times[i][j],
-                    "volt": volts[i][j]
+                    "volt": normalize_volts[i][j]
                 }
                 output = extractor.process(value)
                 if (output):
@@ -134,7 +153,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
         # 定义特征类型
         feature_type = list(feature_values[1].keys())  # keys()方法虽然返回的是列表，但是不可以索引
 
-        for i in range(start, 3 + 1):
+        for i in range(start, end + 1):
 
             # 如果文件存在，则以添加的方式打开
             if (os.path.exists("feature_matrixs/feature_matrix" + str(i) + ".npy")):
@@ -169,8 +188,11 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
                     for k in range(nfeatures):
                         feature_matrix[j][k] = feature_values[i][feature_type[k]][j]
                     label_matrix[j] = action_num
+                # np.save保存时自动为8位小数
                 np.save('feature_matrixs/feature_matrix' + str(i), feature_matrix)
                 np.save('feature_matrixs/label_matrix' + str(i), label_matrix)
+
+                print("feature_matrix" + str(i) + ":" + str(feature_matrix.shape))
 
         tag_acc += 1
 
@@ -178,15 +200,16 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
 if __name__ == '__main__':
     # 清除文件
     start = 1
-    if (os.path.exists("feature_matrixs/feature_matrix1.npy")):
-        for i in range(start, 3 + 1):
+    for i in range(start, 3 + 1):
+        if (os.path.exists("feature_matrixs/feature_matrix" + str(i) + ".npy")):
             os.remove("feature_matrixs/feature_matrix" + str(i) + ".npy")
             os.remove("feature_matrixs/label_matrix" + str(i) + ".npy")
 
-    for i in range(len(action)):
-        draw_features_from_db(action=action[i],
+    for i in range(len(action_names)):
+        draw_features_from_db(action=action_names[i],
                               db=config['db'],
                               tag_collection=config['tag_collection'],
                               volt_collection=config['volt_collection'],
+                              ndevices=config['device_num'],
                               offset=config['offset'],
                               action_num=i)

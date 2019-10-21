@@ -17,7 +17,7 @@ test_lab_matrix = label_matrix[train_size:]
 # 读取模型
 import pickle
 
-with open('models/0.966model.pickle', 'rb') as f:
+with open('models_discard/0.966model.pickle', 'rb') as f:
     model = pickle.load(f)
 train_score = model.score(trainfea_matrix, trainlab_matrix)
 test_score = model.score(test_fea_matrix, test_lab_matrix)

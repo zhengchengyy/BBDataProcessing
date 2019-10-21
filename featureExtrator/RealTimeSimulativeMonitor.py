@@ -71,7 +71,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
 
     # 读取模型
     import pickle
-    with open('models/0.973Acc_6Fea.pickle', 'rb') as f:
+    with open('models_discard/0.973Acc_6Fea.pickle', 'rb') as f:
         model = pickle.load(f)
 
     # read the data that is of a certain action one by one

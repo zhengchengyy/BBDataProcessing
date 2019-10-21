@@ -4,15 +4,18 @@ from matplotlib import style
 from exceptions import CollectionError
 from scipy import signal
 import time
+import numpy as np
 
 action = ["still", "turn_over", "legs_stretch", "hands_stretch",
               "legs_twitch", "hands_twitch", "head_move", "grasp", "kick"]
 
-config = {'action': action[8],
+config = {'action': action[2],
           'db': 'beaglebone',
           'tag_collection': 'tags_411',
           'volt_collection': 'volts_411',
-          'offset': 0}
+          'ndevices': 3,
+          'offset': 0
+          }
 
 def timeToFormat(t):
     ftime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t))
@@ -24,7 +27,16 @@ def timeToSecond(t):
     return stime
 
 
-def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='localhost', ndevices=3, offset=0):
+def getSquare(li):
+    import math
+    temp = []
+    for i in li:
+        temp.append(i**2)
+    return temp
+
+
+def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='localhost',
+                 ndevices=3, offset=0):
     client = MongoClient(port=port, host=host)
     database = client[db]
     tag_collection = database[tag_collection]
@@ -32,7 +44,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
 
     try:
         if volt_collection.count_documents({}) + tag_collection.count_documents({}) < 2:
-            raise CollectionError('Collection not found, please check names of the collection and database')
+            raise CollectionError('Collection not found!')
     except CollectionError as e:
         print(e.message)
 
@@ -69,21 +81,29 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         # plot, add_subplot(211)将画布分割成2行1列，图像画在从左到右从上到下的第1块
         ax = fig.add_subplot(base + n)
         plt.subplots_adjust(hspace=0.5)  # 函数中的wspace是子图之间的垂直间距，hspace是子图的上下间距
-        ax.set_title("Person" + subtitle[n - 1] + ": " + timeToFormat(inittime + offset) + " ~ " + timeToFormat(
-            termtime + offset))
+        ax.set_title("Person" + subtitle[n - 1] + ": " + timeToFormat(inittime + offset)
+                     + " ~ " + timeToFormat(termtime + offset))
         ax.set_xlim(inittime, termtime)
 
         # 自定义y轴的区间范围，可以使图放大或者缩小
         # ax.set_ylim([0.8,1.8])
         ax.set_ylim([0.75, 0.90])
+        # ax.set_ylim([0.60, 0.75])
         # ax.set_ylim([0.82, 0.83])
         ax.set_ylabel('Voltage(mv)')
 
-        for i in range(1, ndevices + 1):
+        # 查看第几号设备
+        start = 1
+        end = 3
+
+        for i in range(start, end + 1):
             # [v + i*0.2 for v in volts[i]]为了把多个设备的数据隔离开
             b, a = signal.butter(8, 3 / 7, 'lowpass')  # 配置滤波器，8表示滤波器的阶数
             filter_volts[i] = signal.filtfilt(b, a, volts[i])
-            ax.plot(times[i], filter_volts[i], label='device_' + str(i), color=colors[i - 1], alpha=0.9)
+            # filter_volts[i] = getSquare(filter_volts[i])
+
+            ax.plot(times[i], filter_volts[i], label='device_' + str(i),
+                    color=colors[i - 1], alpha=0.9)
 
         if n == 1:
             ax.legend(loc='upper right')
@@ -100,7 +120,9 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
             xticks.append(times[1][i])
             xticklabels.append(timeToSecond(times[1][i] + offset))
         ax.set_xticks(xticks)  # 设定标签的实际数字，数据类型必须和原数据一致
-        ax.set_xticklabels(xticklabels, rotation=15)  # 设定我们希望它显示的结果，xticks和xticklabels的元素一一对应
+        # 设定我们希望它显示的结果，xticks和xticklabels的元素一一对应
+        ax.set_xticklabels(xticklabels, rotation=15)
+
 
     # 最大化显示图像窗口
     plt.get_current_fig_manager().window.showMaximized()
@@ -112,4 +134,5 @@ if __name__ == '__main__':
                  db=config['db'],
                  tag_collection=config['tag_collection'],
                  volt_collection=config['volt_collection'],
+                 ndevices=config['ndevices'],
                  offset=config['offset'])

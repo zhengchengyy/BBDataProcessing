@@ -14,6 +14,7 @@ import os
 config = {'db': 'beaglebone',
           'tag_collection': 'tags_411',
           'volt_collection': 'volts_411',
+          'device_num': 3,
           'offset': 0}
 
 
@@ -34,7 +35,7 @@ def timeToSecond(t):
 
 
 def draw_features_from_db(action, db, volt_collection, tag_collection, port=27017,
-                          host='localhost', ndevices=5, offset=0, action_num=0):
+                          host='localhost', ndevices=3, offset=0, action_num=0):
     client = MongoClient(port=port, host=host)
     database = client[db]
     tag_collection = database[tag_collection]
@@ -96,10 +97,11 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
                 feature_values[i][feature[:-6]] = []
 
         # 提取第几个设备的特征
-        start = 2
+        start = 1
+        end = ndevices
 
         # 对每个采集设备进行特征提取 ndevices
-        for i in range(start, start + 1):
+        for i in range(start, end + 1):
             for j in range(len(volts[i])):
                 value = {
                     "time": times[i][j],
@@ -127,7 +129,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
         # 定义特征类型
         feature_type = list(feature_values[1].keys())  # keys()方法虽然返回的是列表，但是不可以索引
 
-        for i in range(start, start + 1):
+        for i in range(start, end + 1):
 
             # 如果文件存在，则以添加的方式打开
             if (os.path.exists("feature_matrixs/feature_matrix" + str(i) + ".npy")):
@@ -174,8 +176,8 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
 if __name__ == '__main__':
     # 清除文件
     start = 1
-    if (os.path.exists("feature_matrixs/feature_matrix1.npy")):
-        for i in range(start, 3 + 1):
+    for i in range(start, 3 + 1):
+        if (os.path.exists("feature_matrixs/feature_matrix" + str(i) + ".npy")):
             os.remove("feature_matrixs/feature_matrix" + str(i) + ".npy")
             os.remove("feature_matrixs/label_matrix" + str(i) + ".npy")
 
@@ -184,5 +186,6 @@ if __name__ == '__main__':
                               db=config['db'],
                               tag_collection=config['tag_collection'],
                               volt_collection=config['volt_collection'],
+                              ndevices=config['device_num'],
                               offset=config['offset'],
                               action_num=i)

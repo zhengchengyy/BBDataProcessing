@@ -6,9 +6,11 @@ from sklearn import __version__ as sklearn_version
 from sklearn import datasets
 import numpy as np
 
-feature_names = ["StandardDeviationModule", "VarianceModule", "AverageModule"]
-action_names = ["turn_over", "legs_stretch", "hands_stretch",
-                "legs_twitch", "hands_twitch", "head_move", "grasp", "kick"]
+# 导入全局变量
+import GlobalVariable as gv
+
+action_names = gv.action_names
+feature_names = gv.feature_names
 
 # 导入数据
 feature_matrix = np.load('feature_matrixs/feature_random_matrix2.npy')
@@ -80,6 +82,7 @@ def plot_decision_regions(X, y, classifier, test_idx=None, resolution=0.02):
 
 
 from sklearn.tree import DecisionTreeClassifier
+
 tree = DecisionTreeClassifier(max_depth=9, min_samples_split=10, max_leaf_nodes=15)
 tree.fit(X_train, y_train)
 X_combined = np.vstack((X_train, X_test))
@@ -91,5 +94,3 @@ plt.legend(loc='upper right')
 plt.tight_layout()
 # plt.savefig('./figures/decision_tree_decision.png', dpi=300)
 plt.show()
-
-

@@ -31,7 +31,7 @@ def binaryTreePaths(root, feature_names, action_names):
 # 读取模型
 import pickle
 
-with open('models/0.966model.pickle', 'rb') as f:
+with open('models_discard/0.966model.pickle', 'rb') as f:
     model = pickle.load(f)
 
 feature_names = ["Range", "StandardDeviation"]

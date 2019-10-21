@@ -57,7 +57,7 @@ title = "Learning Curves (DecisionTree)"
 cv = ShuffleSplit(n_splits=100, test_size=0.25, random_state=0)
 estimator = DecisionTreeClassifier(max_depth=9, min_samples_split=10, max_leaf_nodes=15)
 # import pickle
-# with open('models/0.968Acc_2Fea.pickle', 'rb') as f:
+# with open('models_discard/0.968Acc_2Fea.pickle', 'rb') as f:
 #     model = pickle.load(f)
 plot_learning_curve(estimator, title, X, y, cv=cv, n_jobs=1)
 plt.show()

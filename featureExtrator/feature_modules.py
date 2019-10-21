@@ -222,3 +222,38 @@ class VarianceModule(ProcessModule):
         """清理组件中的队列"""
         self.queue.queue.clear()
 
+
+class MaxModule(ProcessModule):
+    """功能是对满队列中的所有数据求最大值。返回最大值。
+    表示震动幅度达到的最大值"""
+
+    FEATURE_NAME = "Max"
+
+    def processFullQueue(self):
+        max = 0
+        for value in self.queue.queue:
+            if(value['volt'] > max):
+                max = value['volt']
+        return max
+
+    def clear(self):
+        """清理组件中的队列"""
+        self.queue.queue.clear()
+
+
+class MinModule(ProcessModule):
+    """功能是对满队列中的所有数据求最小值。返回最小值。
+    表示震动幅度达到的最小值"""
+
+    FEATURE_NAME = "Min"
+
+    def processFullQueue(self):
+        min = 0
+        for value in self.queue.queue:
+            if(value['volt'] < min):
+                min = value['volt']
+        return min
+
+    def clear(self):
+        """清理组件中的队列"""
+        self.queue.queue.clear()

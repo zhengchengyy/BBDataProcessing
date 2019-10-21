@@ -24,7 +24,7 @@ print(score)
 # 保存模型
 import pickle
 feature_num = feature_matrix.shape[1]
-with open('models/' + str(round(score,3)) + 'Acc_' + str(feature_num) + 'Fea.pickle', 'wb') as f:
+with open('models_discard/' + str(round(score,3)) + 'Acc_' + str(feature_num) + 'Fea.pickle', 'wb') as f:
     pickle.dump(clf, f)
 
 # 决策树可视化
@@ -46,4 +46,4 @@ dot_data = tree.export_graphviz(clf, out_file=None,
                                 special_characters=True)
 graph = pydotplus.graph_from_dot_data(dot_data)
 # Image(graph.create_png())
-graph.write_pdf('trees/' + str(round(score,3)) + 'Acc_' + str(feature_num) + 'Fea.pdf')
+graph.write_pdf('trees_discard/' + str(round(score,3)) + 'Acc_' + str(feature_num) + 'Fea.pdf')

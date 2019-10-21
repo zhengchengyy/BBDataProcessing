@@ -53,12 +53,12 @@ X = np.load('feature_matrixs/feature_random_matrix2.npy')
 y = np.load('feature_matrixs/label_random_matrix2.npy')
 estimator = DecisionTreeClassifier()
 # import pickle
-# with open('models/0.968Acc_2Fea.pickle', 'rb') as f:
+# with open('models_discard/0.968Acc_2Fea.pickle', 'rb') as f:
 #     model = pickle.load(f)
 # plot_learning_curve(estimator, "Learning Curves", X, y)
 plt.show()
 
-# ★近邻分类算法
+# ★K近邻分类算法
 from sklearn.model_selection import ShuffleSplit
 from sklearn.neighbors import KNeighborsClassifier
 

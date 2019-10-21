@@ -29,7 +29,7 @@ n_samples, n_features = X.shape
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=0)
 
 # 使用决策树训练
-clf = DecisionTreeClassifier(max_depth=9, min_samples_split=10, max_leaf_nodes=15)
+clf = DecisionTreeClassifier()
 clf.fit(X_train, y_train)
 y_score = clf.predict(X_test)
 score = clf.score(X_test, y_test)

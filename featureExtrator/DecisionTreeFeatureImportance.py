@@ -19,7 +19,7 @@ print(score)
 # ————保存模型————
 import pickle
 feature_num = feature_matrix.shape[1]
-with open('models/' + str(round(score,3)) + 'Acc_' + str(feature_num) + 'Fea.pickle', 'wb') as f:
+with open('models_discard/' + str(round(score,3)) + 'Acc_' + str(feature_num) + 'Fea.pickle', 'wb') as f:
     pickle.dump(clf, f)
 
 # ————决策树可视化————
@@ -55,7 +55,7 @@ graph.write_pdf("result.pdf")
 import matplotlib.pyplot as plt  # 导入图形展示库
 
 feature_importance = clf.feature_importances_  # 获得指标重要性
-color_list = ['r', 'g', 'b', 'm', 'c', 'y', 'pink']  # 颜色列表
+color_list = ['r', 'm', 'c', 'b', 'g', 'lime', 'y', 'peru', 'navy', 'orange', 'deepskyblue', 'pink']
 
 
 # 按特征输入顺序画出条形图
