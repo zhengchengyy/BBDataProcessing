@@ -7,12 +7,16 @@ action_names = ["turn_over", "legs_stretch", "hands_stretch",
 
 
 # 定义特征名称
-# feature_names = ["StandardDeviationModule", "VarianceModule", "AverageModule"]
+# feature_names = ["SDModule", "VarianceModule", "MeanModule"]
 
-# feature_names = ["StandardDeviationModule", "AverageModule"]
+# feature_names = ["SDModule", "MeanModule"]
 
-feature_names = ["RangeModule", "EnergyModule", "StandardDeviationModule",
-                 "RMSModule", "VarianceModule", "AverageModule", "MaxModule", "MinModule"]
+# feature_names = ["RangeModule", "EnergyModule", "SDModule",
+#                  "RMSModule", "VarianceModule", "MeanModule", "MaxModule", "MinModule"]
 
-# feature_names = ["RangeModule", "EnergyModule", "StandardDeviationModule",
-#                  "RMSModule", "VarianceModule", "AverageModule"]
+# feature_names = ["RangeModule", "MeanModule", "SDModule", "RMSModule", "EnergyModule"]
+
+feature_names = ["MeanModule", "SDModule"]
+
+# feature_names = ["RangeModule", "EnergyModule", "SDModule",
+#                  "RMSModule", "VarianceModule", "MeanModule"]

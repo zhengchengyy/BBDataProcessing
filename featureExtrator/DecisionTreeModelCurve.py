@@ -54,7 +54,7 @@ from sklearn.tree import DecisionTreeClassifier
 X = np.load('feature_matrixs/feature_matrix2.npy')
 y = np.load('feature_matrixs/label_matrix2.npy')
 title = "Learning Curves (DecisionTree)"
-cv = ShuffleSplit(n_splits=100, test_size=0.25, random_state=0)
+cv = ShuffleSplit(n_splits=10, test_size=0.25, random_state=0)
 estimator = DecisionTreeClassifier(max_depth=9, min_samples_split=10, max_leaf_nodes=15)
 # import pickle
 # with open('models_discard/0.968Acc_2Fea.pickle', 'rb') as f:

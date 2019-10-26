@@ -18,7 +18,22 @@ def save_model(device_no):
         feature_matrix, label_matrix, test_size=0.25, random_state=0)
 
     # 训练和预测
-    clf = DecisionTreeClassifier(random_state=0, criterion='entropy')
+    # clf = DecisionTreeClassifier(random_state=0,
+    #                              max_depth=13,
+    #                              max_leaf_nodes=25,
+    #                              min_impurity_decrease=0.0001,
+    #                              min_samples_leaf=3,
+    #                              min_samples_split=3,
+    #                              splitter='best',
+    #                              criterion='gini')
+    clf = DecisionTreeClassifier(random_state=0,
+                                 max_depth=11,
+                                 max_leaf_nodes=24,
+                                 min_impurity_decrease=0.0003,
+                                 min_samples_leaf=3,
+                                 min_samples_split=7,
+                                 splitter='best',
+                                 criterion='entropy')
     clf.fit(X_train, y_train)
     train_score = clf.score(X_train, y_train)
     test_score = clf.score(X_test, y_test)
@@ -29,7 +44,7 @@ def save_model(device_no):
     import pickle
     feature_num = feature_matrix.shape[1]
     with open('models/' + 'device_' + str(device_no) + 'Acc_' + str(round(test_score, 3))
-               + 'Fea_' + str(feature_num) + '.pickle', 'wb') as f:
+               + 'Fea_' + str(feature_num) + '_prune.pickle', 'wb') as f:
         pickle.dump(clf, f)
 
     # 导入全局变量
@@ -56,7 +71,7 @@ def save_model(device_no):
     # graph.write_pdf('trees/' + 'device_' + str(device_no) + 'Acc_' + str(round(test_score, 3))
     #            + 'Fea_' + str(feature_num) + '.pdf')
     graph.write_png('tree_images/' + 'device_' + str(device_no) + 'Acc_' + str(round(test_score, 3))
-               + 'Fea_' + str(feature_num) + '.png')
+               + 'Fea_' + str(feature_num) + '_prune.png')
 
     # 直接画出决策树，但是很小看不清
     # from sklearn.tree import plot_tree

@@ -56,6 +56,10 @@ estimator = DecisionTreeClassifier()
 # with open('models_discard/0.968Acc_2Fea.pickle', 'rb') as f:
 #     model = pickle.load(f)
 # plot_learning_curve(estimator, "Learning Curves", X, y)
+from sklearn.model_selection import ShuffleSplit
+title = "Decision Tree (DT)"
+cv = ShuffleSplit(n_splits=100, test_size=0.2, random_state=0)
+plot_learning_curve(estimator, title, X, y, cv=cv, n_jobs=1)
 plt.show()
 
 # ★K近邻分类算法

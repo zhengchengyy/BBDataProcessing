@@ -44,9 +44,9 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
     # 用于查看几号设备的图
     start = 3
 
-    title = config['volt_collection'][6:] + "" + action + "_fft_" + str(start)
+    title = config['volt_collection'][6:] + "" + action + "_fft_filter_" + str(start)
     fig = plt.figure(title, figsize=(6, 8))
-    fig.suptitle(action + "_fft_" + str(start))
+    fig.suptitle(action + "_fft_filter_" + str(start))
 
     # plot the data that is of a certain action one by one
     for tag in tag_collection.find({'tag': action}):
@@ -85,8 +85,8 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
 
         for i in range(start, start + 1):
             # 滤除20Hz以上的频率成分，wn = 2 * 20 / 70
-            # b, a = signal.butter(8, 3 / 7, 'lowpass')  # 配置滤波器，8表示滤波器的阶数
-            b, a = signal.butter(8, [1 / 7, 4 / 7], 'bandpass')
+            b, a = signal.butter(8, 3 / 7, 'lowpass')  # 配置滤波器，8表示滤波器的阶数
+            # b, a = signal.butter(8, [1 / 7, 4 / 7], 'bandpass')
             filter_volts[i] = signal.filtfilt(b, a, volts[i])
 
             # fft返回值实部表示

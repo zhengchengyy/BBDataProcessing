@@ -6,10 +6,10 @@ import time
 
 import numpy as np
 
-config = {'action': 'still',
+config = {'action': 'turn_over',
           'db': 'beaglebone',
-          'tag_collection': 'tags_424',
-          'volt_collection': 'volts_424',
+          'tag_collection': 'tags_411',
+          'volt_collection': 'volts_411',
           'offset': 0}
 
 
@@ -39,7 +39,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
     ntags = tag_collection.count_documents({'tag': action})
     n = 1
     # 用于查看几号设备的图
-    start = 5
+    start = 3
 
     title = config['volt_collection'][6:] + "" + action + "_fft_" + str(start)
     fig = plt.figure(title, figsize=(6, 8))

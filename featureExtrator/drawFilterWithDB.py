@@ -27,12 +27,17 @@ def timeToSecond(t):
     return stime
 
 
+# 平方放大
 def getSquare(li):
-    import math
     temp = []
     for i in li:
         temp.append(i**2)
     return temp
+
+
+# 使用np实现移动平均滤波
+def np_move_avg(a, n, mode="same"):
+    return (np.convolve(a, np.ones((n,)) / n, mode=mode))
 
 
 def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='localhost',
@@ -100,6 +105,11 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
             # [v + i*0.2 for v in volts[i]]为了把多个设备的数据隔离开
             b, a = signal.butter(8, 3 / 7, 'lowpass')  # 配置滤波器，8表示滤波器的阶数
             filter_volts[i] = signal.filtfilt(b, a, volts[i])
+
+            # 移动平均滤波
+            # filter_volts[i] = np_move_avg(volts[i], 10, mode="same")
+
+            # 平方放大
             # filter_volts[i] = getSquare(filter_volts[i])
 
             ax.plot(times[i], filter_volts[i], label='device_' + str(i),

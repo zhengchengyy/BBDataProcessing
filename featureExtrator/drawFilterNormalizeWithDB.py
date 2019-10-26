@@ -68,9 +68,9 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
     # 定义标签计数
     tag_acc = 0
 
-    title = config['volt_collection'][6:] + "" + action + "_filter"
+    title = config['volt_collection'][6:] + "" + action + "_filter_normalize"
     fig = plt.figure(title, figsize=(6, 8))
-    fig.suptitle(action + "_filter")
+    fig.suptitle(action + "_filter_normalize")
 
     # plot the data that is of a certain action one by one
     for tag in tag_collection.find({'tag': action}):
@@ -105,6 +105,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         # 自定义y轴的区间范围，可以使图放大或者缩小
         # ax.set_ylim([0.8,1.8])
         # ax.set_ylim([0.75, 0.90])
+        # ax.set_ylim([0.7, 0.85])  # 归一化后
         # ax.set_ylim([0.60, 0.75])
         # ax.set_ylim([0.82, 0.83])
         ax.set_ylabel('Voltage(mv)')

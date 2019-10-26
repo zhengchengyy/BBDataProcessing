@@ -5,6 +5,11 @@ import numpy as np
 feature_matrix = np.load('feature_matrixs/feature_matrix2.npy')
 label_matrix = np.load('feature_matrixs/label_matrix2.npy')
 
+# 导入全局变量
+# import GlobalVariable as gv
+# action_names = gv.action_names
+# feature_names = gv.feature_names
+
 # 定义训练集和测试集
 from sklearn.model_selection import train_test_split
 X_train, X_test, y_train, y_test = train_test_split(
@@ -14,7 +19,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 # 读取模型
 import pickle
 
-with open('models_discard/0.973Acc_6Fea.pickle', 'rb') as f:
+with open('models_discard/device_2Acc_0.984Fea_2.pickle', 'rb') as f:
     model = pickle.load(f)
 train_score = model.score(X_train, y_train)
 test_score = model.score(X_test, y_test)
@@ -40,7 +45,8 @@ print("ham_distance:", metrics.hamming_loss(y_test, y_pred))
 
 # 交叉验证
 from sklearn.model_selection import cross_val_score
-print("交叉验证:", cross_val_score(model, X_train, y=y_train, cv=3))  # cv表示几倍交叉验证
+print("交叉验证分数:", cross_val_score(model, X_train, y=y_train, cv=3))  # cv表示几倍交叉验证
+print("交叉验证平均分数:", cross_val_score(model, X_train, y=y_train, cv=3).mean())
 from sklearn.model_selection import validation_curve
 # 检验曲线，传入不同参数和对应参数范围
 train_score, test_score = validation_curve(model, X_train, y_train,

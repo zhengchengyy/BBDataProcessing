@@ -4,11 +4,11 @@ import numpy as np
 import math
 
 
-class StandardDeviationModule(ProcessModule):
+class SDModule(ProcessModule):
     """功能是对满队列中的所有数据求标准差。返回标准差。
     表示震动频率的平均情况"""
 
-    FEATURE_NAME = "StandardDeviation"
+    FEATURE_NAME = "SD"
 
     def processFullQueue(self):
         sum = 0
@@ -184,12 +184,12 @@ class ThresholdCounterModule(ProcessModule):
         self.queue.queue.clear()
 
 
-class AverageModule(ProcessModule):
+class MeanModule(ProcessModule):
     """功能是对满队列中的所有数据求平均值。返回平均值。
     表示震动幅度的平均情况"""
     # 优化，不用重复计算值，只计算增加和减少的数据；可以从其它组件获取数据
 
-    FEATURE_NAME = "Average"
+    FEATURE_NAME = "Mean"
 
     def processFullQueue(self):
         sum = 0
