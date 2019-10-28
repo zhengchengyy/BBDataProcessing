@@ -11,35 +11,41 @@ from scipy import interp
 from sklearn.tree import DecisionTreeClassifier
 
 # 导入数据
-feature_matrix = np.load('feature_matrixs/feature_matrix1.npy')
-label_matrix = np.load('feature_matrixs/label_matrix1.npy')
+device_no = 2
+feature_matrix = np.load('feature_matrixs/feature_matrix'+str(device_no)+'.npy')
+label_matrix = np.load('feature_matrixs/label_matrix'+str(device_no)+'.npy')
 
 # 导入全局变量
 import GlobalVariable as gv
-
 action_names = gv.action_names
 feature_names = gv.feature_names
 
-# 绘制ROC曲线
-X = feature_matrix
-y = label_matrix
-# 设置种类
-n_classes = feature_matrix.shape[1]
-# 将标签类数值化
-# y = label_binarize(y, classes=[0, 1, 2, 3, 4, 5, 6, 7])
-y = label_binarize(y, classes=range(n_classes))
+# 随机化和划分训练集和测试集
+X_train, X_test, y_train, y_test = train_test_split(
+    feature_matrix, label_matrix, test_size=0.25, random_state=0)
 
-# 训练模型并预测
-n_samples, n_features = X.shape
-# shuffle and split training and test sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=0)
+# 将标签类数值化
+n_classes = len(action_names)
+# y = label_binarize(y, classes=[0, 1, 2, 3, 4, 5, 6, 7])
+y_train = label_binarize(y_train, classes=range(n_classes))
+y_test = label_binarize(y_test, classes=range(n_classes))
 
 # 使用决策树训练
-clf = DecisionTreeClassifier()
+clf = DecisionTreeClassifier(random_state=0,
+                             max_depth=13,
+                             max_leaf_nodes=24,
+                             min_impurity_decrease=0.0003,
+                             min_samples_leaf=3,
+                             min_samples_split=7,
+                             splitter='best',
+                             criterion='entropy')
 clf.fit(X_train, y_train)
 y_score = clf.predict(X_test)
-score = clf.score(X_test, y_test)
-print(score)
+
+train_score = clf.score(X_train, y_train)
+test_score = clf.score(X_test, y_test)
+print('device_' + str(device_no) + '\'s train score:', train_score, round(train_score,3))
+print('device_' + str(device_no) +'\'s test score:', test_score, round(test_score,3))
 
 # 计算每一类的ROC
 fpr = dict()
@@ -70,12 +76,12 @@ roc_auc["macro"] = auc(fpr["macro"], tpr["macro"])
 lw = 2
 plt.figure()
 plt.plot(fpr["micro"], tpr["micro"],
-         label='micro-average ROC curve (area = {0:0.2f})'
+         label='micro-average ROC curve (AUC = {0:0.2f})'
                ''.format(roc_auc["micro"]),
          color='deeppink', linestyle=':', linewidth=4)
 
 plt.plot(fpr["macro"], tpr["macro"],
-         label='macro-average ROC curve (area = {0:0.2f})'
+         label='macro-average ROC curve (AUC = {0:0.2f})'
                ''.format(roc_auc["macro"]),
          color='navy', linestyle=':', linewidth=4)
 
@@ -83,9 +89,9 @@ plt.plot(fpr["macro"], tpr["macro"],
 plot_colors = ['r', 'm', 'c', 'b', 'g', 'lime', 'y', 'peru', 'navy', 'orange']
 for i, color in zip(range(n_classes), plot_colors):
     plt.plot(fpr[i], tpr[i], color=color, lw=lw,
-             label=action_names[i] + '(area = {0:0.2f})'.format(roc_auc[i]))
+             label=action_names[i] + '(AUC = {0:0.2f})'.format(roc_auc[i]))
 
-# plt.plot([0, 1], [0, 1], 'k--', color='navy', lw=lw)
+plt.plot([0, 1], [0, 1], 'k--', color='pink', lw=lw)
 plt.xlim([0.0, 1.0])
 plt.ylim([0.0, 1.05])
 plt.xlabel('False Positive Rate')

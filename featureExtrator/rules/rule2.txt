@@ -1,17 +1,177 @@
-R1:IF SD <= 0.254 AND Mean <= 0.63 AND SD <= 0.243 THEN turn_over
-R2:IF SD <= 0.254 AND Mean <= 0.63 AND SD > 0.243 THEN head_move
-R3:IF SD <= 0.254 AND Mean > 0.63 AND SD <= 0.087 THEN head_move
-R4:IF SD <= 0.254 AND Mean > 0.63 AND SD > 0.087 THEN grasp
-R5:IF SD > 0.254 AND SD <= 0.314 AND Mean <= 0.446 AND SD <= 0.305 AND Mean <= 0.414 AND Mean <= 0.295 THEN hands_stretch
-R6:IF SD > 0.254 AND SD <= 0.314 AND Mean <= 0.446 AND SD <= 0.305 AND Mean <= 0.414 AND Mean > 0.295 THEN grasp
-R7:IF SD > 0.254 AND SD <= 0.314 AND Mean <= 0.446 AND SD <= 0.305 AND Mean > 0.414 AND Mean <= 0.434 AND Mean <= 0.427 THEN hands_twitch
-R8:IF SD > 0.254 AND SD <= 0.314 AND Mean <= 0.446 AND SD <= 0.305 AND Mean > 0.414 AND Mean <= 0.434 AND Mean > 0.427 AND Mean <= 0.431 THEN legs_twitch
-R9:IF SD > 0.254 AND SD <= 0.314 AND Mean <= 0.446 AND SD <= 0.305 AND Mean > 0.414 AND Mean <= 0.434 AND Mean > 0.427 AND Mean > 0.431 THEN hands_stretch
-R10:IF SD > 0.254 AND SD <= 0.314 AND Mean <= 0.446 AND SD <= 0.305 AND Mean > 0.414 AND Mean > 0.434 THEN hands_stretch
-R11:IF SD > 0.254 AND SD <= 0.314 AND Mean <= 0.446 AND SD > 0.305 AND Mean <= 0.221 THEN legs_stretch
-R12:IF SD > 0.254 AND SD <= 0.314 AND Mean <= 0.446 AND SD > 0.305 AND Mean > 0.221 THEN kick
-R13:IF SD > 0.254 AND SD <= 0.314 AND Mean > 0.446 AND Mean <= 0.472 THEN kick
-R14:IF SD > 0.254 AND SD <= 0.314 AND Mean > 0.446 AND Mean > 0.472 THEN legs_stretch
-R15:IF SD > 0.254 AND SD > 0.314 AND Mean <= 0.269 AND SD <= 0.315 THEN legs_twitch
-R16:IF SD > 0.254 AND SD > 0.314 AND Mean <= 0.269 AND SD > 0.315 THEN hands_twitch
-R17:IF SD > 0.254 AND SD > 0.314 AND Mean > 0.269 THEN turn_over
+R1:IF SD <= 0.186 AND Mean <= 0.717 AND Mean <= 0.655 THEN hands_twitch
+R2:IF SD <= 0.186 AND Mean <= 0.717 AND Mean > 0.655 THEN legs_stretch
+R3:IF SD <= 0.186 AND Mean > 0.717 AND Mean <= 0.767 THEN legs_twitch
+R4:IF SD <= 0.186 AND Mean > 0.717 AND Mean > 0.767 THEN kick
+R5:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD <= 0.316 AND Mean <= 0.245 AND Mean <= 0.243 AND SD <= 0.315 AND SD <= 0.314 AND Mean <= 0.229 AND Mean <= 0.227 AND Mean <= 0.224 AND Mean <= 0.206 THEN hands_stretch
+R6:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD <= 0.316 AND Mean <= 0.245 AND Mean <= 0.243 AND SD <= 0.315 AND SD <= 0.314 AND Mean <= 0.229 AND Mean <= 0.227 AND Mean <= 0.224 AND Mean > 0.206 THEN head_move
+R7:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD <= 0.316 AND Mean <= 0.245 AND Mean <= 0.243 AND SD <= 0.315 AND SD <= 0.314 AND Mean <= 0.229 AND Mean <= 0.227 AND Mean > 0.224 THEN hands_stretch
+R8:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD <= 0.316 AND Mean <= 0.245 AND Mean <= 0.243 AND SD <= 0.315 AND SD <= 0.314 AND Mean <= 0.229 AND Mean > 0.227 THEN head_move
+R9:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD <= 0.316 AND Mean <= 0.245 AND Mean <= 0.243 AND SD <= 0.315 AND SD <= 0.314 AND Mean > 0.229 THEN hands_stretch
+R10:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD <= 0.316 AND Mean <= 0.245 AND Mean <= 0.243 AND SD <= 0.315 AND SD > 0.314 AND SD <= 0.315 AND Mean <= 0.235 THEN head_move
+R11:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD <= 0.316 AND Mean <= 0.245 AND Mean <= 0.243 AND SD <= 0.315 AND SD > 0.314 AND SD <= 0.315 AND Mean > 0.235 THEN hands_stretch
+R12:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD <= 0.316 AND Mean <= 0.245 AND Mean <= 0.243 AND SD <= 0.315 AND SD > 0.314 AND SD > 0.315 THEN head_move
+R13:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD <= 0.316 AND Mean <= 0.245 AND Mean <= 0.243 AND SD > 0.315 THEN hands_stretch
+R14:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD <= 0.316 AND Mean <= 0.245 AND Mean > 0.243 THEN head_move
+R15:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD <= 0.316 AND Mean > 0.245 AND SD <= 0.316 THEN hands_stretch
+R16:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD <= 0.316 AND Mean > 0.245 AND SD > 0.316 AND Mean <= 0.25 THEN head_move
+R17:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD <= 0.316 AND Mean > 0.245 AND SD > 0.316 AND Mean > 0.25 AND SD <= 0.316 THEN hands_stretch
+R18:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD <= 0.316 AND Mean > 0.245 AND SD > 0.316 AND Mean > 0.25 AND SD > 0.316 THEN head_move
+R19:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD > 0.316 AND Mean <= 0.272 AND SD <= 0.317 AND Mean <= 0.272 AND Mean <= 0.267 AND SD <= 0.317 AND SD <= 0.317 AND Mean <= 0.257 AND Mean <= 0.256 THEN hands_twitch
+R20:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD > 0.316 AND Mean <= 0.272 AND SD <= 0.317 AND Mean <= 0.272 AND Mean <= 0.267 AND SD <= 0.317 AND SD <= 0.317 AND Mean <= 0.257 AND Mean > 0.256 THEN legs_twitch
+R21:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD > 0.316 AND Mean <= 0.272 AND SD <= 0.317 AND Mean <= 0.272 AND Mean <= 0.267 AND SD <= 0.317 AND SD <= 0.317 AND Mean > 0.257 AND Mean <= 0.263 AND Mean <= 0.258 THEN hands_stretch
+R22:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD > 0.316 AND Mean <= 0.272 AND SD <= 0.317 AND Mean <= 0.272 AND Mean <= 0.267 AND SD <= 0.317 AND SD <= 0.317 AND Mean > 0.257 AND Mean <= 0.263 AND Mean > 0.258 AND Mean <= 0.26 THEN head_move
+R23:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD > 0.316 AND Mean <= 0.272 AND SD <= 0.317 AND Mean <= 0.272 AND Mean <= 0.267 AND SD <= 0.317 AND SD <= 0.317 AND Mean > 0.257 AND Mean <= 0.263 AND Mean > 0.258 AND Mean > 0.26 THEN hands_stretch
+R24:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD > 0.316 AND Mean <= 0.272 AND SD <= 0.317 AND Mean <= 0.272 AND Mean <= 0.267 AND SD <= 0.317 AND SD <= 0.317 AND Mean > 0.257 AND Mean > 0.263 THEN head_move
+R25:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD > 0.316 AND Mean <= 0.272 AND SD <= 0.317 AND Mean <= 0.272 AND Mean <= 0.267 AND SD <= 0.317 AND SD > 0.317 AND Mean <= 0.267 AND SD <= 0.317 THEN legs_twitch
+R26:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD > 0.316 AND Mean <= 0.272 AND SD <= 0.317 AND Mean <= 0.272 AND Mean <= 0.267 AND SD <= 0.317 AND SD > 0.317 AND Mean <= 0.267 AND SD > 0.317 AND SD <= 0.317 THEN hands_twitch
+R27:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD > 0.316 AND Mean <= 0.272 AND SD <= 0.317 AND Mean <= 0.272 AND Mean <= 0.267 AND SD <= 0.317 AND SD > 0.317 AND Mean <= 0.267 AND SD > 0.317 AND SD > 0.317 AND Mean <= 0.265 THEN head_move
+R28:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD > 0.316 AND Mean <= 0.272 AND SD <= 0.317 AND Mean <= 0.272 AND Mean <= 0.267 AND SD <= 0.317 AND SD > 0.317 AND Mean <= 0.267 AND SD > 0.317 AND SD > 0.317 AND Mean > 0.265 THEN hands_twitch
+R29:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD > 0.316 AND Mean <= 0.272 AND SD <= 0.317 AND Mean <= 0.272 AND Mean <= 0.267 AND SD <= 0.317 AND SD > 0.317 AND Mean > 0.267 THEN hands_stretch
+R30:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD > 0.316 AND Mean <= 0.272 AND SD <= 0.317 AND Mean <= 0.272 AND Mean <= 0.267 AND SD > 0.317 AND Mean <= 0.266 THEN turn_over
+R31:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD > 0.316 AND Mean <= 0.272 AND SD <= 0.317 AND Mean <= 0.272 AND Mean <= 0.267 AND SD > 0.317 AND Mean > 0.266 THEN hands_stretch
+R32:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD > 0.316 AND Mean <= 0.272 AND SD <= 0.317 AND Mean <= 0.272 AND Mean > 0.267 AND Mean <= 0.272 AND Mean <= 0.268 THEN head_move
+R33:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD > 0.316 AND Mean <= 0.272 AND SD <= 0.317 AND Mean <= 0.272 AND Mean > 0.267 AND Mean <= 0.272 AND Mean > 0.268 AND Mean <= 0.27 THEN legs_twitch
+R34:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD > 0.316 AND Mean <= 0.272 AND SD <= 0.317 AND Mean <= 0.272 AND Mean > 0.267 AND Mean <= 0.272 AND Mean > 0.268 AND Mean > 0.27 THEN turn_over
+R35:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD > 0.316 AND Mean <= 0.272 AND SD <= 0.317 AND Mean <= 0.272 AND Mean > 0.267 AND Mean > 0.272 AND Mean <= 0.272 THEN hands_twitch
+R36:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD > 0.316 AND Mean <= 0.272 AND SD <= 0.317 AND Mean <= 0.272 AND Mean > 0.267 AND Mean > 0.272 AND Mean > 0.272 THEN head_move
+R37:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD > 0.316 AND Mean <= 0.272 AND SD <= 0.317 AND Mean > 0.272 THEN hands_stretch
+R38:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD > 0.316 AND Mean <= 0.272 AND SD > 0.317 AND Mean <= 0.272 THEN turn_over
+R39:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD > 0.316 AND Mean <= 0.272 AND SD > 0.317 AND Mean > 0.272 THEN hands_twitch
+R40:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD > 0.316 AND Mean > 0.272 AND Mean <= 0.277 AND Mean <= 0.273 THEN head_move
+R41:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD > 0.316 AND Mean > 0.272 AND Mean <= 0.277 AND Mean > 0.273 AND SD <= 0.317 THEN head_move
+R42:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD > 0.316 AND Mean > 0.272 AND Mean <= 0.277 AND Mean > 0.273 AND SD > 0.317 THEN legs_twitch
+R43:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD > 0.316 AND Mean > 0.272 AND Mean > 0.277 AND Mean <= 0.277 THEN hands_stretch
+R44:IF SD > 0.186 AND Mean <= 0.351 AND Mean <= 0.277 AND SD > 0.316 AND Mean > 0.272 AND Mean > 0.277 AND Mean > 0.277 THEN head_move
+R45:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean <= 0.293 AND Mean <= 0.277 THEN hands_twitch
+R46:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean <= 0.293 AND Mean > 0.277 AND Mean <= 0.292 AND SD <= 0.317 AND Mean <= 0.291 AND Mean <= 0.288 THEN legs_twitch
+R47:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean <= 0.293 AND Mean > 0.277 AND Mean <= 0.292 AND SD <= 0.317 AND Mean <= 0.291 AND Mean > 0.288 THEN hands_stretch
+R48:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean <= 0.293 AND Mean > 0.277 AND Mean <= 0.292 AND SD <= 0.317 AND Mean > 0.291 THEN legs_twitch
+R49:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean <= 0.293 AND Mean > 0.277 AND Mean <= 0.292 AND SD > 0.317 AND Mean <= 0.287 AND Mean <= 0.284 AND Mean <= 0.282 AND Mean <= 0.281 AND SD <= 0.317 THEN legs_twitch
+R50:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean <= 0.293 AND Mean > 0.277 AND Mean <= 0.292 AND SD > 0.317 AND Mean <= 0.287 AND Mean <= 0.284 AND Mean <= 0.282 AND Mean <= 0.281 AND SD > 0.317 THEN turn_over
+R51:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean <= 0.293 AND Mean > 0.277 AND Mean <= 0.292 AND SD > 0.317 AND Mean <= 0.287 AND Mean <= 0.284 AND Mean <= 0.282 AND Mean > 0.281 THEN hands_stretch
+R52:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean <= 0.293 AND Mean > 0.277 AND Mean <= 0.292 AND SD > 0.317 AND Mean <= 0.287 AND Mean <= 0.284 AND Mean > 0.282 AND Mean <= 0.283 THEN hands_twitch
+R53:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean <= 0.293 AND Mean > 0.277 AND Mean <= 0.292 AND SD > 0.317 AND Mean <= 0.287 AND Mean <= 0.284 AND Mean > 0.282 AND Mean > 0.283 THEN turn_over
+R54:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean <= 0.293 AND Mean > 0.277 AND Mean <= 0.292 AND SD > 0.317 AND Mean <= 0.287 AND Mean > 0.284 AND Mean <= 0.286 THEN legs_twitch
+R55:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean <= 0.293 AND Mean > 0.277 AND Mean <= 0.292 AND SD > 0.317 AND Mean <= 0.287 AND Mean > 0.284 AND Mean > 0.286 THEN hands_stretch
+R56:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean <= 0.293 AND Mean > 0.277 AND Mean <= 0.292 AND SD > 0.317 AND Mean > 0.287 AND Mean <= 0.288 THEN hands_twitch
+R57:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean <= 0.293 AND Mean > 0.277 AND Mean <= 0.292 AND SD > 0.317 AND Mean > 0.287 AND Mean > 0.288 THEN turn_over
+R58:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean <= 0.293 AND Mean > 0.277 AND Mean > 0.292 THEN hands_twitch
+R59:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean > 0.293 AND Mean <= 0.296 AND Mean <= 0.295 THEN turn_over
+R60:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean > 0.293 AND Mean <= 0.296 AND Mean > 0.295 THEN hands_stretch
+R61:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean > 0.293 AND Mean > 0.296 AND Mean <= 0.298 AND Mean <= 0.297 THEN legs_twitch
+R62:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean > 0.293 AND Mean > 0.296 AND Mean <= 0.298 AND Mean > 0.297 THEN hands_twitch
+R63:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean > 0.293 AND Mean > 0.296 AND Mean > 0.298 AND SD <= 0.316 AND Mean <= 0.303 AND Mean <= 0.302 AND Mean <= 0.3 THEN turn_over
+R64:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean > 0.293 AND Mean > 0.296 AND Mean > 0.298 AND SD <= 0.316 AND Mean <= 0.303 AND Mean <= 0.302 AND Mean > 0.3 THEN legs_twitch
+R65:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean > 0.293 AND Mean > 0.296 AND Mean > 0.298 AND SD <= 0.316 AND Mean <= 0.303 AND Mean > 0.302 THEN hands_twitch
+R66:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean > 0.293 AND Mean > 0.296 AND Mean > 0.298 AND SD <= 0.316 AND Mean > 0.303 AND Mean <= 0.306 THEN turn_over
+R67:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean > 0.293 AND Mean > 0.296 AND Mean > 0.298 AND SD <= 0.316 AND Mean > 0.303 AND Mean > 0.306 AND Mean <= 0.308 AND SD <= 0.315 AND Mean <= 0.307 THEN legs_twitch
+R68:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean > 0.293 AND Mean > 0.296 AND Mean > 0.298 AND SD <= 0.316 AND Mean > 0.303 AND Mean > 0.306 AND Mean <= 0.308 AND SD <= 0.315 AND Mean > 0.307 THEN hands_twitch
+R69:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean > 0.293 AND Mean > 0.296 AND Mean > 0.298 AND SD <= 0.316 AND Mean > 0.303 AND Mean > 0.306 AND Mean <= 0.308 AND SD > 0.315 THEN legs_twitch
+R70:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean > 0.293 AND Mean > 0.296 AND Mean > 0.298 AND SD <= 0.316 AND Mean > 0.303 AND Mean > 0.306 AND Mean > 0.308 AND Mean <= 0.311 THEN turn_over
+R71:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean > 0.293 AND Mean > 0.296 AND Mean > 0.298 AND SD <= 0.316 AND Mean > 0.303 AND Mean > 0.306 AND Mean > 0.308 AND Mean > 0.311 AND Mean <= 0.312 THEN hands_twitch
+R72:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean > 0.293 AND Mean > 0.296 AND Mean > 0.298 AND SD <= 0.316 AND Mean > 0.303 AND Mean > 0.306 AND Mean > 0.308 AND Mean > 0.311 AND Mean > 0.312 AND Mean <= 0.313 THEN legs_twitch
+R73:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean > 0.293 AND Mean > 0.296 AND Mean > 0.298 AND SD <= 0.316 AND Mean > 0.303 AND Mean > 0.306 AND Mean > 0.308 AND Mean > 0.311 AND Mean > 0.312 AND Mean > 0.313 AND SD <= 0.314 AND SD <= 0.313 AND SD <= 0.313 AND Mean <= 0.33 THEN hands_twitch
+R74:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean > 0.293 AND Mean > 0.296 AND Mean > 0.298 AND SD <= 0.316 AND Mean > 0.303 AND Mean > 0.306 AND Mean > 0.308 AND Mean > 0.311 AND Mean > 0.312 AND Mean > 0.313 AND SD <= 0.314 AND SD <= 0.313 AND SD <= 0.313 AND Mean > 0.33 AND Mean <= 0.332 THEN legs_twitch
+R75:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean > 0.293 AND Mean > 0.296 AND Mean > 0.298 AND SD <= 0.316 AND Mean > 0.303 AND Mean > 0.306 AND Mean > 0.308 AND Mean > 0.311 AND Mean > 0.312 AND Mean > 0.313 AND SD <= 0.314 AND SD <= 0.313 AND SD <= 0.313 AND Mean > 0.33 AND Mean > 0.332 AND Mean <= 0.335 THEN turn_over
+R76:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean > 0.293 AND Mean > 0.296 AND Mean > 0.298 AND SD <= 0.316 AND Mean > 0.303 AND Mean > 0.306 AND Mean > 0.308 AND Mean > 0.311 AND Mean > 0.312 AND Mean > 0.313 AND SD <= 0.314 AND SD <= 0.313 AND SD <= 0.313 AND Mean > 0.33 AND Mean > 0.332 AND Mean > 0.335 THEN legs_twitch
+R77:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean > 0.293 AND Mean > 0.296 AND Mean > 0.298 AND SD <= 0.316 AND Mean > 0.303 AND Mean > 0.306 AND Mean > 0.308 AND Mean > 0.311 AND Mean > 0.312 AND Mean > 0.313 AND SD <= 0.314 AND SD <= 0.313 AND SD > 0.313 THEN turn_over
+R78:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean > 0.293 AND Mean > 0.296 AND Mean > 0.298 AND SD <= 0.316 AND Mean > 0.303 AND Mean > 0.306 AND Mean > 0.308 AND Mean > 0.311 AND Mean > 0.312 AND Mean > 0.313 AND SD <= 0.314 AND SD > 0.313 AND Mean <= 0.321 AND SD <= 0.314 THEN turn_over
+R79:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean > 0.293 AND Mean > 0.296 AND Mean > 0.298 AND SD <= 0.316 AND Mean > 0.303 AND Mean > 0.306 AND Mean > 0.308 AND Mean > 0.311 AND Mean > 0.312 AND Mean > 0.313 AND SD <= 0.314 AND SD > 0.313 AND Mean <= 0.321 AND SD > 0.314 THEN legs_twitch
+R80:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean > 0.293 AND Mean > 0.296 AND Mean > 0.298 AND SD <= 0.316 AND Mean > 0.303 AND Mean > 0.306 AND Mean > 0.308 AND Mean > 0.311 AND Mean > 0.312 AND Mean > 0.313 AND SD <= 0.314 AND SD > 0.313 AND Mean > 0.321 THEN legs_twitch
+R81:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean > 0.293 AND Mean > 0.296 AND Mean > 0.298 AND SD <= 0.316 AND Mean > 0.303 AND Mean > 0.306 AND Mean > 0.308 AND Mean > 0.311 AND Mean > 0.312 AND Mean > 0.313 AND SD > 0.314 THEN turn_over
+R82:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean > 0.293 AND Mean > 0.296 AND Mean > 0.298 AND SD > 0.316 AND Mean <= 0.299 AND SD <= 0.316 THEN turn_over
+R83:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean > 0.293 AND Mean > 0.296 AND Mean > 0.298 AND SD > 0.316 AND Mean <= 0.299 AND SD > 0.316 THEN hands_stretch
+R84:IF SD > 0.186 AND Mean <= 0.351 AND Mean > 0.277 AND Mean > 0.293 AND Mean > 0.296 AND Mean > 0.298 AND SD > 0.316 AND Mean > 0.299 THEN turn_over
+R85:IF SD > 0.186 AND Mean > 0.351 AND Mean <= 0.471 AND Mean <= 0.415 AND Mean <= 0.391 THEN grasp
+R86:IF SD > 0.186 AND Mean > 0.351 AND Mean <= 0.471 AND Mean <= 0.415 AND Mean > 0.391 AND Mean <= 0.393 THEN legs_stretch
+R87:IF SD > 0.186 AND Mean > 0.351 AND Mean <= 0.471 AND Mean <= 0.415 AND Mean > 0.391 AND Mean > 0.393 THEN grasp
+R88:IF SD > 0.186 AND Mean > 0.351 AND Mean <= 0.471 AND Mean > 0.415 AND SD <= 0.269 AND Mean <= 0.467 THEN hands_stretch
+R89:IF SD > 0.186 AND Mean > 0.351 AND Mean <= 0.471 AND Mean > 0.415 AND SD <= 0.269 AND Mean > 0.467 THEN legs_stretch
+R90:IF SD > 0.186 AND Mean > 0.351 AND Mean <= 0.471 AND Mean > 0.415 AND SD > 0.269 THEN legs_stretch
+R91:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD <= 0.213 AND SD <= 0.204 THEN head_move
+R92:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD <= 0.213 AND SD > 0.204 AND SD <= 0.213 AND SD <= 0.208 AND SD <= 0.205 THEN kick
+R93:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD <= 0.213 AND SD > 0.204 AND SD <= 0.213 AND SD <= 0.208 AND SD > 0.205 THEN head_move
+R94:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD <= 0.213 AND SD > 0.204 AND SD <= 0.213 AND SD > 0.208 AND SD <= 0.21 AND SD <= 0.209 THEN kick
+R95:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD <= 0.213 AND SD > 0.204 AND SD <= 0.213 AND SD > 0.208 AND SD <= 0.21 AND SD > 0.209 AND SD <= 0.209 THEN grasp
+R96:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD <= 0.213 AND SD > 0.204 AND SD <= 0.213 AND SD > 0.208 AND SD <= 0.21 AND SD > 0.209 AND SD > 0.209 AND Mean <= 0.572 THEN kick
+R97:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD <= 0.213 AND SD > 0.204 AND SD <= 0.213 AND SD > 0.208 AND SD <= 0.21 AND SD > 0.209 AND SD > 0.209 AND Mean > 0.572 AND SD <= 0.209 THEN grasp
+R98:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD <= 0.213 AND SD > 0.204 AND SD <= 0.213 AND SD > 0.208 AND SD <= 0.21 AND SD > 0.209 AND SD > 0.209 AND Mean > 0.572 AND SD > 0.209 THEN kick
+R99:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD <= 0.213 AND SD > 0.204 AND SD <= 0.213 AND SD > 0.208 AND SD > 0.21 AND SD <= 0.211 THEN head_move
+R100:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD <= 0.213 AND SD > 0.204 AND SD <= 0.213 AND SD > 0.208 AND SD > 0.21 AND SD > 0.211 AND Mean <= 0.568 THEN kick
+R101:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD <= 0.213 AND SD > 0.204 AND SD <= 0.213 AND SD > 0.208 AND SD > 0.21 AND SD > 0.211 AND Mean > 0.568 AND SD <= 0.212 THEN grasp
+R102:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD <= 0.213 AND SD > 0.204 AND SD <= 0.213 AND SD > 0.208 AND SD > 0.21 AND SD > 0.211 AND Mean > 0.568 AND SD > 0.212 AND Mean <= 0.568 THEN kick
+R103:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD <= 0.213 AND SD > 0.204 AND SD <= 0.213 AND SD > 0.208 AND SD > 0.21 AND SD > 0.211 AND Mean > 0.568 AND SD > 0.212 AND Mean > 0.568 THEN grasp
+R104:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD <= 0.213 AND SD > 0.204 AND SD > 0.213 THEN head_move
+R105:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean <= 0.554 AND SD <= 0.238 AND SD <= 0.236 AND Mean <= 0.531 THEN turn_over
+R106:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean <= 0.554 AND SD <= 0.238 AND SD <= 0.236 AND Mean > 0.531 AND Mean <= 0.534 AND SD <= 0.234 AND SD <= 0.234 THEN kick
+R107:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean <= 0.554 AND SD <= 0.238 AND SD <= 0.236 AND Mean > 0.531 AND Mean <= 0.534 AND SD <= 0.234 AND SD > 0.234 THEN grasp
+R108:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean <= 0.554 AND SD <= 0.238 AND SD <= 0.236 AND Mean > 0.531 AND Mean <= 0.534 AND SD > 0.234 THEN kick
+R109:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean <= 0.554 AND SD <= 0.238 AND SD <= 0.236 AND Mean > 0.531 AND Mean > 0.534 AND Mean <= 0.536 THEN turn_over
+R110:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean <= 0.554 AND SD <= 0.238 AND SD <= 0.236 AND Mean > 0.531 AND Mean > 0.534 AND Mean > 0.536 AND SD <= 0.23 AND SD <= 0.229 AND SD <= 0.227 AND SD <= 0.223 THEN turn_over
+R111:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean <= 0.554 AND SD <= 0.238 AND SD <= 0.236 AND Mean > 0.531 AND Mean > 0.534 AND Mean > 0.536 AND SD <= 0.23 AND SD <= 0.229 AND SD <= 0.227 AND SD > 0.223 AND Mean <= 0.546 THEN turn_over
+R112:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean <= 0.554 AND SD <= 0.238 AND SD <= 0.236 AND Mean > 0.531 AND Mean > 0.534 AND Mean > 0.536 AND SD <= 0.23 AND SD <= 0.229 AND SD <= 0.227 AND SD > 0.223 AND Mean > 0.546 AND SD <= 0.224 AND Mean <= 0.549 AND SD <= 0.224 AND Mean <= 0.548 THEN grasp
+R113:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean <= 0.554 AND SD <= 0.238 AND SD <= 0.236 AND Mean > 0.531 AND Mean > 0.534 AND Mean > 0.536 AND SD <= 0.23 AND SD <= 0.229 AND SD <= 0.227 AND SD > 0.223 AND Mean > 0.546 AND SD <= 0.224 AND Mean <= 0.549 AND SD <= 0.224 AND Mean > 0.548 AND Mean <= 0.549 THEN kick
+R114:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean <= 0.554 AND SD <= 0.238 AND SD <= 0.236 AND Mean > 0.531 AND Mean > 0.534 AND Mean > 0.536 AND SD <= 0.23 AND SD <= 0.229 AND SD <= 0.227 AND SD > 0.223 AND Mean > 0.546 AND SD <= 0.224 AND Mean <= 0.549 AND SD <= 0.224 AND Mean > 0.548 AND Mean > 0.549 AND SD <= 0.224 THEN turn_over
+R115:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean <= 0.554 AND SD <= 0.238 AND SD <= 0.236 AND Mean > 0.531 AND Mean > 0.534 AND Mean > 0.536 AND SD <= 0.23 AND SD <= 0.229 AND SD <= 0.227 AND SD > 0.223 AND Mean > 0.546 AND SD <= 0.224 AND Mean <= 0.549 AND SD <= 0.224 AND Mean > 0.548 AND Mean > 0.549 AND SD > 0.224 AND SD <= 0.224 THEN grasp
+R116:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean <= 0.554 AND SD <= 0.238 AND SD <= 0.236 AND Mean > 0.531 AND Mean > 0.534 AND Mean > 0.536 AND SD <= 0.23 AND SD <= 0.229 AND SD <= 0.227 AND SD > 0.223 AND Mean > 0.546 AND SD <= 0.224 AND Mean <= 0.549 AND SD <= 0.224 AND Mean > 0.548 AND Mean > 0.549 AND SD > 0.224 AND SD > 0.224 THEN kick
+R117:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean <= 0.554 AND SD <= 0.238 AND SD <= 0.236 AND Mean > 0.531 AND Mean > 0.534 AND Mean > 0.536 AND SD <= 0.23 AND SD <= 0.229 AND SD <= 0.227 AND SD > 0.223 AND Mean > 0.546 AND SD <= 0.224 AND Mean <= 0.549 AND SD > 0.224 AND SD <= 0.224 THEN grasp
+R118:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean <= 0.554 AND SD <= 0.238 AND SD <= 0.236 AND Mean > 0.531 AND Mean > 0.534 AND Mean > 0.536 AND SD <= 0.23 AND SD <= 0.229 AND SD <= 0.227 AND SD > 0.223 AND Mean > 0.546 AND SD <= 0.224 AND Mean <= 0.549 AND SD > 0.224 AND SD > 0.224 AND SD <= 0.224 THEN head_move
+R119:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean <= 0.554 AND SD <= 0.238 AND SD <= 0.236 AND Mean > 0.531 AND Mean > 0.534 AND Mean > 0.536 AND SD <= 0.23 AND SD <= 0.229 AND SD <= 0.227 AND SD > 0.223 AND Mean > 0.546 AND SD <= 0.224 AND Mean <= 0.549 AND SD > 0.224 AND SD > 0.224 AND SD > 0.224 THEN grasp
+R120:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean <= 0.554 AND SD <= 0.238 AND SD <= 0.236 AND Mean > 0.531 AND Mean > 0.534 AND Mean > 0.536 AND SD <= 0.23 AND SD <= 0.229 AND SD <= 0.227 AND SD > 0.223 AND Mean > 0.546 AND SD <= 0.224 AND Mean > 0.549 AND SD <= 0.224 THEN turn_over
+R121:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean <= 0.554 AND SD <= 0.238 AND SD <= 0.236 AND Mean > 0.531 AND Mean > 0.534 AND Mean > 0.536 AND SD <= 0.23 AND SD <= 0.229 AND SD <= 0.227 AND SD > 0.223 AND Mean > 0.546 AND SD <= 0.224 AND Mean > 0.549 AND SD > 0.224 AND Mean <= 0.549 THEN grasp
+R122:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean <= 0.554 AND SD <= 0.238 AND SD <= 0.236 AND Mean > 0.531 AND Mean > 0.534 AND Mean > 0.536 AND SD <= 0.23 AND SD <= 0.229 AND SD <= 0.227 AND SD > 0.223 AND Mean > 0.546 AND SD <= 0.224 AND Mean > 0.549 AND SD > 0.224 AND Mean > 0.549 AND SD <= 0.224 THEN turn_over
+R123:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean <= 0.554 AND SD <= 0.238 AND SD <= 0.236 AND Mean > 0.531 AND Mean > 0.534 AND Mean > 0.536 AND SD <= 0.23 AND SD <= 0.229 AND SD <= 0.227 AND SD > 0.223 AND Mean > 0.546 AND SD <= 0.224 AND Mean > 0.549 AND SD > 0.224 AND Mean > 0.549 AND SD > 0.224 THEN grasp
+R124:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean <= 0.554 AND SD <= 0.238 AND SD <= 0.236 AND Mean > 0.531 AND Mean > 0.534 AND Mean > 0.536 AND SD <= 0.23 AND SD <= 0.229 AND SD <= 0.227 AND SD > 0.223 AND Mean > 0.546 AND SD > 0.224 THEN kick
+R125:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean <= 0.554 AND SD <= 0.238 AND SD <= 0.236 AND Mean > 0.531 AND Mean > 0.534 AND Mean > 0.536 AND SD <= 0.23 AND SD <= 0.229 AND SD > 0.227 AND Mean <= 0.544 AND Mean <= 0.544 THEN kick
+R126:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean <= 0.554 AND SD <= 0.238 AND SD <= 0.236 AND Mean > 0.531 AND Mean > 0.534 AND Mean > 0.536 AND SD <= 0.23 AND SD <= 0.229 AND SD > 0.227 AND Mean <= 0.544 AND Mean > 0.544 THEN grasp
+R127:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean <= 0.554 AND SD <= 0.238 AND SD <= 0.236 AND Mean > 0.531 AND Mean > 0.534 AND Mean > 0.536 AND SD <= 0.23 AND SD <= 0.229 AND SD > 0.227 AND Mean > 0.544 THEN kick
+R128:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean <= 0.554 AND SD <= 0.238 AND SD <= 0.236 AND Mean > 0.531 AND Mean > 0.534 AND Mean > 0.536 AND SD <= 0.23 AND SD > 0.229 AND SD <= 0.23 THEN turn_over
+R129:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean <= 0.554 AND SD <= 0.238 AND SD <= 0.236 AND Mean > 0.531 AND Mean > 0.534 AND Mean > 0.536 AND SD <= 0.23 AND SD > 0.229 AND SD > 0.23 THEN kick
+R130:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean <= 0.554 AND SD <= 0.238 AND SD <= 0.236 AND Mean > 0.531 AND Mean > 0.534 AND Mean > 0.536 AND SD > 0.23 THEN grasp
+R131:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean <= 0.554 AND SD <= 0.238 AND SD > 0.236 AND SD <= 0.237 THEN hands_stretch
+R132:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean <= 0.554 AND SD <= 0.238 AND SD > 0.236 AND SD > 0.237 AND SD <= 0.237 THEN kick
+R133:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean <= 0.554 AND SD <= 0.238 AND SD > 0.236 AND SD > 0.237 AND SD > 0.237 AND Mean <= 0.527 THEN grasp
+R134:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean <= 0.554 AND SD <= 0.238 AND SD > 0.236 AND SD > 0.237 AND SD > 0.237 AND Mean > 0.527 AND SD <= 0.237 THEN kick
+R135:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean <= 0.554 AND SD <= 0.238 AND SD > 0.236 AND SD > 0.237 AND SD > 0.237 AND Mean > 0.527 AND SD > 0.237 THEN grasp
+R136:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean <= 0.554 AND SD > 0.238 THEN turn_over
+R137:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean > 0.554 AND Mean <= 0.554 AND SD <= 0.221 THEN kick
+R138:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean > 0.554 AND Mean <= 0.554 AND SD > 0.221 AND SD <= 0.221 AND SD <= 0.221 AND SD <= 0.221 AND Mean <= 0.554 AND SD <= 0.221 THEN grasp
+R139:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean > 0.554 AND Mean <= 0.554 AND SD > 0.221 AND SD <= 0.221 AND SD <= 0.221 AND SD <= 0.221 AND Mean <= 0.554 AND SD > 0.221 THEN kick
+R140:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean > 0.554 AND Mean <= 0.554 AND SD > 0.221 AND SD <= 0.221 AND SD <= 0.221 AND SD <= 0.221 AND Mean > 0.554 THEN grasp
+R141:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean > 0.554 AND Mean <= 0.554 AND SD > 0.221 AND SD <= 0.221 AND SD <= 0.221 AND SD > 0.221 THEN kick
+R142:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean > 0.554 AND Mean <= 0.554 AND SD > 0.221 AND SD <= 0.221 AND SD > 0.221 THEN grasp
+R143:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean > 0.554 AND Mean <= 0.554 AND SD > 0.221 AND SD > 0.221 THEN kick
+R144:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean > 0.554 AND Mean > 0.554 AND SD <= 0.218 AND Mean <= 0.561 AND SD <= 0.217 THEN head_move
+R145:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean > 0.554 AND Mean > 0.554 AND SD <= 0.218 AND Mean <= 0.561 AND SD > 0.217 AND Mean <= 0.558 THEN kick
+R146:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean > 0.554 AND Mean > 0.554 AND SD <= 0.218 AND Mean <= 0.561 AND SD > 0.217 AND Mean > 0.558 AND SD <= 0.218 THEN grasp
+R147:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean > 0.554 AND Mean > 0.554 AND SD <= 0.218 AND Mean <= 0.561 AND SD > 0.217 AND Mean > 0.558 AND SD > 0.218 THEN kick
+R148:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean > 0.554 AND Mean > 0.554 AND SD <= 0.218 AND Mean > 0.561 AND SD <= 0.215 AND SD <= 0.214 THEN turn_over
+R149:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean > 0.554 AND Mean > 0.554 AND SD <= 0.218 AND Mean > 0.561 AND SD <= 0.215 AND SD > 0.214 THEN kick
+R150:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean > 0.554 AND Mean > 0.554 AND SD <= 0.218 AND Mean > 0.561 AND SD > 0.215 AND SD <= 0.215 THEN grasp
+R151:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean > 0.554 AND Mean > 0.554 AND SD <= 0.218 AND Mean > 0.561 AND SD > 0.215 AND SD > 0.215 AND Mean <= 0.563 THEN turn_over
+R152:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean > 0.554 AND Mean > 0.554 AND SD <= 0.218 AND Mean > 0.561 AND SD > 0.215 AND SD > 0.215 AND Mean > 0.563 AND Mean <= 0.563 THEN kick
+R153:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean > 0.554 AND Mean > 0.554 AND SD <= 0.218 AND Mean > 0.561 AND SD > 0.215 AND SD > 0.215 AND Mean > 0.563 AND Mean > 0.563 AND SD <= 0.215 THEN grasp
+R154:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean > 0.554 AND Mean > 0.554 AND SD <= 0.218 AND Mean > 0.561 AND SD > 0.215 AND SD > 0.215 AND Mean > 0.563 AND Mean > 0.563 AND SD > 0.215 THEN kick
+R155:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean > 0.554 AND Mean > 0.554 AND SD > 0.218 AND SD <= 0.22 THEN turn_over
+R156:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD <= 0.239 AND SD > 0.213 AND Mean > 0.554 AND Mean > 0.554 AND SD > 0.218 AND SD > 0.22 THEN head_move
+R157:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD > 0.239 AND SD <= 0.253 AND Mean <= 0.52 AND SD <= 0.242 THEN turn_over
+R158:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD > 0.239 AND SD <= 0.253 AND Mean <= 0.52 AND SD > 0.242 AND Mean <= 0.513 AND SD <= 0.248 AND SD <= 0.246 THEN turn_over
+R159:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD > 0.239 AND SD <= 0.253 AND Mean <= 0.52 AND SD > 0.242 AND Mean <= 0.513 AND SD <= 0.248 AND SD > 0.246 THEN grasp
+R160:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD > 0.239 AND SD <= 0.253 AND Mean <= 0.52 AND SD > 0.242 AND Mean <= 0.513 AND SD > 0.248 AND SD <= 0.251 AND SD <= 0.25 AND SD <= 0.248 THEN hands_stretch
+R161:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD > 0.239 AND SD <= 0.253 AND Mean <= 0.52 AND SD > 0.242 AND Mean <= 0.513 AND SD > 0.248 AND SD <= 0.251 AND SD <= 0.25 AND SD > 0.248 THEN turn_over
+R162:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD > 0.239 AND SD <= 0.253 AND Mean <= 0.52 AND SD > 0.242 AND Mean <= 0.513 AND SD > 0.248 AND SD <= 0.251 AND SD > 0.25 THEN hands_stretch
+R163:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD > 0.239 AND SD <= 0.253 AND Mean <= 0.52 AND SD > 0.242 AND Mean <= 0.513 AND SD > 0.248 AND SD > 0.251 THEN turn_over
+R164:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD > 0.239 AND SD <= 0.253 AND Mean <= 0.52 AND SD > 0.242 AND Mean > 0.513 AND SD <= 0.243 THEN hands_stretch
+R165:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD > 0.239 AND SD <= 0.253 AND Mean <= 0.52 AND SD > 0.242 AND Mean > 0.513 AND SD > 0.243 AND Mean <= 0.514 THEN hands_stretch
+R166:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD > 0.239 AND SD <= 0.253 AND Mean <= 0.52 AND SD > 0.242 AND Mean > 0.513 AND SD > 0.243 AND Mean > 0.514 THEN kick
+R167:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD > 0.239 AND SD <= 0.253 AND Mean > 0.52 AND Mean <= 0.522 AND SD <= 0.24 THEN grasp
+R168:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD > 0.239 AND SD <= 0.253 AND Mean > 0.52 AND Mean <= 0.522 AND SD > 0.24 THEN kick
+R169:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD > 0.239 AND SD <= 0.253 AND Mean > 0.52 AND Mean > 0.522 THEN hands_stretch
+R170:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD > 0.239 AND SD > 0.253 AND Mean <= 0.484 AND Mean <= 0.479 AND Mean <= 0.473 THEN hands_stretch
+R171:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD > 0.239 AND SD > 0.253 AND Mean <= 0.484 AND Mean <= 0.479 AND Mean > 0.473 AND SD <= 0.264 THEN hands_stretch
+R172:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD > 0.239 AND SD > 0.253 AND Mean <= 0.484 AND Mean <= 0.479 AND Mean > 0.473 AND SD > 0.264 THEN legs_stretch
+R173:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD > 0.239 AND SD > 0.253 AND Mean <= 0.484 AND Mean > 0.479 AND Mean <= 0.481 THEN turn_over
+R174:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD > 0.239 AND SD > 0.253 AND Mean <= 0.484 AND Mean > 0.479 AND Mean > 0.481 THEN legs_stretch
+R175:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD > 0.239 AND SD > 0.253 AND Mean > 0.484 AND Mean <= 0.493 THEN hands_stretch
+R176:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD > 0.239 AND SD > 0.253 AND Mean > 0.484 AND Mean > 0.493 AND SD <= 0.254 THEN hands_stretch
+R177:IF SD > 0.186 AND Mean > 0.351 AND Mean > 0.471 AND SD > 0.239 AND SD > 0.253 AND Mean > 0.484 AND Mean > 0.493 AND SD > 0.254 THEN kick

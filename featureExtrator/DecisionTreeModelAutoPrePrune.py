@@ -1,16 +1,18 @@
 from sklearn.tree import DecisionTreeClassifier
 import numpy as np
 
-ndevices = 3
-start = 2
-end = 2
+# ndevices = 3
+# start = 2
+# end = 2
 
+ndevices = 3
+start = 1
+end = ndevices
 
 def save_model(device_no):
     # 导入数据
     feature_matrix = np.load('feature_matrixs/feature_matrix' + str(device_no) + '.npy')
     label_matrix = np.load('feature_matrixs/label_matrix' + str(device_no) + '.npy')
-    # print(feature_matrix)
 
     # 定义训练集和测试集
     from sklearn.model_selection import train_test_split
@@ -27,18 +29,34 @@ def save_model(device_no):
     #                              splitter='best',
     #                              criterion='gini')
     clf = DecisionTreeClassifier(random_state=0,
-                                 max_depth=11,
+                                 max_depth=13,
                                  max_leaf_nodes=24,
                                  min_impurity_decrease=0.0003,
                                  min_samples_leaf=3,
                                  min_samples_split=7,
                                  splitter='best',
                                  criterion='entropy')
+    # clf = DecisionTreeClassifier(random_state=0,
+    #                              max_depth=11,
+    #                              max_leaf_nodes=24,
+    #                              min_impurity_decrease=0.0001,
+    #                              min_samples_leaf=3,
+    #                              min_samples_split=2,
+    #                              splitter='best',
+    #                              criterion='entropy')
+    # clf = DecisionTreeClassifier(random_state=0,
+    #                              max_depth=13,
+    #                              max_leaf_nodes=31,
+    #                              min_impurity_decrease=0.0001,
+    #                              min_samples_leaf=4,
+    #                              min_samples_split=3,
+    #                              splitter='best',
+    #                              criterion='entropy')
     clf.fit(X_train, y_train)
     train_score = clf.score(X_train, y_train)
     test_score = clf.score(X_test, y_test)
-    print('device_' + str(device_no) + '\'s train score:', train_score)
-    print('device_' + str(device_no) +'\'s test score:', test_score)
+    print('device_' + str(device_no) + '\'s train score:', train_score, round(train_score,3))
+    print('device_' + str(device_no) +'\'s test score:', test_score, round(test_score,3))
 
     # 保存模型
     import pickle

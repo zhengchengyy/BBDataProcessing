@@ -88,7 +88,12 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
     for tag in tag_collection.find({'tag': action}):
         inittime, termtime = tag['inittime'], tag['termtime']
 
-        # get the arrays according to which we will plot later
+        # 某些设备接收数据时阻塞导致数据不对齐，减少0.3s数据，如果增加0.3秒数据会导致准确率为0.99
+        # if(action=="legs_twitch" or action =="hands_twitch"):
+        #     inittime += 0.3
+            # termtime -=0.5
+
+            # get the arrays according to which we will plot later
         times, volts, filter_volts, normalize_volts = {}, {}, {}, {}
         for i in range(1, ndevices + 1):
             times[i] = []
@@ -206,6 +211,7 @@ if __name__ == '__main__':
             os.remove("feature_matrixs/label_matrix" + str(i) + ".npy")
 
     for i in range(len(action_names)):
+        print(action_names[i])
         draw_features_from_db(action=action_names[i],
                               db=config['db'],
                               tag_collection=config['tag_collection'],

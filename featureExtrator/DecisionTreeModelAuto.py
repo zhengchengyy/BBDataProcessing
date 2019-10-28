@@ -2,8 +2,8 @@ from sklearn.tree import DecisionTreeClassifier
 import numpy as np
 
 ndevices = 3
-start = 2
-end = 2
+start = 1
+end = ndevices
 
 
 def save_model(device_no):
