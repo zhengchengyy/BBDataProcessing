@@ -51,6 +51,7 @@ def save_model(device_no):
                                     feature_names=feature_names,
                                     class_names=action_names,
                                     filled=True, rounded=True,
+                                    proportion=True,
                                     special_characters=True)
     graph = pydotplus.graph_from_dot_data(dot_data)
     # graph.write_pdf('trees/' + 'device_' + str(device_no) + 'Acc_' + str(round(test_score, 3))

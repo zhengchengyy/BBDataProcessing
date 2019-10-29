@@ -21,7 +21,10 @@ def binaryTreePaths(model, root, feature_names, action_names):
         name = feature_name[node]
         if left == _tree.TREE_LEAF and right == _tree.TREE_LEAF:
             idx = np.argmax(tree_.value[node])
-            result = " THEN " + action_names[idx]
+            value = tree_.value[node]
+            action_proba = value[0][idx] / sum(value[0])
+            # result = " THEN action = " + action_names[idx] + ", action_proba = " + str(action_proba)
+            result = " THEN action_no = " + str(idx) + ", action_proba = " + str(action_proba)
             res.append("IF " + ls + val + result)
         if right != _tree.TREE_LEAF:
             stack.append((right, ls + name + " > " + val + " AND "))
@@ -34,7 +37,7 @@ def binaryTreePaths(model, root, feature_names, action_names):
 import pickle
 
 # with open('models/device_2Acc_0.984Fea_2.pickle', 'rb') as f:
-with open('models/device_3Acc_0.981Fea_2_prune.pickle', 'rb') as f:
+with open('models/device_1Acc_0.905Fea_2_prune.pickle', 'rb') as f:
     model = pickle.load(f)
 
 # 导入全局变量

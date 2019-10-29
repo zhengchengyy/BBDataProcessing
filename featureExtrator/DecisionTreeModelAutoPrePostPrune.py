@@ -79,7 +79,7 @@ def binaryTreePaths(model, root, feature_names, action_names):
         name = feature_name[node]
         if left == _tree.TREE_LEAF and right == _tree.TREE_LEAF:
             idx = np.argmax(tree_.value[node])
-            result = " THEN " + action_names[idx]
+            result = " THEN action = " + action_names[idx]
             res.append("IF " + ls + val + result)
         if right != _tree.TREE_LEAF:
             stack.append((right, ls + name + " > " + val + " AND "))

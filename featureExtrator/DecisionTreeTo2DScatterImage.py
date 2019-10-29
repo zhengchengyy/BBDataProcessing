@@ -65,7 +65,6 @@ for i in range(n_classes):
     idx = np.where(y_train == i)  # 返回满足条件的索引
     plt.scatter(X_train[idx, 0], X_train[idx, 1], s=30,
                 c=plot_colors[i], label=action_names[i], marker=plot_markers[i])
-
 plt.legend(loc='upper right')
 plt.xlabel(feature_names[0])
 plt.ylabel(feature_names[1])
@@ -79,7 +78,6 @@ for i in range(n_classes):
     idx = np.where(y_test == i)  # 返回满足条件的索引
     plt.scatter(X_test[idx, 0], X_test[idx, 1], s=30,
                 c=plot_colors[i], label=action_names[i], marker=plot_markers[i])
-
 plt.legend(loc='upper right')
 plt.xlabel(feature_names[0])
 plt.ylabel(feature_names[1])
