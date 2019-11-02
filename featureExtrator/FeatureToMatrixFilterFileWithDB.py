@@ -48,6 +48,11 @@ def getNormalization(li):
     return temp
 
 
+# 使用np实现移动平均滤波
+def np_move_avg(a, n, mode="same"):
+    return (np.convolve(a, np.ones((n,)) / n, mode=mode))
+
+
 def draw_features_from_db(action, db, volt_collection, tag_collection, port=27017,
                           host='localhost', ndevices=3, offset=0, action_num=0):
     client = MongoClient(port=port, host=host)
@@ -109,8 +114,11 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
 
         for i in range(1, ndevices + 1):
             # 滤波
-            b, a = signal.butter(8, 4 / 7, 'lowpass')  # 配置滤波器，8表示滤波器的阶数
-            filter_volts[i] = signal.lfilter(b, a, volts[i])
+            b, a = signal.butter(8, 3 / 7, 'lowpass')  # 配置滤波器，8表示滤波器的阶数
+            filter_volts[i] = signal.filtfilt(b, a, volts[i])
+
+            # 移动平均滤波，参数可选：full, valid, same
+            # filter_volts[i] = np_move_avg(filter_volts[i], 5, mode="same")
 
             # 除以体重，归一化数据
             filter_volts[i] = list(map(lambda x: x / weights[tag_acc - 1], filter_volts[i]))

@@ -41,6 +41,11 @@ def model_json():
                                  splitter='best',
                                  criterion='entropy')
 
+    # 直接后剪枝
+    # clf = DecisionTreeClassifier(random_state=0,
+    #                              max_depth=20,
+    #                              criterion='entropy')
+
     print("now training,wait please..........")
     clf.fit(X_train, y_train)
     print("train finished")

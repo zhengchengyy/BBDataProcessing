@@ -18,7 +18,7 @@ def save_model(device_no):
         feature_matrix, label_matrix, test_size=0.25, random_state=0)
 
     # 训练和预测
-    clf = DecisionTreeClassifier(random_state=0, criterion='entropy')
+    clf = DecisionTreeClassifier(random_state=0, criterion='gini')
     clf.fit(X_train, y_train)
     train_score = clf.score(X_train, y_train)
     test_score = clf.score(X_test, y_test)

@@ -72,6 +72,7 @@ def combine(model_list, X_test_list):
             pre = pre_list[j]
             pre_proba = pre_proba_list[j][pre]
             action_proba.append([pre,pre_proba])
+        print(action_proba)
         action_proba_list.append(action_proba)
     for i in range(len(action_proba_list[0])):
         max_proba = 0

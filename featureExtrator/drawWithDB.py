@@ -7,7 +7,7 @@ import time
 action = ["still", "turn_over", "legs_stretch", "hands_stretch",
           "legs_twitch", "hands_twitch", "head_move", "grasp", "kick"]
 
-config = {'action': action[2],
+config = {'action': action[1],
           'db': 'beaglebone',
           'tag_collection': 'tags_411',
           'volt_collection': 'volts_411',

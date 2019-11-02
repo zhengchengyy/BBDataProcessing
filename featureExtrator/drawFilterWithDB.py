@@ -17,6 +17,8 @@ config = {'action': action[2],
           'offset': 0
           }
 
+weights = [65, 75]
+
 def timeToFormat(t):
     ftime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t))
     return ftime
@@ -40,6 +42,16 @@ def np_move_avg(a, n, mode="same"):
     return (np.convolve(a, np.ones((n,)) / n, mode=mode))
 
 
+def getNormalization(li):
+    temp = []
+    _max = max(li)
+    _min = min(li)
+    for i in li:
+        normal = (i - _min) / (_max - _min)
+        temp.append(normal)
+    return temp
+
+
 def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='localhost',
                  ndevices=3, offset=0):
     client = MongoClient(port=port, host=host)
@@ -59,6 +71,9 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
     title = config['volt_collection'][6:] + "" + action + "_filter"
     fig = plt.figure(title, figsize=(6, 8))
     fig.suptitle(action + "_filter")
+
+    # 标签累加，即人数累加
+    tag_acc = 1
 
     # plot the data that is of a certain action one by one
     for tag in tag_collection.find({'tag': action}):
@@ -92,9 +107,9 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
 
         # 自定义y轴的区间范围，可以使图放大或者缩小
         # ax.set_ylim([0.8,1.8])
-        ax.set_ylim([0.75, 0.90])
+        # ax.set_ylim([0.75, 0.90])
         # ax.set_ylim([0.60, 0.75])
-        # ax.set_ylim([0.82, 0.83])
+        # ax.set_ylim([0.85, 1.0])
         ax.set_ylabel('Voltage(mv)')
 
         # 查看第几号设备
@@ -106,8 +121,12 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
             b, a = signal.butter(8, 3 / 7, 'lowpass')  # 配置滤波器，8表示滤波器的阶数
             filter_volts[i] = signal.filtfilt(b, a, volts[i])
 
-            # 移动平均滤波
-            # filter_volts[i] = np_move_avg(volts[i], 10, mode="same")
+            # 移动平均滤波，参数可选：full, valid, same
+            # filter_volts[i] = np_move_avg(filter_volts[i], 5, mode="same")
+
+            # 除以体重，归一化数据
+            filter_volts[i] = list(map(lambda x: x / weights[tag_acc - 1], filter_volts[i]))
+            filter_volts[i] = getNormalization(filter_volts[i])
 
             # 平方放大
             # filter_volts[i] = getSquare(filter_volts[i])
@@ -133,6 +152,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         # 设定我们希望它显示的结果，xticks和xticklabels的元素一一对应
         ax.set_xticklabels(xticklabels, rotation=15)
 
+        tag_acc += 1
 
     # 最大化显示图像窗口
     plt.get_current_fig_manager().window.showMaximized()

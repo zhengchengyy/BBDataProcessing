@@ -11,7 +11,7 @@ from sklearn import preprocessing
 action = ["still", "turn_over", "legs_stretch", "hands_stretch",
               "legs_twitch", "hands_twitch", "head_move", "grasp", "kick"]
 
-config = {'action': action[2],
+config = {'action': action[1],
           'db': 'beaglebone',
           'tag_collection': 'tags_411',
           'volt_collection': 'volts_411',
@@ -121,10 +121,10 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
             filter_volts[i] = signal.filtfilt(b, a, volts[i])
 
             # 除以体重，归一化数据
-            filter_volts[i] = list(map(lambda x: x / weights[tag_acc], filter_volts[i]))
-            normalize_volts[i] = getNormalization(filter_volts[i])
+            # filter_volts[i] = list(map(lambda x: x / weights[tag_acc], filter_volts[i]))
+            # normalize_volts[i] = getNormalization(filter_volts[i])
 
-            ax.plot(times[i], normalize_volts[i], label='device_' + str(i),
+            ax.plot(times[i], filter_volts[i], label='device_' + str(i),
                     color=colors[i - 1], alpha=0.9)
 
         if n == 1:
