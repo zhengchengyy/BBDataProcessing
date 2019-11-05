@@ -65,6 +65,10 @@ def save_model(device_no):
                + 'Fea_' + str(feature_num) + '_prune.pickle', 'wb') as f:
         pickle.dump(clf, f)
 
+    tree_ = clf.tree_
+    print("节点总数：", tree_.node_count)
+    print("叶子数量：", tree_.n_leaves)
+
     # 导入全局变量
     import GlobalVariable as gv
     action_names = gv.action_names

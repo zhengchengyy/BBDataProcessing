@@ -10,7 +10,7 @@ f3 = lambda t: np.cos(2*np.pi*100*t)
 
 y1 = np.piecewise(t, cond, [f1, f2, f3])
 y2 = np.piecewise(t, cond, [f2, f1, f3])
-
+print(len(y1),len(y2),len(t))
 cwtmatr1, freqs1 = pywt.cwt(y1, np.arange(1, 200), 'cgau8', 1/400)
 cwtmatr2, freqs2 = pywt.cwt(y2, np.arange(1, 200), 'cgau8', 1/400)
 

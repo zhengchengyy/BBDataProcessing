@@ -7,11 +7,16 @@ import time
 import numpy as np
 import pywt
 
-config = {'action':'turn_over',
-          'db':'beaglebone',
-          'tag_collection':'tags_411',
-          'volt_collection':'volts_411',
-          'offset':0}
+action = ["still", "turn_over", "legs_stretch", "hands_stretch",
+          "legs_twitch", "hands_twitch", "head_move", "grasp", "kick"]
+
+config = {'action': action[1],
+          'db': 'beaglebone',
+          'tag_collection': 'tags_411',
+          'volt_collection': 'volts_411',
+          'ndevices': 3,
+          'offset': 0
+          }
 
 def timeToFormat(t):
     ftime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t))
@@ -35,6 +40,8 @@ def plot_from_db(action, db, volt_collection, tag_collection,port=27017, host='l
 
     ntags = tag_collection.count_documents({'tag':action})
     n = 1
+    # 用于查看几号设备的图
+    start = 1
 
     title =config['volt_collection'][6:] + "" + action +"_cwt"
     fig = plt.figure(title, figsize=(6,8))
@@ -43,7 +50,7 @@ def plot_from_db(action, db, volt_collection, tag_collection,port=27017, host='l
     # plot the data that is of a certain action one by one
     for tag in tag_collection.find({'tag': action}):
         # inittime termtime
-        inittime, termtime = tag['termtime'] - offset - 20, tag['termtime'] - offset
+        inittime, termtime = tag['inittime'] - offset, tag['termtime'] - offset
         # get the arrays according to which we will plot later
         times, volts = {}, {}
         for i in range(1, ndevices + 1):
@@ -68,13 +75,23 @@ def plot_from_db(action, db, volt_collection, tag_collection,port=27017, host='l
         ax.set_title("Person" + subtitle[n - 1] + ": " + timeToFormat(inittime + offset) + " ~ " + timeToFormat(termtime + offset))
 
         # 自定义y轴的区间范围，可以使图放大或者缩小
-        ax.set_ylim(0, 20)
+        ax.set_ylim(0, 3)
         ax.set_ylabel('Frequency')
 
-        for i in range(1, 1 + 1):
+        for i in range(start, start + 1):
             # gaus1、cgau8
-            cwtmatr, freqs = pywt.cwt(volts[i], np.arange(1,len(volts[i])), 'cgau8', 1/1024)
-            ax.contourf(times[i], freqs, abs(cwtmatr))
+            wavename = "cgau8"
+            totalscal = 370
+            fc = pywt.central_frequency(wavename)  # 中心频率
+            cparam = 2 * fc * totalscal
+            scales = cparam / np.arange(totalscal, 1, -1)
+
+            cwtmatr, freqs = pywt.cwt(volts[i], scales, wavename, 1/70)  #???
+            # cwtmatr, freqs = pywt.cwt(volts[i], np.arange(1, 70), 'cgau8', 1 / 70)
+
+            # ax.contourf(times[i], freqs, abs(cwtmatr))  #绘制等高线
+            ax.contourf(times[i], freqs, abs(cwtmatr), cmap=plt.cm.hot)  # 绘制热力图
+
 
         if n  == 1:
             ax.legend(loc='upper right')
@@ -98,7 +115,8 @@ def plot_from_db(action, db, volt_collection, tag_collection,port=27017, host='l
 
 if __name__=='__main__':
     plot_from_db(action=config['action'],
-                  db=config['db'],
-                  tag_collection=config['tag_collection'],
-                  volt_collection=config['volt_collection'],
-                  offset=config['offset'])
+                 db=config['db'],
+                 tag_collection=config['tag_collection'],
+                 volt_collection=config['volt_collection'],
+                 ndevices=config['ndevices'],
+                 offset=config['offset'])

@@ -9,9 +9,9 @@ action = ["still", "turn_over", "legs_stretch", "hands_stretch",
 
 config = {'action': action[1],
           'db': 'beaglebone',
-          'tag_collection': 'tags_411',
-          'volt_collection': 'volts_411',
-          'ndevices': 3,
+          'tag_collection': 'tags_424',
+          'volt_collection': 'volts_424',
+          'ndevices': 5,
           'offset': 0
           }
 
@@ -38,7 +38,9 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
     except CollectionError as e:
         print(e.message)
 
-    ntags = tag_collection.count_documents({'tag': action})
+    # ntags = tag_collection.count_documents({'tag': action})
+    ntags = 1   #为了观察图的情况，只显示1个人的图
+    tag_acc = 1
     n = 1
 
     title = config['volt_collection'][6:] + "" + action
@@ -47,6 +49,8 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
 
     # plot the data that is of a certain action one by one
     for tag in tag_collection.find({'tag': action}):
+        if(tag_acc==2):
+            break
         # inittime
         inittime, termtime = tag['inittime'] - offset, tag['termtime'] - offset
         # get the arrays according to which we will plot later
@@ -76,8 +80,9 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
 
         # 自定义y轴的区间范围，可以使图放大或者缩小
         # ax.set_ylim([0.8,1.8])
-        ax.set_ylim([0.75, 0.90])
-        # ax.set_ylim([0.82, 0.83])
+        # ax.set_ylim([0.75, 0.90])
+        # ax.set_ylim([0.82, 0.92])  #三个设备时
+        ax.set_ylim([0.85, 1.04])  #五个设备时
         ax.set_ylabel('Voltage(mv)')
 
         # 查看第几号设备
@@ -85,8 +90,13 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         end = ndevices
 
         for i in range(start, end + 1):
-            # [v + i*0.2 for v in volts[i]]为了把多个设备的数据隔离开
-            ax.plot(times[i], volts[i], label='device_' + str(i), color=colors[i - 1], alpha=0.9)
+            # 三个设备时
+            # ax.plot(times[i], [v + i*0.025 for v in volts[i]],
+            #         label='device_' + str(i), color=colors[i - 1], alpha=0.9)
+            # 五个设备
+            ax.plot(times[i], [v + i * 0.04 for v in volts[i]],
+                    label='device_' + str(i), color=colors[i - 1], alpha=0.9)
+
 
         if n == 1:
             ax.legend(loc='upper right')
@@ -104,6 +114,8 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
             xticklabels.append(timeToSecond(times[1][i] + offset))
         ax.set_xticks(xticks)  # 设定标签的实际数字，数据类型必须和原数据一致
         ax.set_xticklabels(xticklabels, rotation=15)  # 设定我们希望它显示的结果，xticks和xticklabels的元素一一对应
+
+        tag_acc += 1
 
     # 最大化显示图像窗口
     plt.get_current_fig_manager().window.showMaximized()

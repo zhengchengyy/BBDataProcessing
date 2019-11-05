@@ -92,7 +92,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         xticks = []
         xticklabels = []
         length = len(times[1])
-        interval = length // 8 - 1
+        interval = length // 15 - 1
         for i in range(0, length, interval):
             xticks.append(times[1][i])
             xticklabels.append(timeToSecond(times[1][i] + offset))
