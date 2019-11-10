@@ -7,10 +7,18 @@ import time
 action = ["still", "turn_over", "legs_stretch", "hands_stretch",
           "legs_twitch", "hands_twitch", "head_move", "grasp", "kick"]
 
-config = {'action': action[1],
+# 每个动作的时间间隔不超过1s，每个动作30s
+# 静止：没人静止(still)、有人静止(still_people)
+# 床上有没有人：上床(get_up)、下床(go_to_bed)
+# 大动作：转身、翻身(turn_over)、腿部伸展(legs_stretch)、手部伸展(hands_stretch)
+# 中等动作：腿部抖动(legs_tremble)、手部抖动(hands_tremble)、身体抖动(body_tremble)
+# 小动作：头部微小移动(head_move)、腿部微小移动(legs_move)、手部微小移动(hands_move)
+# 其它动作：手部抬起(hands_rising)、踢踹(kick)
+
+config = {'action': "head_move",
           'db': 'beaglebone',
-          'tag_collection': 'tags_424',
-          'volt_collection': 'volts_424',
+          'tag_collection': 'tags_1105',
+          'volt_collection': 'volts_1105',
           'ndevices': 5,
           'offset': 0
           }
@@ -40,7 +48,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
 
     # ntags = tag_collection.count_documents({'tag': action})
     ntags = 1   #为了观察图的情况，只显示1个人的图
-    tag_acc = 1
+    tag_acc = 0
     n = 1
 
     title = config['volt_collection'][6:] + "" + action
@@ -49,7 +57,8 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
 
     # plot the data that is of a certain action one by one
     for tag in tag_collection.find({'tag': action}):
-        if(tag_acc==2):
+        tag_acc += 1
+        if(tag_acc > ntags):
             break
         # inittime
         inittime, termtime = tag['inittime'] - offset, tag['termtime'] - offset
@@ -69,12 +78,10 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         style.use('default')
         colors = ['r', 'b', 'g', 'c', 'm']  # m c
         subtitle = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
-        base = ntags * 100 + 10
 
-        # plot, add_subplot(211)将画布分割成2行1列，图像画在从左到右从上到下的第1块
-        ax = fig.add_subplot(base + n)
+        ax = fig.add_subplot(ntags, 1, tag_acc)
         plt.subplots_adjust(hspace=0.5)  # 函数中的wspace是子图之间的垂直间距，hspace是子图的上下间距
-        ax.set_title("Person" + subtitle[n - 1] + ": " + timeToFormat(inittime + offset) + " ~ " + timeToFormat(
+        ax.set_title("Person" + subtitle[tag_acc - 1] + ": " + timeToFormat(inittime + offset) + " ~ " + timeToFormat(
             termtime + offset))
         ax.set_xlim(inittime, termtime)
 
@@ -98,11 +105,10 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
                     label='device_' + str(i), color=colors[i - 1], alpha=0.9)
 
 
-        if n == 1:
+        if tag_acc == 1:
             ax.legend(loc='upper right')
-        if n == ntags:
+        if tag_acc == ntags:
             ax.set_xlabel('Time(mm:ss)')
-        n += 1
 
         # 以第一个设备的时间数据为准，数据的每1/10添加一个x轴标签
         xticks = []
@@ -115,7 +121,6 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         ax.set_xticks(xticks)  # 设定标签的实际数字，数据类型必须和原数据一致
         ax.set_xticklabels(xticklabels, rotation=15)  # 设定我们希望它显示的结果，xticks和xticklabels的元素一一对应
 
-        tag_acc += 1
 
     # 最大化显示图像窗口
     plt.get_current_fig_manager().window.showMaximized()

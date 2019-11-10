@@ -14,9 +14,9 @@ import os
 from scipy import signal
 
 config = {'db': 'beaglebone',
-          'tag_collection': 'tags_411',
-          'volt_collection': 'volts_411',
-          'device_num': 3,
+          'tag_collection': 'tags_1105',
+          'volt_collection': 'volts_1105',
+          'device_num': 5,
           'offset': 0}
 
 weights = [65, 75, 65, 45, 60, 62, 48, 55, 65, 60, 70, 65]
@@ -53,7 +53,7 @@ def np_move_avg(a, n, mode="same"):
     return (np.convolve(a, np.ones((n,)) / n, mode=mode))
 
 
-# 使用小波变换滤波
+# 使用小波滤波
 def cwt_filter(data, threshold):
     w = pywt.Wavelet('db8')  # 选用Daubechies8小波
     maxlev = pywt.dwt_max_level(len(data), w.dec_len)
@@ -83,7 +83,9 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
     except CollectionError as e:
         print(e.message)
 
+    # ntags表示总标签数，即人数；tag_acc表示累加计数
     ntags = tag_collection.count_documents({'tag': action})
+    tag_acc = 0
 
     title = config['volt_collection'][6:] + "" + action + "_features"
     fig = plt.figure(title, figsize=(6, 8))
@@ -103,18 +105,23 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
         # 注册特征提取模块
         extractor.register(module)
 
-    # 定义画布左右位置的计数：标签累加，即人数累加
-    tag_acc = 0
+    # 丢弃数据
+    discard = {"turn_over":[2,4,5,6,9],"legs_stretch":[2,5,7,8,9,11],
+               "hands_stretch":[7,8,9],"legs_tremble":[3,6,9,10,11,12],
+               "hands_tremble":[2,3,7,8,9,11],"body_tremble":[1,2,3,6,7,8,9],
+               "head_move":[3,9,12],"legs_move":[1,3,4,6,9],"hands_move":[3,6,9],
+               "hands_rising":[4,5,7,8,9],"kick":[2,4,5,6,7,8,9,11,12]
+               }
 
     # read the data that is of a certain action one by one
     for tag in tag_collection.find({'tag': action}):
         tag_acc += 1
-        if(tag_acc > 8):
-            break
+        if tag_acc in discard[action]:
+            continue
         inittime, termtime = tag['inittime'], tag['termtime']
 
-            # get the arrays according to which we will plot later
-        times, volts, filter_volts, normalize_volts = {}, {}, {}, {}
+        # get the arrays according to which we will plot later
+        times, volts, filter_volts = {}, {}, {}
         for i in range(1, ndevices + 1):
             times[i] = []
             volts[i] = []
@@ -140,7 +147,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
 
             # 除以体重，归一化数据
             filter_volts[i] = list(map(lambda x: x / weights[tag_acc - 1], filter_volts[i]))
-            normalize_volts[i] = getNormalization(filter_volts[i])
+            filter_volts[i] = getNormalization(filter_volts[i])
 
         # 定义存储时间、特征列表
         feature_times, feature_values = {}, {}
@@ -157,10 +164,10 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
 
         # 对每个采集设备进行特征提取
         for i in range(start, end + 1):
-            for j in range(len(normalize_volts[i])):
+            for j in range(len(filter_volts[i])):
                 value = {
                     "time": times[i][j],
-                    "volt": normalize_volts[i][j]
+                    "volt": filter_volts[i][j]
                 }
                 output = extractor.process(value)
                 if (output):

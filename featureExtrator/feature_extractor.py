@@ -74,7 +74,7 @@ class FeatureExtractor:
         self.modules.append(processModule)
 
     def process(self, value):
-        """Subject的notify(),接收一个value值，让self.modules中的每一个ProcessModule处理该值"""
+        """Subject的notify()，接收一个value值，让self.modules中的每一个ProcessModule处理该值"""
         result = {}
         for module in self.modules:
             output = module.process(value)

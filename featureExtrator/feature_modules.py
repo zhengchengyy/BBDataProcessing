@@ -2,6 +2,7 @@ from feature_extractor import FeatureExtractor
 from feature_extractor import ProcessModule
 import numpy as np
 import math
+import pywt
 
 
 class SDModule(ProcessModule):
@@ -106,19 +107,49 @@ class RangeModule(ProcessModule):
 
 
 class RMSModule(ProcessModule):
-    """计算检测到的电压中的均方根"""
+    """计算检测到的电压小波变换后提取系数的均方根，不同层系数均方根的平均值"""
 
     FEATURE_NAME = "RMS"
 
     def processFullQueue(self):
-        sum = 0
+        threshold = 0.1
+        volts = []
         for i in self.queue.queue:
-            sum += i['volt'] ** 2
-        return math.sqrt(sum / len(self.queue.queue))
+            volts.append(i['volt'])
+
+        w = pywt.Wavelet('db8')  # 选用Daubechies8小波
+        maxlev = pywt.dwt_max_level(len(volts), w.dec_len)
+
+        # Decompose into wavelet components, to the level selected:
+        coeffs = pywt.wavedec(volts, 'db8', level=maxlev)  # 将信号进行小波分解
+
+        for li in coeffs[1:]:
+            rms_sum = 0
+            sum = 0
+            for i in li:
+                sum += i ** 2
+            rms_sum += math.sqrt(sum / len(li))
+        return rms_sum
 
     def clear(self):
         """清理组件中的队列"""
         self.queue.queue.clear()
+
+
+# class RMSModule(ProcessModule):
+#     """计算检测到的电压中的均方根"""
+#
+#     FEATURE_NAME = "RMS"
+#
+#     def processFullQueue(self):
+#         sum = 0
+#         for i in self.queue.queue:
+#             sum += i['volt'] ** 2
+#         return math.sqrt(sum / len(self.queue.queue))
+#
+#     def clear(self):
+#         """清理组件中的队列"""
+#         self.queue.queue.clear()
 
 
 class DurationModule(ProcessModule):

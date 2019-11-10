@@ -5,6 +5,7 @@ from exceptions import CollectionError
 from scipy import signal
 import time
 import numpy as np
+import pywt
 
 action = ["still", "turn_over", "legs_stretch", "hands_stretch",
               "legs_twitch", "hands_twitch", "head_move", "grasp", "kick"]
@@ -18,6 +19,23 @@ config = {'action': action[2],
           }
 
 weights = [65, 75]
+
+
+def cwt_filter(data, threshold):
+    w = pywt.Wavelet('db8')  # 选用Daubechies8小波
+    maxlev = pywt.dwt_max_level(len(data), w.dec_len)
+    # Decompose into wavelet components, to the level selected:
+    coeffs = pywt.wavedec(data, 'db8', level=maxlev)  # 将信号进行小波分解
+
+    for i in range(1, len(coeffs)):
+        coeffs[i] = pywt.threshold(coeffs[i], threshold * max(coeffs[i]))  # 将噪声滤波
+
+    data_filter = pywt.waverec(coeffs, 'db8')  # 将信号进行小波重构
+    if (len(data) != len(data_filter)):
+        data_filter = np.delete(data_filter, 0)
+
+    return data_filter
+
 
 def timeToFormat(t):
     ftime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t))
@@ -65,18 +83,17 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
     except CollectionError as e:
         print(e.message)
 
+    # ntags表示总标签数，即人数；tag_acc表示累加计数
     ntags = tag_collection.count_documents({'tag': action})
-    n = 1
+    tag_acc = 0
 
     title = config['volt_collection'][6:] + "" + action + "_filter"
     fig = plt.figure(title, figsize=(6, 8))
     fig.suptitle(action + "_filter")
 
-    # 标签累加，即人数累加
-    tag_acc = 1
-
     # plot the data that is of a certain action one by one
     for tag in tag_collection.find({'tag': action}):
+        tag_acc += 1
         # inittime
         inittime, termtime = tag['inittime'] - offset, tag['termtime'] - offset
         # get the arrays according to which we will plot later
@@ -96,12 +113,10 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         style.use('default')
         colors = ['r', 'b', 'g', 'c', 'm']  # m c
         subtitle = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
-        base = ntags * 100 + 10
 
-        # plot, add_subplot(211)将画布分割成2行1列，图像画在从左到右从上到下的第1块
-        ax = fig.add_subplot(base + n)
+        ax = fig.add_subplot(ntags, 1, tag_acc)
         plt.subplots_adjust(hspace=0.5)  # 函数中的wspace是子图之间的垂直间距，hspace是子图的上下间距
-        ax.set_title("Person" + subtitle[n - 1] + ": " + timeToFormat(inittime + offset)
+        ax.set_title("Person" + subtitle[tag_acc - 1] + ": " + timeToFormat(inittime + offset)
                      + " ~ " + timeToFormat(termtime + offset))
         ax.set_xlim(inittime, termtime)
 
@@ -116,17 +131,23 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         start = 1
         end = 3
 
+        filter_thread = [0.2, 0.06, 0.08]
+
         for i in range(start, end + 1):
-            # [v + i*0.2 for v in volts[i]]为了把多个设备的数据隔离开
-            b, a = signal.butter(8, 3 / 7, 'lowpass')  # 配置滤波器，8表示滤波器的阶数
-            filter_volts[i] = signal.filtfilt(b, a, volts[i])
+            filter_volts[i] = volts[i]
+            # 小波变换滤波
+            filter_volts[i] = cwt_filter(filter_volts[i], filter_thread[i-1])
+
+            # 低通滤波器滤波
+            # b, a = signal.butter(8, 3 / 7, 'lowpass')  # 配置滤波器，8表示滤波器的阶数
+            # filter_volts[i] = signal.filtfilt(b, a, filter_volts[i])
 
             # 移动平均滤波，参数可选：full, valid, same
             # filter_volts[i] = np_move_avg(filter_volts[i], 5, mode="same")
 
             # 除以体重，归一化数据
-            filter_volts[i] = list(map(lambda x: x / weights[tag_acc - 1], filter_volts[i]))
-            filter_volts[i] = getNormalization(filter_volts[i])
+            # filter_volts[i] = list(map(lambda x: x / weights[tag_acc - 1], filter_volts[i]))
+            # filter_volts[i] = getNormalization(filter_volts[i])
 
             # 平方放大
             # filter_volts[i] = getSquare(filter_volts[i])
@@ -134,11 +155,10 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
             ax.plot(times[i], filter_volts[i], label='device_' + str(i),
                     color=colors[i - 1], alpha=0.9)
 
-        if n == 1:
+        if tag_acc == 1:
             ax.legend(loc='upper right')
-        if n == ntags:
+        if tag_acc == ntags:
             ax.set_xlabel('Time(mm:ss)')
-        n += 1
 
         # 以第一个设备的时间数据为准，数据的每1/10添加一个x轴标签
         xticks = []
@@ -152,7 +172,6 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         # 设定我们希望它显示的结果，xticks和xticklabels的元素一一对应
         ax.set_xticklabels(xticklabels, rotation=15)
 
-        tag_acc += 1
 
     # 最大化显示图像窗口
     plt.get_current_fig_manager().window.showMaximized()

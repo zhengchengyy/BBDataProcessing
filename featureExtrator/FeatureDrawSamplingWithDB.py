@@ -10,16 +10,32 @@ from matplotlib import pyplot as plt
 from matplotlib import style
 import numpy as np
 
-action = ["still", "turn_over", "legs_stretch", "hands_stretch",
-          "legs_twitch", "hands_twitch", "head_move", "grasp", "kick"]
+# action = ["still", "turn_over", "legs_stretch", "hands_stretch",
+#           "legs_twitch", "hands_twitch", "head_move", "grasp", "kick"]
+#
+# config = {'action': action[1],
+#           'db': 'beaglebone',
+#           'tag_collection': 'tags_424',
+#           'volt_collection': 'volts_424',
+#           'offset': 0}
 
-config = {'action': action[1],
+action = [
+          "turn_over","legs_stretch","hands_stretch",
+          "legs_tremble","hands_tremble","body_tremble",
+          "head_move","legs_move","hands_move",
+          "hands_rising","kick"]
+
+
+config = {'action': action[0],
           'db': 'beaglebone',
-          'tag_collection': 'tags_424',
-          'volt_collection': 'volts_424',
-          'offset': 0}
+          'tag_collection': 'tags_1105',
+          'volt_collection': 'volts_1105',
+          'ndevices': 5,
+          'offset': 0
+          }
 
-feature_names = ["RangeModule", "EnergyModule", "RMSModule"]
+
+feature_names = ["SamplingFreqModule"]
 
 
 def timeToFormat(t):
@@ -45,10 +61,8 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
     except CollectionError as e:
         print(e.message)
 
-    # ntags表示总标签数，即人数；tag_acc表示累加计数
-    ntags = tag_collection.count_documents({'tag': action})
-    # ntags = 1
-    tag_acc = 0
+    # ntags = tag_collection.count_documents({'tag': action})
+    ntags = 1  #表示查看人数
 
     title = config['volt_collection'][6:] + "" + action + "_features"
     fig = plt.figure(title, figsize=(6, 8))
@@ -68,10 +82,13 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
         # 注册特征提取模块
         extractor.register(module)
 
+    # 定义画布左右位置的计数：标签累加，即人数累加
+    tag_acc = 0
+
     # read the data that is of a certain action one by one
     for tag in tag_collection.find({'tag': action}):
         tag_acc += 1
-        if(tag_acc > ntags):
+        if(tag_acc>ntags):
             break
         inittime, termtime = tag['inittime'], tag['termtime']
 
@@ -127,14 +144,14 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
         # 定义特征数量
         nfeatures = len(feature_values[1])
         # 定义画布上下位置的计数，即特征累加
-        fea_acc = 0
-
+        fea_acc = 1
+        base = nfeatures * 100 + ntags * 10
         style.use('default')
         colors = ['r', 'b', 'g', 'c', 'm']  # m c
 
         for feature_type in feature_values[1].keys():
-            fea_acc += 1
-            ax = fig.add_subplot(nfeatures, ntags, (fea_acc-1) * ntags + tag_acc)
+            # plot, add_subplot(311)将画布分割成3行1列，图像画在从左到右从上到下的第1块
+            ax = fig.add_subplot(base + tag_acc + (fea_acc - 1) * ntags)
             plt.subplots_adjust(hspace=0.5)  # 函数中的wspace是子图之间的垂直间距，hspace是子图的上下间距
             ax.set_title(feature_type)
 
@@ -168,6 +185,8 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
                 person = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
                 ax.set_xlabel("Person" + person[tag_acc - 1] + ": " + timeToFormat(inittime + offset)
                               + " ~ " + timeToFormat(termtime + offset))
+
+            fea_acc += 1
 
             # 以第一个设备的时间数据为准，数据的每1/10添加一个x轴标签
             xticks = []

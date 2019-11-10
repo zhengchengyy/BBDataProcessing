@@ -1,7 +1,7 @@
 from sklearn.tree import DecisionTreeClassifier
 import numpy as np
 
-ndevices = 3
+ndevices = 5
 start = 1
 end = ndevices
 
@@ -24,6 +24,7 @@ def save_model(device_no):
     test_score = clf.score(X_test, y_test)
     print('device_' + str(device_no) + '\'s train score:', train_score)
     print('device_' + str(device_no) +'\'s test score:', test_score)
+
 
     # 保存模型
     import pickle

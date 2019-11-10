@@ -4,14 +4,21 @@ from matplotlib import style
 from exceptions import CollectionError
 import time
 
-action = ["still", "turn_over", "legs_stretch", "hands_stretch",
-              "legs_twitch", "hands_twitch", "head_move", "grasp", "kick"]
+# action = ["still", "turn_over", "legs_stretch", "hands_stretch",
+#               "legs_twitch", "hands_twitch", "head_move", "grasp", "kick"]
 
-config = {'action': action[1],
+# 导入全局变量
+import GlobalVariable as gv
+action = gv.action_names
+
+
+config = {'action': action[0],
           'db': 'beaglebone',
-          'tag_collection': 'tags_411',
-          'volt_collection': 'volts_411',
-          'offset': 0}
+          'tag_collection': 'tags_1105',
+          'volt_collection': 'volts_1105',
+          'ndevices': 5,
+          'offset': 0
+          }
 
 
 def timeToFormat(t):
@@ -36,8 +43,9 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
     except CollectionError as e:
         print(e.message)
 
-    ntags = tag_collection.count_documents({'tag': action})
-    n = 1
+    # ntags = tag_collection.count_documents({'tag': action})
+    ntags = 12
+    tag_acc = 0
 
     title = config['volt_collection'][6:] + "" + action
     fig = plt.figure(title, figsize=(6, 8))
@@ -45,6 +53,9 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
 
     # plot the data that is of a certain action one by one
     for tag in tag_collection.find({'tag': action}):
+        tag_acc += 1
+        if (tag_acc > ntags):
+            break
         # inittime
         inittime, termtime = tag['inittime'] - offset, tag['termtime'] - offset
         # get the arrays according to which we will plot later
@@ -62,13 +73,11 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
 
         style.use('default')
         colors = ['r', 'b', 'g', 'c', 'm']  # m c
-        subtitle = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
-        base = ntags * 100 + 10
+        subtitle = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N']
 
-        # plot, add_subplot(211)将画布分割成2行1列，图像画在从左到右从上到下的第1块
-        ax = fig.add_subplot(base + n)
+        ax = fig.add_subplot(ntags,1,tag_acc)
         plt.subplots_adjust(hspace=0.5)  # 函数中的wspace是子图之间的垂直间距，hspace是子图的上下间距
-        ax.set_title("Person" + subtitle[n - 1] + ": " + timeToFormat(inittime + offset) + " ~ " + timeToFormat(
+        ax.set_title("Person" + subtitle[tag_acc - 1] + ": " + timeToFormat(inittime + offset) + " ~ " + timeToFormat(
             termtime + offset))
         ax.set_xlim(inittime, termtime)
 
@@ -82,11 +91,10 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
             # [v + i*0.2 for v in volts[i]]为了把多个设备的数据隔离开
             ax.plot(times[i], volts[i], label='device_' + str(i), color=colors[i - 1], alpha=0.9)
 
-        if n == 1:
+        if tag_acc == 1:
             ax.legend(loc='upper right')
-        if n == ntags:
+        if tag_acc == ntags:
             ax.set_xlabel('Time(mm:ss)')
-        n += 1
 
         # 以第一个设备的时间数据为准，数据的每1/10添加一个x轴标签
         xticks = []
@@ -114,4 +122,5 @@ if __name__ == '__main__':
                       db=config['db'],
                       tag_collection=config['tag_collection'],
                       volt_collection=config['volt_collection'],
+                      ndevices=5,
                       offset=config['offset'])

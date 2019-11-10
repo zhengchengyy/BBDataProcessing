@@ -3,8 +3,8 @@ import os
 import time
 # 需要统计的文件夹或者文件，这是在windows下运行的，如果使用Linux系统可以使用basedir = '/app/log'
 basedir = 'D:\Offer\BBDataProcessing'
-testdir = 'D:\Offer\BBDataProcessing\\featureExtrator\\test'
-testdir2 = 'D:\Offer\BBDataProcessing\\synchronizeData\\test'
+# testdir = 'D:\Offer\BBDataProcessing\\featureExtrator\\test'
+# testdir2 = 'D:\Offer\BBDataProcessing\\synchronizeData\\test'
 secdir = 'D:\Offer\BBDetection'
 filelists = []
 # 指定想要统计的文件类型
@@ -28,7 +28,7 @@ def countLine(fname):
     return count
 if __name__ == '__main__' :
     startTime = time.clock()
-    getFile(testdir2)
+    getFile(basedir)
     totalline = 0
     for filelist in filelists:
         totalline = totalline + countLine(filelist)
