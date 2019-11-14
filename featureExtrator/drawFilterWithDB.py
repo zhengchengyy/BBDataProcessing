@@ -94,14 +94,16 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
     # plot the data that is of a certain action one by one
     for tag in tag_collection.find({'tag': action}):
         tag_acc += 1
+        if (tag_acc > ntags):
+            break
         # inittime
         inittime, termtime = tag['inittime'] - offset, tag['termtime'] - offset
         # get the arrays according to which we will plot later
-        times, volts, filter_volts = {}, {}, {}
+        times, volts, volts_filter = {}, {}, {}
         for i in range(1, ndevices + 1):
             times[i] = []
             volts[i] = []
-            filter_volts[i] = []
+            volts_filter[i] = []
 
         for volt in volt_collection.find({'time': {'$gt': inittime, '$lt': termtime}}):
             device_no = int(volt['device_no'])
@@ -134,26 +136,27 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         filter_thread = [0.2, 0.06, 0.08]
 
         for i in range(start, end + 1):
-            filter_volts[i] = volts[i]
+            volts_filter[i] = volts[i]
             # 小波变换滤波
-            filter_volts[i] = cwt_filter(filter_volts[i], filter_thread[i-1])
+            volts_filter[i] = cwt_filter(volts_filter[i], filter_thread[i-1])
 
             # 低通滤波器滤波
-            # b, a = signal.butter(8, 3 / 7, 'lowpass')  # 配置滤波器，8表示滤波器的阶数
-            # filter_volts[i] = signal.filtfilt(b, a, filter_volts[i])
+            b, a = signal.butter(8, 3 / 7, 'lowpass')  # 配置滤波器，8表示滤波器的阶数
+            volts_filter[i] = signal.filtfilt(b, a, volts_filter[i])
 
             # 移动平均滤波，参数可选：full, valid, same
-            # filter_volts[i] = np_move_avg(filter_volts[i], 5, mode="same")
+            # volts_filter[i] = np_move_avg(volts_filter[i], 5, mode="same")
 
             # 除以体重，归一化数据
-            # filter_volts[i] = list(map(lambda x: x / weights[tag_acc - 1], filter_volts[i]))
-            # filter_volts[i] = getNormalization(filter_volts[i])
+            # volts_filter[i] = list(map(lambda x: x / weights[tag_acc - 1], volts_filter[i]))
+            # volts_filter[i] = getNormalization(volts_filter[i])
 
             # 平方放大
-            # filter_volts[i] = getSquare(filter_volts[i])
+            # volts_filter[i] = getSquare(volts_filter[i])
 
-            ax.plot(times[i], filter_volts[i], label='device_' + str(i),
+            ax.plot(times[i], volts_filter[i], label='device_' + str(i),
                     color=colors[i - 1], alpha=0.9)
+        ax.grid()
 
         if tag_acc == 1:
             ax.legend(loc='upper right')
@@ -174,7 +177,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
 
 
     # 最大化显示图像窗口
-    plt.get_current_fig_manager().window.showMaximized()
+    plt.get_current_fig_manager().window.state('zoomed')
     plt.show()
 
 

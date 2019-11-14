@@ -49,8 +49,17 @@ def timeToSecond(t):
     return stime
 
 
+def fft_filter(data, sampling_frequency, threshold_frequency):
+    fft_result = np.fft.fft(data)
+    freqs = np.fft.fftfreq(len(fft_result), d=sampling_frequency)
+    begin = int(len(data) * threshold_frequency * sampling_frequency)
+    fft_result[begin:] = 0  # 高通滤波
+    filter_data = np.fft.ifft(fft_result)
+    return abs(filter_data)
+
+
 def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='localhost',
-                 ndevices=5, offset=0):
+                 ndevices=3, offset=0):
     client = MongoClient(port=port, host=host)
     database = client[db]
     tag_collection = database[tag_collection]
@@ -68,7 +77,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
     tag_acc = 0
 
     # 用于查看几号设备的图
-    start = 3
+    start = 1
     end = start
 
     title = config['volt_collection'][6:] + "" + action + "_fft_" + str(start)
@@ -106,12 +115,16 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
                      + " ~ " + timeToFormat(termtime + offset))
 
         # 自定义y轴的区间范围，可以使图放大或者缩小
-        ax.set_ylim(0, 0.001)
+        # ax.set_ylim(0, 0.001)
         # ax.set_ylim(0, 0.0003)
         # ax.set_ylim(0, 1)
         ax.set_ylabel('Amplitude')
 
-        for i in range(start, start + 1):
+        for i in range(start, end + 1):
+            ax.plot(times[i], volts[i], label='device_' + str(i), color=colors[i - 1], alpha=0.3)
+            volts[i] = fft_filter(volts[i], 1 / 70, 15)
+            ax.plot(times[i], volts[i], label='device_' + str(i) + "_fft_filter", color=colors[i - 1], alpha=0.9)
+
             # fft返回值实部表示
             result = np.fft.fft(volts[i])
             # 实数fft后会使原信号幅值翻N/2倍，直流分量即第一点翻N倍
@@ -122,7 +135,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
             # 第二个参数d是采样周期，其倒数就是采样频率Fs，即d=1/Fs
             freqs = np.fft.fftfreq(len(result), d=1 / 70)
 
-            ax.plot(abs(freqs), amplitudes, label='device_' + str(i), color=colors[i - 1], alpha=0.9)
+            # ax.plot(abs(freqs), amplitudes, label='device_' + str(i), color=colors[i - 1], alpha=0.9)
 
         ax.grid(linestyle=':')
         if tag_acc == 1:

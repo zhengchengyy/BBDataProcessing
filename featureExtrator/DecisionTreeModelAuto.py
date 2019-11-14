@@ -1,7 +1,7 @@
 from sklearn.tree import DecisionTreeClassifier
 import numpy as np
 
-ndevices = 5
+ndevices = 3
 start = 1
 end = ndevices
 

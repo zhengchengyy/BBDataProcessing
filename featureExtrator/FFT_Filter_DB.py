@@ -49,6 +49,15 @@ def timeToSecond(t):
     return stime
 
 
+def fft_filter(data, sampling_frequency, threshold_frequency):
+    fft_result = np.fft.fft(data)
+    freqs = np.fft.fftfreq(len(fft_result), d=sampling_frequency)
+    begin = int(len(data) * threshold_frequency * sampling_frequency)
+    fft_result[begin:] = 0  # 高通滤波
+    filter_data = np.fft.ifft(fft_result)
+    return abs(filter_data)
+
+
 def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='localhost',
                  ndevices=5, offset=0):
     client = MongoClient(port=port, host=host)
@@ -112,16 +121,15 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         ax.set_ylabel('Amplitude')
 
         for i in range(start, start + 1):
+            volts[i] = fft_filter(volts[i], 1/70, 15)
             # fft返回值实部表示
             result = np.fft.fft(volts[i])
             # 实数fft后会使原信号幅值翻N/2倍，直流分量即第一点翻N倍
             amplitudes = abs(result) / (len(result) / 2)  # 复数的绝对值其实就是它的模长
             amplitudes[0] /= 2
-
             # fftfreq第一个参数n是FFT的点数，一般取FFT之后的数据的长度（size）
             # 第二个参数d是采样周期，其倒数就是采样频率Fs，即d=1/Fs
             freqs = np.fft.fftfreq(len(result), d=1 / 70)
-
             ax.plot(abs(freqs), amplitudes, label='device_' + str(i), color=colors[i - 1], alpha=0.9)
 
         ax.grid(linestyle=':')

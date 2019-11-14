@@ -7,19 +7,28 @@ import time
 action = ["still", "turn_over", "legs_stretch", "hands_stretch",
           "legs_twitch", "hands_twitch", "head_move", "grasp", "kick"]
 
-action = ["get_up","go_to_bed",
-          "turn_over","legs_stretch","hands_stretch",
-          "legs_tremble","hands_tremble","body_tremble",
-          "head_move","legs_move","hands_move",
-          "hands_rising","kick"]
+# action = ["get_up","go_to_bed",
+#           "turn_over","legs_stretch","hands_stretch",
+#           "legs_tremble","hands_tremble","body_tremble",
+#           "head_move","legs_move","hands_move",
+#           "hands_rising","kick"]
 
-config = {'action': "kick",
+config = {'action': action[1],
           'db': 'beaglebone',
-          'tag_collection': 'tags_1105',
-          'volt_collection': 'volts_1105',
-          'ndevices': 5,
+          'tag_collection': 'tags_411',
+          'volt_collection': 'volts_411',
+          'ndevices': 3,
           'offset': 0
           }
+
+
+# config = {'action': "still",
+#           'db': 'beaglebone',
+#           'tag_collection': 'tags_1105',
+#           'volt_collection': 'volts_1105',
+#           'ndevices': 5,
+#           'offset': 0
+#           }
 
 
 def timeToFormat(t):
@@ -45,8 +54,8 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         print(e.message)
 
     # ntags表示总标签数，即人数；tag_acc表示累加计数
-    # ntags = tag_collection.count_documents({'tag': action})
-    ntags = 3
+    ntags = tag_collection.count_documents({'tag': action})
+    # ntags = 3
     tag_acc = 0
 
     title = config['volt_collection'][6:] + "" + action
@@ -56,7 +65,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
     # plot the data that is of a certain action one by one
     for tag in tag_collection.find({'tag': action}):
         tag_acc += 1
-        if(tag_acc > ntags):
+        if (tag_acc > ntags):
             break
         # inittime
         inittime, termtime = tag['inittime'] - offset, tag['termtime'] - offset
@@ -75,12 +84,13 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
 
         style.use('default')
         colors = ['r', 'b', 'g', 'c', 'm']  # m c
-        subtitle = ['A', 'B', 'C', 'D', 'E', 'F', 'G','H','I','J','L','M','N']
+        subtitle = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'L', 'M', 'N']
 
-        ax = fig.add_subplot(ntags,1,tag_acc)
+        ax = fig.add_subplot(ntags, 1, tag_acc)
 
         plt.subplots_adjust(hspace=0.5)  # 函数中的wspace是子图之间的垂直间距，hspace是子图的上下间距
-        ax.set_title("Person" + subtitle[tag_acc - 1] + ": " + timeToFormat(inittime + offset) + " ~ " + timeToFormat(termtime + offset))
+        ax.set_title("Person" + subtitle[tag_acc - 1] + ": " + timeToFormat(inittime + offset) + " ~ " + timeToFormat(
+            termtime + offset))
         ax.set_xlim(inittime, termtime)
 
         # 自定义y轴的区间范围，可以使图放大或者缩小
@@ -115,7 +125,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         ax.set_xticklabels(xticklabels, rotation=15)  # 设定我们希望它显示的结果，xticks和xticklabels的元素一一对应
 
     # 最大化显示图像窗口
-    plt.get_current_fig_manager().window.showMaximized()
+    plt.get_current_fig_manager().window.state('zoomed')
     plt.show()
 
 
