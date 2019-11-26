@@ -51,7 +51,6 @@ def timeToSecond(t):
 
 def fft_filter(data, sampling_frequency, threshold_frequency):
     fft_result = np.fft.fft(data)
-    freqs = np.fft.fftfreq(len(fft_result), d=sampling_frequency)
     begin = int(len(data) * threshold_frequency * sampling_frequency)
     fft_result[begin:] = 0  # 高通滤波
     filter_data = np.fft.ifft(fft_result)

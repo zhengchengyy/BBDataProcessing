@@ -142,6 +142,8 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         ax.set_xticks(xticks)  # 设定标签的实际数字，数据类型必须和原数据一致
         ax.set_xticklabels(xticklabels, rotation=15)  # 设定我们希望它显示的结果，xticks和xticklabels的元素一一对应
 
+    # 最大化显示图像窗口
+    plt.get_current_fig_manager().window.state('zoomed')
     plt.show()
 
 

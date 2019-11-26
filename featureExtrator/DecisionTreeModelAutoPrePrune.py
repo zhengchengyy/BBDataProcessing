@@ -6,8 +6,8 @@ import numpy as np
 # end = 2
 
 ndevices = 3
-start = 1
-end = ndevices
+start = 2
+end = 2
 
 def save_model(device_no):
     # 导入数据

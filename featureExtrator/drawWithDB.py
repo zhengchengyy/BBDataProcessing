@@ -55,11 +55,11 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
 
     # ntags表示总标签数，即人数；tag_acc表示累加计数
     ntags = tag_collection.count_documents({'tag': action})
-    # ntags = 3
+    ntags = 1
     tag_acc = 0
 
     title = config['volt_collection'][6:] + "" + action
-    fig = plt.figure(title, figsize=(6, 8))
+    fig = plt.figure(title)
     fig.suptitle(action)
 
     # plot the data that is of a certain action one by one
@@ -67,8 +67,8 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         tag_acc += 1
         if (tag_acc > ntags):
             break
-        # inittime
-        inittime, termtime = tag['inittime'] - offset, tag['termtime'] - offset
+        # inittime,termtime
+        inittime, termtime = tag['inittime'] - offset + 30, tag['inittime'] - offset + 60
         # get the arrays according to which we will plot later
         times, volts = {}, {}
         for i in range(1, ndevices + 1):
@@ -110,7 +110,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         if tag_acc == 1:
             ax.legend(loc='upper right')
         if tag_acc == ntags:
-            ax.set_xlabel('Time(mm:ss)')
+            ax.set_xlabel('Time(s)')
 
         # 以第一个设备的时间数据为准，数据的每1/10添加一个x轴标签
         xticks = []
@@ -125,7 +125,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         ax.set_xticklabels(xticklabels, rotation=15)  # 设定我们希望它显示的结果，xticks和xticklabels的元素一一对应
 
     # 最大化显示图像窗口
-    plt.get_current_fig_manager().window.state('zoomed')
+    # plt.get_current_fig_manager().window.state('zoomed')
     plt.show()
 
 

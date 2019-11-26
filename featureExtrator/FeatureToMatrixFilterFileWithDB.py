@@ -19,7 +19,6 @@ config = {'db': 'beaglebone',
           'device_num': 3,
           'offset': 0}
 
-weights = [65, 75, 65, 45, 60, 62, 48, 55, 65, 60, 70, 65]
 
 # 导入全局变量
 import GlobalVariable as gv
@@ -153,8 +152,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
             # 移动平均滤波，参数可选：full, valid, same
             # filter_volts[i] = np_move_avg(filter_volts[i], 5, mode="same")
 
-            # 除以体重，归一化数据
-            filter_volts[i] = list(map(lambda x: x / weights[tag_acc - 1], filter_volts[i]))
+            # 归一化数据
             normalize_volts[i] = getNormalization(filter_volts[i])
 
         # 定义存储时间、特征列表

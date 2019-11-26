@@ -122,7 +122,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         filter_thread = [0.2, 0.06, 0.08]
         for i in range(start, end + 1):
             # volts_filter = volts[i]
-            ax.plot(times[i], volts[i], label='device_' + str(i), color=colors[i - 1], alpha=0.3)
+            ax.plot(times[i], volts[i], label='device_' + str(i), color=colors[i - 1], alpha=0.5)
             volts_filter = cwt_filter(volts[i], filter_thread[i-1])
             print("device"+str(i)+"'RMSE:",get_rmse(volts[i], volts_filter))
             ax.plot(times[i], volts_filter, label='device_' + str(i) + "_cwt_filter", color=colors[i - 1], alpha=0.9)
