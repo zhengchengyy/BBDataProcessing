@@ -1,4 +1,4 @@
-# 训练前把测试标签二值化，用训练的模型得到的预测分数自然就变成二值化，画出ROC
+# 训练完把测试标签和预测分数二值化后画出ROC
 # 引入必要的库
 import numpy as np
 import matplotlib.pyplot as plt
@@ -21,10 +21,6 @@ import GlobalVariable as gv
 action_names = gv.action_names
 feature_names = gv.feature_names
 
-# 将标签类二值化,对应类的位置为1,其它位置为1,如[1,0,0],[0,1,0],[0,0,1]
-n_classes = len(action_names)
-label_matrix = label_binarize(label_matrix, classes=range(n_classes))
-
 # 随机化和划分训练集和测试集
 X_train, X_test, y_train, y_test = train_test_split(
     feature_matrix, label_matrix, test_size=0.25, random_state=0)
@@ -39,12 +35,17 @@ clf = DecisionTreeClassifier(random_state=0,
                              splitter='best',
                              criterion='entropy')
 clf.fit(X_train, y_train)
+
 train_score = clf.score(X_train, y_train)
 test_score = clf.score(X_test, y_test)
 print('device_' + str(device_no) + '\'s train score:', train_score, round(train_score,3))
 print('device_' + str(device_no) +'\'s test score:', test_score, round(test_score,3))
 
 y_score = clf.predict(X_test)
+# 将标签类二值化,对应类的位置为1,其它位置为1,如[1,0,0],[0,1,0],[0,0,1]
+n_classes = len(action_names)
+y_score = label_binarize(y_score, classes=range(n_classes))
+y_test = label_binarize(y_test, classes=range(n_classes))
 
 # 计算每一类的ROC
 fpr = dict()
