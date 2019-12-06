@@ -31,13 +31,13 @@ config = {'action': 'turn_over',
 #           }
 
 
-# config = {'action': "still",
-#           'db': 'beaglebone',
-#           'tag_collection': 'tags_1105',
-#           'volt_collection': 'volts_1105',
-#           'ndevices': 5,
-#           'offset': 0
-#           }
+config = {'action': "turn_over",
+          'db': 'beaglebone',
+          'tag_collection': 'tags_1105',
+          'volt_collection': 'volts_1105',
+          'ndevices': 5,
+          'offset': 0
+          }
 
 
 def timeToFormat(t):
@@ -89,7 +89,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
 
     # ntags表示总标签数，即人数；tag_acc表示累加计数
     ntags = tag_collection.count_documents({'tag': action})
-    ntags = 1
+    ntags = 8
     tag_acc = 0
 
     # 用于查看几号设备的图

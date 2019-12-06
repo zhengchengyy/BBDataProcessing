@@ -17,9 +17,11 @@ config = {'db': 'beaglebone',
           'tag_collection': 'tags_1105',
           'volt_collection': 'volts_1105',
           'device_num': 5,
-          'offset': 0}
+          'offset': 0,
+          'interval': 2,
+          'rate': 1}
 
-weights = [65, 75, 65, 45, 60, 62, 48, 55, 65, 60, 70, 65]
+# weights = [65, 75, 65, 45, 60, 62, 48, 55, 65, 60, 70, 65]
 
 # 导入全局变量
 import GlobalVariable as gv
@@ -70,8 +72,22 @@ def cwt_filter(data, threshold):
     return data_filter
 
 
-def draw_features_from_db(action, db, volt_collection, tag_collection, port=27017,
-                          host='localhost', ndevices=3, offset=0, action_num=0):
+# 使用快速傅里叶变换滤波
+def fft_filter(data, sampling_frequency, threshold_frequency):
+    fft_result = np.fft.fft(data)
+    freqs = np.fft.fftfreq(len(fft_result), d=sampling_frequency)
+    begin = int(len(data) * threshold_frequency * sampling_frequency)
+    fft_result[begin:] = 0  # 高通滤波
+    filter_data = np.fft.ifft(fft_result)
+    return abs(filter_data)
+
+
+def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=27017,
+                          host='localhost', ndevices=3, offset=0, action_num=0,
+                          interval = 1, rate = 1):
+    # 根据时间采集数据，基本单位为s，比如1s、10s、30s、60s
+    # interval表示每次分析的时间跨度，rate表示间隔多长时间进行一次分析
+    # print(interval,rate)
     client = MongoClient(port=port, host=host)
     database = client[db]
     tag_collection = database[tag_collection]
@@ -89,11 +105,6 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
 
     title = config['volt_collection'][6:] + "" + action + "_features"
     fig = plt.figure(title, figsize=(6, 8))
-
-    # 根据时间采集数据，基本单位为s，比如1s、10s、30s、60s
-    # interval表示每次分析的时间跨度，rate表示间隔多长时间进行一次分析
-    interval = 1
-    rate = 1
     fig.suptitle(action + " (" + "interval:" + str(interval) + "s, " + "stepsize:" + str(rate) + "s)")
 
     # 定义特征提取器
@@ -106,7 +117,8 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
         extractor.register(module)
 
     # 丢弃数据
-    discard = {"turn_over":[2,4,5,6,9],"legs_stretch":[2,5,7,8,9,11],
+    discard = {"get_up":[],"go_to_bed":[],
+               "turn_over":[2,4,5,6,9],"legs_stretch":[2,5,7,8,9,11],
                "hands_stretch":[7,8,9],"legs_tremble":[3,6,9,10,11,12],
                "hands_tremble":[2,3,7,8,9,11],"body_tremble":[1,2,3,6,7,8,9],
                "head_move":[3,9,12],"legs_move":[1,3,4,6,9],"hands_move":[3,6,9],
@@ -117,7 +129,9 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
     for tag in tag_collection.find({'tag': action}):
         tag_acc += 1
         if tag_acc in discard[action]:
+        # if tag_acc == 9 or tag_acc == 11:  #don't discard data
             continue
+        print("people_" + str(tag_acc))
         inittime, termtime = tag['inittime'], tag['termtime']
 
         # get the arrays according to which we will plot later
@@ -135,18 +149,22 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
             volts[device_no].append(v)
 
         for i in range(1, ndevices + 1):
+            filter_volts[i] = volts[i]
             # 小波变换滤波
-            filter_volts[i] = cwt_filter(volts[i], 0.1)
+            filter_volts[i] = cwt_filter(volts[i], 0.08)
 
             # 低通滤波器滤波
-            b, a = signal.butter(8, 3 / 7, 'lowpass')  # 配置滤波器，8表示滤波器的阶数
-            filter_volts[i] = signal.filtfilt(b, a, filter_volts[i])
+            # b, a = signal.butter(8, 3 / 7, 'lowpass')  # 配置滤波器，8表示滤波器的阶数
+            # filter_volts[i] = signal.filtfilt(b, a, filter_volts[i])
+
+            # 傅里叶变换滤波
+            filter_volts[i] = fft_filter(filter_volts[i], 1 / 70, 25)
 
             # 移动平均滤波，参数可选：full, valid, same
             # filter_volts[i] = np_move_avg(filter_volts[i], 5, mode="same")
 
             # 除以体重，归一化数据
-            filter_volts[i] = list(map(lambda x: x / weights[tag_acc - 1], filter_volts[i]))
+            # filter_volts[i] = list(map(lambda x: x / weights[tag_acc - 1], filter_volts[i]))
             filter_volts[i] = getNormalization(filter_volts[i])
 
         # 定义存储时间、特征列表
@@ -236,17 +254,20 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
 if __name__ == '__main__':
     # 清除文件
     start = 1
+    end = config['device_num']
     for i in range(start, 5 + 1):
         if (os.path.exists("feature_matrixs/feature_matrix" + str(i) + ".npy")):
             os.remove("feature_matrixs/feature_matrix" + str(i) + ".npy")
             os.remove("feature_matrixs/label_matrix" + str(i) + ".npy")
 
     for i in range(len(action_names)):
-        print(action_names[i])
-        draw_features_from_db(action=action_names[i],
+        print("---------" + action_names[i] + "---------")
+        feature_to_matrix_file(action=action_names[i],
                               db=config['db'],
                               tag_collection=config['tag_collection'],
                               volt_collection=config['volt_collection'],
                               ndevices=config['device_num'],
                               offset=config['offset'],
-                              action_num=i)
+                              action_num=i,
+                              interval=config['interval'],
+                              rate=config['rate'])

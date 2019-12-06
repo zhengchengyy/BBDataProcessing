@@ -2,7 +2,7 @@ from sklearn.tree import DecisionTreeClassifier
 import numpy as np
 
 # ————导入数据————
-device_no = 2
+device_no = 1
 feature_matrix = np.load('feature_matrixs/feature_matrix'+str(device_no)+'.npy')
 label_matrix = np.load('feature_matrixs/label_matrix'+str(device_no)+'.npy')
 
@@ -70,11 +70,11 @@ def DecisionTreeClassifiter_param(*data, param_name, param_value):
                  xy=(max_indx, testing_scores[max_indx]), color="r")
 
     plt.show()
-param_names = ["max_depth","min_samples_split","min_samples_leaf","max_leaf_nodes"]
+# param_names = ["max_depth","min_samples_split","min_samples_leaf","max_leaf_nodes"]
 # param_names = ["min_impurity_split"] #will be removed in 0.25
-param_names = ["min_impurity_decrease"]
+# param_names = ["min_impurity_decrease"]
 # param_names = ["max_features"]
-# param_names = ["max_depth"]
+param_names = ["max_depth"]
 for param_name in param_names:
     DecisionTreeClassifiter_param(X_train, X_test, y_train, y_test,
                                   param_name=param_name, param_value=50)

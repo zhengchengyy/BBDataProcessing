@@ -2,13 +2,14 @@ from sklearn.tree import DecisionTreeClassifier
 import numpy as np
 
 # 导入数据
-feature_matrix = np.load('feature_matrixs/feature_matrix2.npy')
-label_matrix = np.load('feature_matrixs/label_matrix2.npy')
+device_no = 2
+feature_matrix = np.load('feature_matrixs/feature_matrix' + str(device_no) + '.npy')
+label_matrix = np.load('feature_matrixs/label_matrix' + str(device_no) + '.npy')
 
 # 导入全局变量
-# import GlobalVariable as gv
-# action_names = gv.action_names
-# feature_names = gv.feature_names
+import GlobalVariable as gv
+action_names = gv.action_names
+feature_names = gv.feature_names
 
 # 定义训练集和测试集
 from sklearn.model_selection import train_test_split
@@ -19,7 +20,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 # 读取模型
 import pickle
 
-with open('models_discard/device_2Acc_0.984Fea_2.pickle', 'rb') as f:
+with open('models/device_1Acc_0.887Fea_2.pickle', 'rb') as f:
     model = pickle.load(f)
 train_score = model.score(X_train, y_train)
 test_score = model.score(X_test, y_test)

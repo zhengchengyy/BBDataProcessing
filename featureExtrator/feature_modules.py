@@ -26,37 +26,6 @@ class SDModule(ProcessModule):
         """清理组件中的队列"""
         self.queue.queue.clear()
 
-class VibrationFreqModule(ProcessModule):
-    """计算检测到的电压中的频率"""
-
-    FEATURE_NAME = "VibrationFreq"
-
-    def processFullQueue(self):
-        volts = []
-        for i in self.queue.queue:
-            volts.append(i['volt'])
-        import numpy as np
-        # fft返回值实部表示
-        result = np.fft.fft(volts)  # 除以长度表示归一化处理
-        # fftfreq第一个参数n是FFT的点数，一般取FFT之后的数据的长度（size）
-        # 第二个参数d是采样周期，其倒数就是采样频率Fs，即d=1/Fs
-        freq = np.fft.fftfreq(len(result), d=1 / 70)
-        amplitude = np.sqrt(result.real ** 2 + result.imag ** 2) / (len(volts) / 2)
-        sum = 0
-        for f, a in zip(freq, amplitude):
-            sum += abs(f) * a
-        return sum / len(freq)
-
-    def get_average(self, list):
-        sum = 0
-        for item in list:
-            sum += item
-        return sum / len(list)
-
-    def clear(self):
-        """清理组件中的队列"""
-        self.queue.queue.clear()
-
 
 class EnergyModule(ProcessModule):
     """计算检测到的电压中的能量：指定时间间隔内不同频率对应的幅值之和"""
@@ -69,13 +38,13 @@ class EnergyModule(ProcessModule):
             volts.append(i['volt'])
 
         # fft返回值实部表示
-        result = np.fft.fft(volts)  # 除以长度表示归一化处理
-        # fftfreq第一个参数n是FFT的点数，一般取FFT之后的数据的长度（size）
-        # 第二个参数d是采样周期，其倒数就是采样频率Fs，即d=1/Fs
-        freq = np.fft.fftfreq(len(result), d=1 / 70)
-        amplitude = np.sqrt(result.real ** 2 + result.imag ** 2) / (len(volts) / 2)
+        result = np.fft.fft(volts)
+        # 实数fft后会使原信号幅值翻N/2倍，直流分量即第一点翻N倍
+        amplitudes = abs(result) / (len(result) / 2)  # 复数的绝对值其实就是它的模长
+        # amplitudes[0] /= 2
+
         sum = 0
-        for i in abs(amplitude):
+        for i in amplitudes[1:]:
             sum += i ** 2
         return sum
 
@@ -84,6 +53,45 @@ class EnergyModule(ProcessModule):
         for item in list:
             sum += item
         return sum / len(list)
+
+    def clear(self):
+        """清理组件中的队列"""
+        self.queue.queue.clear()
+
+
+class FDEModule(ProcessModule):
+    """计算检测到的电压中的频域熵：指定时间间隔内不同频率对应的频域熵之和"""
+
+    FEATURE_NAME = "FDE"
+
+    def processFullQueue(self):
+        volts = []
+        for i in self.queue.queue:
+            volts.append(i['volt'])
+
+        # fft返回值实部表示
+        result = np.fft.fft(volts)
+        # 实数fft后会使原信号幅值翻N/2倍，直流分量即第一点翻N倍
+        amplitudes = abs(result) / (len(result) / 2)  # 复数的绝对值其实就是它的模长
+        # amplitudes[0] /= 2
+
+        # 归一化系数
+        amplitudes[1:] = self.getNormalization(amplitudes[1:])
+
+        sum = 0
+        for i in amplitudes[1:]:
+            if(i != 0):
+                sum += i * math.log(i, 2)
+        return -sum
+
+    def getNormalization(self, li):
+        temp = []
+        _max = max(li)
+        _min = min(li)
+        for i in li:
+            normal = (i - _min) / (_max - _min)
+            temp.append(normal)
+        return temp
 
     def clear(self):
         """清理组件中的队列"""
@@ -100,6 +108,24 @@ class RangeModule(ProcessModule):
         for i in self.queue.queue:
             range.append(i['volt'])
         return math.sqrt(max(range) - min(range))
+
+    def clear(self):
+        """清理组件中的队列"""
+        self.queue.queue.clear()
+
+
+class MeanModule(ProcessModule):
+    """功能是对满队列中的所有数据求平均值。返回平均值。
+    表示震动幅度的平均情况"""
+    # 优化，不用重复计算值，只计算增加和减少的数据；可以从其它组件获取数据
+
+    FEATURE_NAME = "Mean"
+
+    def processFullQueue(self):
+        sum = 0
+        for value in self.queue.queue:
+            sum = sum + value['volt']
+        return sum / self.size
 
     def clear(self):
         """清理组件中的队列"""
@@ -215,24 +241,6 @@ class ThresholdCounterModule(ProcessModule):
         self.queue.queue.clear()
 
 
-class MeanModule(ProcessModule):
-    """功能是对满队列中的所有数据求平均值。返回平均值。
-    表示震动幅度的平均情况"""
-    # 优化，不用重复计算值，只计算增加和减少的数据；可以从其它组件获取数据
-
-    FEATURE_NAME = "Mean"
-
-    def processFullQueue(self):
-        sum = 0
-        for value in self.queue.queue:
-            sum = sum + value['volt']
-        return sum / self.size
-
-    def clear(self):
-        """清理组件中的队列"""
-        self.queue.queue.clear()
-
-
 class VarianceModule(ProcessModule):
     """功能是对满队列中的所有数据求方差。返回方差。
     表示震动频率的平均情况"""
@@ -248,6 +256,38 @@ class VarianceModule(ProcessModule):
         for value in self.queue.queue:
             variance = variance + (value['volt'] - average) ** 2
         return variance / self.size
+
+    def clear(self):
+        """清理组件中的队列"""
+        self.queue.queue.clear()
+
+
+class VibrationFreqModule(ProcessModule):
+    """计算检测到的电压中的频率"""
+
+    FEATURE_NAME = "VibrationFreq"
+
+    def processFullQueue(self):
+        volts = []
+        for i in self.queue.queue:
+            volts.append(i['volt'])
+        import numpy as np
+        # fft返回值实部表示
+        result = np.fft.fft(volts)  # 除以长度表示归一化处理
+        # fftfreq第一个参数n是FFT的点数，一般取FFT之后的数据的长度（size）
+        # 第二个参数d是采样周期，其倒数就是采样频率Fs，即d=1/Fs
+        freq = np.fft.fftfreq(len(result), d=1 / 70)
+        amplitude = np.sqrt(result.real ** 2 + result.imag ** 2) / (len(volts) / 2)
+        sum = 0
+        for f, a in zip(freq, amplitude):
+            sum += abs(f) * a
+        return sum / len(freq)
+
+    def get_average(self, list):
+        sum = 0
+        for item in list:
+            sum += item
+        return sum / len(list)
 
     def clear(self):
         """清理组件中的队列"""

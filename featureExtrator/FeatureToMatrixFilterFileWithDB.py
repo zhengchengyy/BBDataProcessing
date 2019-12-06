@@ -17,7 +17,9 @@ config = {'db': 'beaglebone',
           'tag_collection': 'tags_411',
           'volt_collection': 'volts_411',
           'device_num': 3,
-          'offset': 0}
+          'offset': 0,
+          'interval': 1,
+          'rate': 1}
 
 
 # 导入全局变量
@@ -79,8 +81,16 @@ def fft_filter(data, sampling_frequency, threshold_frequency):
     return abs(filter_data)
 
 
-def draw_features_from_db(action, db, volt_collection, tag_collection, port=27017,
-                          host='localhost', ndevices=3, offset=0, action_num=0):
+def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=27017,
+                          host='localhost', ndevices=3, offset=0, action_num=0,
+                          interval = 1, rate = 0.5):
+    # 根据时间采集数据，基本单位为s，比如1s、10s、30s、60s
+    # interval表示每次分析的时间跨度，rate表示间隔多长时间进行一次分析
+    # print(interval,rate)
+    # 针对不同动作,设置不同时间窗口
+    if(action == "turn_over"):
+        interval = 2
+        rate = 1
     client = MongoClient(port=port, host=host)
     database = client[db]
     tag_collection = database[tag_collection]
@@ -96,11 +106,6 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
 
     title = config['volt_collection'][6:] + "" + action + "_features"
     fig = plt.figure(title, figsize=(6, 8))
-
-    # 根据时间采集数据，基本单位为s，比如1s、10s、30s、60s
-    # interval表示每次分析的时间跨度，rate表示间隔多长时间进行一次分析
-    interval = 1
-    rate = 1
     fig.suptitle(action + " (" + "interval:" + str(interval) + "s, " + "stepsize:" + str(rate) + "s)")
 
     # 定义特征提取器
@@ -120,6 +125,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
         tag_acc += 1
         if(tag_acc > 8):
             break
+        print("people_" + str(tag_acc))
         inittime, termtime = tag['inittime'], tag['termtime']
 
             # get the arrays according to which we will plot later
@@ -249,11 +255,13 @@ if __name__ == '__main__':
             os.remove("feature_matrixs/label_matrix" + str(i) + ".npy")
 
     for i in range(len(action_names)):
-        print(action_names[i])
-        draw_features_from_db(action=action_names[i],
-                              db=config['db'],
-                              tag_collection=config['tag_collection'],
-                              volt_collection=config['volt_collection'],
-                              ndevices=config['device_num'],
-                              offset=config['offset'],
-                              action_num=i)
+        print("---------" + action_names[i] + "---------")
+        feature_to_matrix_file(action=action_names[i],
+                               db=config['db'],
+                               tag_collection=config['tag_collection'],
+                               volt_collection=config['volt_collection'],
+                               ndevices=config['device_num'],
+                               offset=config['offset'],
+                               action_num=i,
+                               interval=config['interval'],
+                               rate=config['rate'])

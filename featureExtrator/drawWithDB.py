@@ -22,13 +22,13 @@ config = {'action': action[1],
           }
 
 
-# config = {'action': "still",
-#           'db': 'beaglebone',
-#           'tag_collection': 'tags_1105',
-#           'volt_collection': 'volts_1105',
-#           'ndevices': 5,
-#           'offset': 0
-#           }
+config = {'action': "go_to_bed",
+          'db': 'beaglebone',
+          'tag_collection': 'tags_1105',
+          'volt_collection': 'volts_1105',
+          'ndevices': 5,
+          'offset': 0
+          }
 
 
 def timeToFormat(t):
@@ -55,7 +55,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
 
     # ntags表示总标签数，即人数；tag_acc表示累加计数
     ntags = tag_collection.count_documents({'tag': action})
-    ntags = 1
+    # ntags = 2
     tag_acc = 0
 
     title = config['volt_collection'][6:] + "" + action
@@ -68,7 +68,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         if (tag_acc > ntags):
             break
         # inittime,termtime
-        inittime, termtime = tag['inittime'] - offset + 30, tag['inittime'] - offset + 60
+        inittime, termtime = tag['inittime'] - offset, tag['termtime'] - offset
         # get the arrays according to which we will plot later
         times, volts = {}, {}
         for i in range(1, ndevices + 1):
@@ -116,7 +116,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         xticks = []
         xticklabels = []
         length = len(times[1])
-        interval = length // 8 - 1
+        interval = length // 6 - 1
         for i in range(0, length, interval):
             xticks.append(times[1][i])
             # xticklabels.append(timeToSecond(times[1][i] + offset))

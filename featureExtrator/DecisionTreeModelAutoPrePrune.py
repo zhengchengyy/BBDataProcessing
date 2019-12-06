@@ -5,9 +5,9 @@ import numpy as np
 # start = 2
 # end = 2
 
-ndevices = 3
-start = 2
-end = 2
+ndevices = 5
+start = 1
+end = ndevices
 
 def save_model(device_no):
     # 导入数据
@@ -17,39 +17,34 @@ def save_model(device_no):
     # 定义训练集和测试集
     from sklearn.model_selection import train_test_split
     X_train, X_test, y_train, y_test = train_test_split(
-        feature_matrix, label_matrix, test_size=0.25, random_state=0)
+        feature_matrix, label_matrix, test_size=0.2, random_state=0)
 
     # 训练和预测
-    # clf = DecisionTreeClassifier(random_state=0,
-    #                              max_depth=13,
-    #                              max_leaf_nodes=25,
-    #                              min_impurity_decrease=0.0001,
-    #                              min_samples_leaf=3,
-    #                              min_samples_split=3,
-    #                              splitter='best',
-    #                              criterion='gini')
+    # 加入上下床动作
     clf = DecisionTreeClassifier(random_state=0,
-                                 max_depth=13,
-                                 max_leaf_nodes=24,
-                                 min_impurity_decrease=0.0003,
-                                 min_samples_leaf=3,
-                                 min_samples_split=7,
+                                 max_depth=45,
+                                 max_leaf_nodes=72,
+                                 min_impurity_decrease=0.0013,
+                                 min_samples_leaf=2,
+                                 min_samples_split=6,
                                  splitter='best',
                                  criterion='entropy')
+    # 1105数据
     # clf = DecisionTreeClassifier(random_state=0,
     #                              max_depth=11,
-    #                              max_leaf_nodes=24,
-    #                              min_impurity_decrease=0.0001,
-    #                              min_samples_leaf=3,
-    #                              min_samples_split=2,
+    #                              max_leaf_nodes=78,
+    #                              min_impurity_decrease=0.00032,
+    #                              min_samples_leaf=2,
+    #                              min_samples_split=5,
     #                              splitter='best',
     #                              criterion='entropy')
+    # 411数据
     # clf = DecisionTreeClassifier(random_state=0,
     #                              max_depth=13,
-    #                              max_leaf_nodes=31,
-    #                              min_impurity_decrease=0.0001,
-    #                              min_samples_leaf=4,
-    #                              min_samples_split=3,
+    #                              max_leaf_nodes=24,
+    #                              min_impurity_decrease=0.0003,
+    #                              min_samples_leaf=3,
+    #                              min_samples_split=7,
     #                              splitter='best',
     #                              criterion='entropy')
     clf.fit(X_train, y_train)

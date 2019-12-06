@@ -1,9 +1,9 @@
 from sklearn.tree import DecisionTreeClassifier
 import numpy as np
 
-ndevices = 3
-start = 2
-end = 2
+ndevices = 5
+start = 1
+end = ndevices
 
 
 def save_model(device_no):
@@ -15,16 +15,20 @@ def save_model(device_no):
     # 定义训练集和测试集
     from sklearn.model_selection import train_test_split
     X_train, X_test, y_train, y_test = train_test_split(
-        feature_matrix, label_matrix, test_size=0.25, random_state=0)
+        feature_matrix, label_matrix, test_size=0.3, random_state=0)
 
     # 训练和预测
-    clf = DecisionTreeClassifier(random_state=0, criterion='gini')
+    clf = DecisionTreeClassifier(random_state=0, criterion='entropy')
     clf.fit(X_train, y_train)
     train_score = clf.score(X_train, y_train)
     test_score = clf.score(X_test, y_test)
     print('device_' + str(device_no) + '\'s train score:', train_score)
     print('device_' + str(device_no) +'\'s test score:', test_score)
 
+    # 交叉验证
+    from sklearn.model_selection import cross_val_score
+    # print("交叉验证分数:", cross_val_score(clf, X_train, y=y_train, cv=5))  # cv表示几倍交叉验证
+    print("交叉验证平均分数:", cross_val_score(clf, X_train, y=y_train, cv=10).mean())
 
     # 保存模型
     import pickle

@@ -90,9 +90,10 @@ for i, color in zip(range(n_classes), plot_colors):
     plt.plot(fpr[i], tpr[i], color=color, lw=lw,
              label=action_names[i] + '(AUC = {0:0.3f})'.format(roc_auc[i]))
 
-plt.plot([0, 1], [0, 1], 'k--', color='pink', lw=lw)
+plt.plot([0, 1], [0, 1], 'k--', color='pink', lw=lw, label="y=x(AUC=0.5)")
 plt.xlim([0.0, 1.0])
-plt.ylim([0.0, 1.05])
+# plt.ylim([0.0, 1.05])
+plt.ylim([0.7, 1.01])
 plt.xlabel('False Positive Rate')
 plt.ylabel('True Positive Rate')
 plt.title('ROC curves of different sleep movements')

@@ -49,7 +49,7 @@ for device_no in range(1,3+1):
     print("device_"+str(device_no)+"'test score:", test_score)
 
 
-print("------------------规则1：不同推理机动作结论概率最大值为最终结论的精确率---------------------------")
+print("------------------规则1：不同推理机动作结论概率最大值为最终结论的准确率---------------------------")
 # 多个设备时
 model_list = ["model1","model2","model3"]
 X_test_list = ["X_test1","X_test2","X_test3"]
@@ -98,7 +98,7 @@ combine(["model1","model3"], ["X_test1","X_test3"])
 combine(["model2","model3"], ["X_test2","X_test3"])
 
 
-print("------------------规则2：不同推理机动作结论概率和的最大值为最终结论的精确率------------------------")
+print("------------------规则2：不同推理机动作结论概率和的最大值为最终结论的准确率------------------------")
 # 多个设备时
 model_list = ["model1","model2","model3"]
 X_test_list = ["X_test1","X_test2","X_test3"]

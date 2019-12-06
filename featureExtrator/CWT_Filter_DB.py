@@ -18,13 +18,19 @@ config = {'action': action[1],
           'offset': 0
           }
 
-# config = {'action': "head_move",
-#           'db': 'beaglebone',
-#           'tag_collection': 'tags_1105',
-#           'volt_collection': 'volts_1105',
-#           'ndevices': 5,
-#           'offset': 0
-#           }
+action_names = [
+          "get_up","go_to_bed",
+          "turn_over","legs_stretch","hands_stretch",
+          "head_move","legs_move","hands_move",
+          "kick","legs_tremble","hands_tremble"]
+
+config = {'action': "legs_tremble",
+          'db': 'beaglebone',
+          'tag_collection': 'tags_1105',
+          'volt_collection': 'volts_1105',
+          'ndevices': 5,
+          'offset': 0
+          }
 
 
 def timeToFormat(t):
@@ -75,12 +81,12 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         print(e.message)
 
     ntags = tag_collection.count_documents({'tag': action})
-    # ntags = 1
+    ntags = 1
     tag_acc = 0
 
     # 用于查看几号设备的图
     start = 1
-    end = ndevices
+    end = 1
 
     title = config['volt_collection'][6:] + "" + action + "_cwt"
     fig = plt.figure(title, figsize=(6, 8))
@@ -119,10 +125,11 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         ax.set_ylim(0.75, 0.90)
         ax.set_ylabel('Frequency')
 
-        filter_thread = [0.2, 0.06, 0.08]
         for i in range(start, end + 1):
-            # volts_filter = volts[i]
-            volts_filter = cwt_filter(volts[i], filter_thread[i-1])
+            volts_filter = volts[i]
+            # filter_thread = [0.2, 0.06, 0.08]
+            # volts_filter = cwt_filter(volts[i], filter_thread[i-1])  #411数据专用
+            volts_filter = cwt_filter(volts[i], 0.08)
             print("device"+str(i)+"'RMSE:",get_rmse(volts[i], volts_filter))
             ax.plot(times[i], volts_filter, label='device_' + str(i), color=colors[i - 1], alpha=0.9)
 

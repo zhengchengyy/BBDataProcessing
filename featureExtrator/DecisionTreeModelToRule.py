@@ -32,7 +32,7 @@ def binaryTreePaths(model, root, feature_names, action_names):
 import pickle
 
 # with open('models/device_2Acc_0.984Fea_2.pickle', 'rb') as f:
-with open('models/device_2Acc_0.885Fea_2.pickle', 'rb') as f:
+with open('models/device_1Acc_0.901Fea_2.pickle', 'rb') as f:
     model = pickle.load(f)
 
 # 导入全局变量

@@ -19,7 +19,16 @@ config = {'action': action[1],
           'volt_collection': 'volts_424',
           'offset': 0}
 
-feature_names = ["RangeModule", "EnergyModule", "RMSModule"]
+config = {'action': "turn_over",
+          'db': 'beaglebone',
+          'tag_collection': 'tags_1105',
+          'volt_collection': 'volts_1105',
+          'ndevices': 5,
+          'offset': 0
+          }
+
+
+feature_names = ["RangeModule", "EnergyModule", "RMSModule", "FDEModule","SamplingFreqModule"]
 
 
 def timeToFormat(t):
@@ -47,7 +56,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
 
     # ntags表示总标签数，即人数；tag_acc表示累加计数
     ntags = tag_collection.count_documents({'tag': action})
-    # ntags = 1
+    ntags = 8
     tag_acc = 0
 
     title = config['volt_collection'][6:] + "" + action + "_features"
@@ -165,7 +174,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
                 ax.set_xlabel('Time(s)')
             if fea_acc == nfeatures:
                 # 设置人员
-                person = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
+                person = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
                 ax.set_xlabel("Person" + person[tag_acc - 1] + ": " + timeToFormat(inittime + offset)
                               + " ~ " + timeToFormat(termtime + offset))
 
@@ -187,9 +196,8 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
             # 显示网格
             # ax.grid(True, which='both')
 
-
     # 最大化显示图像窗口
-    plt.get_current_fig_manager().window.showMaximized()
+    plt.get_current_fig_manager().window.state('zoomed')
     plt.show()
 
 
@@ -198,4 +206,5 @@ if __name__ == '__main__':
                           db=config['db'],
                           tag_collection=config['tag_collection'],
                           volt_collection=config['volt_collection'],
+                          ndevices=config['ndevices'],
                           offset=config['offset'])
