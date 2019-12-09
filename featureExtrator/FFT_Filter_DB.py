@@ -31,13 +31,13 @@ config = {'action': 'turn_over',
 #           }
 
 
-# config = {'action': "still",
-#           'db': 'beaglebone',
-#           'tag_collection': 'tags_1105',
-#           'volt_collection': 'volts_1105',
-#           'ndevices': 5,
-#           'offset': 0
-#           }
+config = {'action': "turn_over",
+          'db': 'beaglebone',
+          'tag_collection': 'tags_1105',
+          'volt_collection': 'volts_1105',
+          'ndevices': 5,
+          'offset': 0
+          }
 
 
 def timeToFormat(t):
@@ -93,8 +93,8 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
     tag_acc = 0
 
     # 用于查看几号设备的图
-    start = 3
-    end = start
+    start = 1
+    end = 1
 
     title = config['volt_collection'][6:] + "" + action + "_filter_fft_" + str(start)
     # fig = plt.figure(title, figsize=(6, 8))
@@ -133,19 +133,20 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
                      + " ~ " + timeToFormat(termtime + offset))
 
         # 自定义y轴的区间范围，可以使图放大或者缩小
-        ax.set_ylim(0, 0.001)
+        # ax.set_ylim(0, 0.002)
+        ax.set_ylim(0, 0.005)
         # ax.set_ylim(0, 0.0003)
         # ax.set_ylim(0, 1)
         ax.set_ylabel('Amplitude')
 
-        filter_thread = [0.2, 0.06, 0.08]
+        # filter_thread = [0.2, 0.06, 0.08]
         for i in range(start, start + 1):
             volts_filter[i] = volts[i]
             # 小波变换滤波
-            volts_filter[i] = cwt_filter(volts_filter[i], filter_thread[i - 1])
+            volts_filter[i] = cwt_filter(volts_filter[i], 0.1)
 
             # 傅里叶变换滤波
-            volts_filter[i] = fft_filter(volts_filter[i], 1 / 70, 15)
+            volts_filter[i] = fft_filter(volts_filter[i], 1 / 70, 20)
 
             # fft返回值实部表示
             result = np.fft.fft(volts_filter[i])

@@ -22,7 +22,7 @@ config = {'action': action[1],
           }
 
 
-config = {'action': "go_to_bed",
+config = {'action': "turn_over",
           'db': 'beaglebone',
           'tag_collection': 'tags_1105',
           'volt_collection': 'volts_1105',
@@ -55,8 +55,12 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
 
     # ntags表示总标签数，即人数；tag_acc表示累加计数
     ntags = tag_collection.count_documents({'tag': action})
-    # ntags = 2
+    ntags = 1
     tag_acc = 0
+
+    # 查看第几号设备
+    start = 2
+    end = 2
 
     title = config['volt_collection'][6:] + "" + action
     fig = plt.figure(title)
@@ -68,7 +72,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         if (tag_acc > ntags):
             break
         # inittime,termtime
-        inittime, termtime = tag['inittime'] - offset, tag['termtime'] - offset
+        inittime, termtime = tag['termtime'] - offset - 31, tag['termtime'] - offset
         # get the arrays according to which we will plot later
         times, volts = {}, {}
         for i in range(1, ndevices + 1):
@@ -99,14 +103,11 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         # ax.set_ylim([0.82, 0.83])
         ax.set_ylabel('Voltage(mv)')
 
-        # 查看第几号设备
-        start = 1
-        end = ndevices
-
         for i in range(start, end + 1):
             # [v + i*0.2 for v in volts[i]]为了把多个设备的数据隔离开
             ax.plot(times[i], volts[i], label='device_' + str(i), color=colors[i - 1], alpha=0.9)
 
+        ax.grid(linestyle=':')
         if tag_acc == 1:
             ax.legend(loc='upper right')
         if tag_acc == ntags:
@@ -116,7 +117,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         xticks = []
         xticklabels = []
         length = len(times[1])
-        interval = length // 6 - 1
+        interval = length // 15 - 1
         for i in range(0, length, interval):
             xticks.append(times[1][i])
             # xticklabels.append(timeToSecond(times[1][i] + offset))

@@ -27,7 +27,7 @@ class_names = gv.action_names
 # 定义训练集和测试集
 from sklearn.model_selection import train_test_split
 X_train, X_test, y_train, y_test = train_test_split(
-    feature_matrix, label_matrix, test_size=0.25, random_state=0)
+    feature_matrix, label_matrix, test_size=0.2, random_state=0)
 
 print("训练集长度:", len(X_train), len(y_train))
 print("测试集长度：", len(X_test), len(y_test))
@@ -36,14 +36,23 @@ print("测试集长度：", len(X_test), len(y_test))
 feature_names = [feature[:-6] for feature in feature_names]
 
 def model_json():
+    # 9动作2特征
     clf = DecisionTreeClassifier(random_state=0,
-                                 max_depth=13,
-                                 max_leaf_nodes=24,
-                                 min_impurity_decrease=0.0003,
-                                 min_samples_leaf=3,
-                                 min_samples_split=7,
+                                 max_depth=11,
+                                 max_leaf_nodes=78,
+                                 min_impurity_decrease=0.00032,
+                                 min_samples_leaf=2,
+                                 min_samples_split=5,
                                  splitter='best',
                                  criterion='entropy')
+    # clf = DecisionTreeClassifier(random_state=0,
+    #                              max_depth=13,
+    #                              max_leaf_nodes=24,
+    #                              min_impurity_decrease=0.0003,
+    #                              min_samples_leaf=3,
+    #                              min_samples_split=7,
+    #                              splitter='best',
+    #                              criterion='entropy')
 
     # 直接后剪枝
     # clf = DecisionTreeClassifier(random_state=0,
@@ -131,25 +140,26 @@ def drawRoc(y_score, y_test, class_names):
     plt.plot(fpr["micro"], tpr["micro"],
              label='micro-average ROC curve (AUC = {0:0.3f})'
                    ''.format(roc_auc["micro"]),
-             color='deeppink', linestyle=':', linewidth=4)
+             color='deeppink', linestyle=':', linewidth=3)
 
     plt.plot(fpr["macro"], tpr["macro"],
              label='macro-average ROC curve (AUC = {0:0.3f})'
                    ''.format(roc_auc["macro"]),
-             color='navy', linestyle=':', linewidth=4)
+             color='navy', linestyle=':', linewidth=3)
 
     # colors = cycle(['aqua', 'darkorange', 'cornflowerblue'])
-    plot_colors = ['r', 'm', 'c', 'b', 'g', 'lime', 'y', 'peru', 'navy', 'orange']
+    plot_colors = ['r', 'm', 'c', 'b', 'g', 'lime', 'y', 'saddlebrown', 'navy', 'orange', 'dodgerblue']
     for i, color in zip(range(n_classes), plot_colors):
         plt.plot(fpr[i], tpr[i], color=color, lw=lw,
                  label=class_names[i] + '(AUC = {0:0.3f})'.format(roc_auc[i]))
 
-    plt.plot([0, 1], [0, 1], 'k--', color='pink', lw=lw)
+    plt.plot([0, 1], [0, 1], 'k--', color='tan', lw=lw, label="y=x(AUC=0.5)")
     plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.05])
+    # plt.ylim([0.0, 1.05])
+    plt.ylim([0.7, 1.01])
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
-    plt.title('ROC curves of different sleep movements')
+    plt.title('ROC curves of different sleep movements in device_' + str(device_no))
     plt.legend(loc="lower right")
     plt.show()
 

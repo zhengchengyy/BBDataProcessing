@@ -19,7 +19,7 @@ config = {'action': action[1],
           'volt_collection': 'volts_424',
           'offset': 0}
 
-config = {'action': "turn_over",
+config = {'action': "head_move",
           'db': 'beaglebone',
           'tag_collection': 'tags_1105',
           'volt_collection': 'volts_1105',
@@ -28,7 +28,8 @@ config = {'action': "turn_over",
           }
 
 
-feature_names = ["RangeModule", "EnergyModule", "RMSModule", "FDEModule","SamplingFreqModule"]
+# feature_names = ["RangeModule", "EnergyModule", "RMSModule", "FDEModule","SamplingFreqModule"]
+feature_names = ["SamplingFreqModule"]
 
 
 def timeToFormat(t):

@@ -31,13 +31,21 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 # 使用决策树训练
 clf = DecisionTreeClassifier(random_state=0,
-                             max_depth=13,
-                             max_leaf_nodes=24,
-                             min_impurity_decrease=0.0003,
-                             min_samples_leaf=3,
-                             min_samples_split=7,
-                             splitter='best',
-                             criterion='entropy')
+                                 max_depth=45,
+                                 max_leaf_nodes=72,
+                                 min_impurity_decrease=0.0013,
+                                 min_samples_leaf=2,
+                                 min_samples_split=6,
+                                 splitter='best',
+                                 criterion='entropy')
+# clf = DecisionTreeClassifier(random_state=0,
+#                              max_depth=13,
+#                              max_leaf_nodes=24,
+#                              min_impurity_decrease=0.0003,
+#                              min_samples_leaf=3,
+#                              min_samples_split=7,
+#                              splitter='best',
+#                              criterion='entropy')
 clf.fit(X_train, y_train)
 train_score = clf.score(X_train, y_train)
 test_score = clf.score(X_test, y_test)
@@ -72,20 +80,20 @@ tpr["macro"] = mean_tpr
 roc_auc["macro"] = auc(fpr["macro"], tpr["macro"])
 
 # Plot all ROC curves
-lw = 2
+lw = 2  # 线的粗细程度
 plt.figure()
 plt.plot(fpr["micro"], tpr["micro"],
          label='micro-average ROC curve (AUC = {0:0.3f})'
                ''.format(roc_auc["micro"]),
-         color='deeppink', linestyle=':', linewidth=4)
+         color='deeppink', linestyle=':', linewidth=3)
 
 plt.plot(fpr["macro"], tpr["macro"],
          label='macro-average ROC curve (AUC = {0:0.3f})'
                ''.format(roc_auc["macro"]),
-         color='navy', linestyle=':', linewidth=4)
+         color='navy', linestyle=':', linewidth=3)
 
 # colors = cycle(['aqua', 'darkorange', 'cornflowerblue'])
-plot_colors = ['r', 'm', 'c', 'b', 'g', 'lime', 'y', 'peru', 'navy', 'orange']
+plot_colors = ['r', 'm', 'c', 'b', 'g', 'lime', 'y', 'saddlebrown', 'navy', 'orange', 'dodgerblue']
 for i, color in zip(range(n_classes), plot_colors):
     plt.plot(fpr[i], tpr[i], color=color, lw=lw,
              label=action_names[i] + '(AUC = {0:0.3f})'.format(roc_auc[i]))
@@ -96,7 +104,7 @@ plt.xlim([0.0, 1.0])
 plt.ylim([0.7, 1.01])
 plt.xlabel('False Positive Rate')
 plt.ylabel('True Positive Rate')
-plt.title('ROC curves of different sleep movements')
+plt.title('ROC curves of different sleep movements in device_' + str(device_no))
 plt.legend(loc="lower right")
 plt.show()
 

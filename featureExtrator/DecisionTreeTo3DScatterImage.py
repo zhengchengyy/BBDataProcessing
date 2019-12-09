@@ -15,21 +15,6 @@ from sklearn.model_selection import train_test_split
 X_train, X_test, y_train, y_test = train_test_split(
     feature_matrix, label_matrix, test_size=0.25, random_state=0)
 
-# # 定义训练集和测试集
-# train_size = feature_matrix.shape[0] // 4 * 3
-# test_size = feature_matrix.shape[0] - train_size
-#
-# trainfea_matrix = feature_matrix[0:train_size]
-# trainlab_matrix = label_matrix[0:train_size]
-# test_fea_matrix = feature_matrix[train_size:]
-# test_lab_matrix = label_matrix[train_size:]
-#
-# # 重新定义变量
-# X_train = trainfea_matrix
-# X_test = test_fea_matrix
-# y_train = trainlab_matrix
-# y_test = test_lab_matrix
-
 import matplotlib.pyplot as plt
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 from mpl_toolkits.mplot3d import Axes3D

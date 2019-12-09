@@ -18,7 +18,6 @@ action_names = ["turn_over", "legs_stretch", "hands_stretch",
 #           "kick","legs_tremble","hands_tremble"]
 
 action_names = [
-          "get_up","go_to_bed",
           "turn_over","legs_stretch","hands_stretch",
           "head_move","legs_move","hands_move",
           "kick","legs_tremble","hands_tremble"]
@@ -31,10 +30,10 @@ action_names = [
 
 # feature_names = ["RangeModule", "MeanModule", "SDModule", "RMSModule", "EnergyModule"]
 
-feature_names = ["MeanModule", "SDModule"]
-
 # feature_names = ["RangeModule", "EnergyModule", "SDModule", "FDEModule",
 #                  "RMSModule", "VarianceModule", "MeanModule"]
+
+feature_names = ["MeanModule", "SDModule"]
 
 # feature_names = ["RangeModule", "MeanModule", "SDModule", "EnergyModule", "FDEModule",
 #                  "RMSModule"]

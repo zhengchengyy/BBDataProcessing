@@ -2,7 +2,7 @@ from sklearn.tree import DecisionTreeClassifier
 import numpy as np
 
 # ————导入数据————
-device_no = 3
+device_no = 2
 feature_matrix = np.load('feature_matrixs/feature_matrix' + str(device_no) + '.npy')
 label_matrix = np.load('feature_matrixs/label_matrix' + str(device_no) + '.npy')
 

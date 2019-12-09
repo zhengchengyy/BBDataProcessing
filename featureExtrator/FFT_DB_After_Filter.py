@@ -112,12 +112,12 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
 
         filter_thread = [0.2, 0.06, 0.08]
         for i in range(start, end + 1):
-            ax.plot(times[i], volts[i], label='device_' + str(i), color=colors[i - 1], alpha=0.3)
+            # ax.plot(times[i], volts[i], label='device_' + str(i), color=colors[i - 1], alpha=0.3)
             # 小波变换滤波
             filter_volts[i] = cwt_filter(volts[i], filter_thread[i - 1])
 
             # 傅里叶变换滤波
-            filter_volts[i] = fft_filter(filter_volts[i], 1 / 70, 15)
+            filter_volts[i] = fft_filter(filter_volts[i], 1 / 70, 20)
 
             ax.plot(times[i], filter_volts[i], label='device_' + str(i) + "_cwt_filter", color=colors[i - 1], alpha=0.9)
 

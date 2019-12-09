@@ -18,21 +18,13 @@ config = {'action': action[6],
           'offset': 0
           }
 
-
-def cwt_filter(data, threshold):
-    w = pywt.Wavelet('db8')  # 选用Daubechies8小波
-    maxlev = pywt.dwt_max_level(len(data), w.dec_len)
-    # Decompose into wavelet components, to the level selected:
-    coeffs = pywt.wavedec(data, 'db8', level=maxlev)  # 将信号进行小波分解
-
-    for i in range(1, len(coeffs)):
-        coeffs[i] = pywt.threshold(coeffs[i], threshold * max(coeffs[i]))  # 将噪声滤波
-
-    data_filter = pywt.waverec(coeffs, 'db8')  # 将信号进行小波重构
-    if (len(data) != len(data_filter)):
-        data_filter = np.delete(data_filter, 0)
-
-    return data_filter
+config = {'action': "turn_over",
+          'db': 'beaglebone',
+          'tag_collection': 'tags_1105',
+          'volt_collection': 'volts_1105',
+          'ndevices': 5,
+          'offset': 0
+          }
 
 
 def timeToFormat(t):
@@ -110,6 +102,10 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
     ntags = 1
     tag_acc = 0
 
+    # 查看第几号设备
+    start = 1
+    end = 1
+
     title = config['volt_collection'][6:] + "" + action + "_filter_normalization"
     # fig = plt.figure(title, figsize=(6, 8))
     fig = plt.figure(title)
@@ -120,9 +116,9 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         tag_acc += 1
         if (tag_acc > ntags):
             break
-        # inittime
-        inittime, termtime = tag['inittime'] - offset, tag['termtime'] - offset
-        inittime, termtime = tag['inittime'] - offset + 30, tag['inittime'] - offset + 60
+        # inittime, termtime
+        # inittime, termtime = tag['inittime'] - offset, tag['termtime'] - offset
+        inittime, termtime = tag['termtime'] - offset - 31, tag['termtime'] - offset
         # get the arrays according to which we will plot later
         times, volts, volts_filter = {}, {}, {}
         for i in range(1, ndevices + 1):
@@ -154,19 +150,15 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         # ax.set_ylim([0.85, 1.0])
         ax.set_ylabel('Voltage(mv)')
 
-        # 查看第几号设备
-        start = 1
-        end = 3
-
-        filter_thread = [0.2, 0.06, 0.08]
+        # filter_thread = [0.2, 0.06, 0.08]
 
         for i in range(start, end + 1):
             volts_filter[i] = volts[i]
             # 小波变换滤波
-            volts_filter[i] = cwt_filter(volts_filter[i], filter_thread[i - 1])
+            volts_filter[i] = cwt_filter(volts_filter[i], 0.1)
 
             # 傅里叶变换滤波
-            volts_filter[i] = fft_filter(volts_filter[i], 1 / 70, 15)
+            volts_filter[i] = fft_filter(volts_filter[i], 1 / 70, 20)
 
             # 低通滤波器滤波
             # b, a = signal.butter(8, 3 / 7, 'lowpass')  # 配置滤波器，8表示滤波器的阶数
@@ -182,6 +174,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
                     color=colors[i - 1], alpha=0.9)
         # ax.grid()
 
+        ax.grid(linestyle=':')
         if tag_acc == 1:
             ax.legend(loc='upper right')
         if tag_acc == ntags:
@@ -191,7 +184,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         xticks = []
         xticklabels = []
         length = len(times[1])
-        interval = length // 10 - 1
+        interval = length // 15 - 1
         for i in range(0, length, interval):
             xticks.append(times[1][i])
             # xticklabels.append(timeToSecond(times[1][i] + offset))

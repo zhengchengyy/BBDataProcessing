@@ -15,11 +15,6 @@ action = ["get_up", "go_to_bed",
           "head_move", "legs_move", "hands_move",
           "hands_rising", "kick"]
 
-action = ["turn_over", "legs_stretch", "hands_stretch",
-          "legs_tremble", "hands_tremble", "body_tremble",
-          "head_move", "legs_move", "hands_move",
-          "hands_rising", "kick"]
-
 config = {'action': 'turn_over',
           'db': 'beaglebone',
           'tag_collection': 'tags_411',
@@ -94,12 +89,12 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
 
     # ntags表示总标签数，即人数；tag_acc表示累加计数
     ntags = tag_collection.count_documents({'tag': action})
-    ntags = 8
+    ntags = 1
     tag_acc = 0
 
     # 用于查看几号设备的图
-    start = 3
-    end = start
+    start = 1
+    end = 1
 
     title = config['volt_collection'][6:] + "" + action + "_fft_" + str(start)
     # fig = plt.figure(title, figsize=(6, 8))
@@ -138,7 +133,8 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
                      + " ~ " + timeToFormat(termtime + offset))
 
         # 自定义y轴的区间范围，可以使图放大或者缩小
-        ax.set_ylim(0, 0.001)
+        ax.set_ylim(0, 0.005)
+        # ax.set_ylim(0, 0.001)
         # ax.set_ylim(0, 0.0003)
         # ax.set_ylim(0, 1)
         ax.set_ylabel('Amplitude')

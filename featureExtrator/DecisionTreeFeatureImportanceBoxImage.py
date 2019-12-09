@@ -13,7 +13,7 @@ color_list = ['r', 'm', 'c', 'b', 'g', 'lime', 'y', 'peru', 'navy', 'orange', 'd
 
 # 定义特征阈值
 # importance_threshold = 1 / len(feature_names)
-importance_threshold = 0.2
+importance_threshold = 0.1
 
 # ————导入数据————
 device_no = 2
@@ -23,7 +23,7 @@ label_matrix = np.load('feature_matrixs/label_matrix'+str(device_no)+'.npy')
 # 划分训练集和测试集
 from sklearn.model_selection import train_test_split
 X_train, X_test, y_train, y_test = train_test_split(
-    feature_matrix, label_matrix, test_size=0.25, random_state=0)
+    feature_matrix, label_matrix, test_size=0.2, random_state=0)
 
 # 训练和预测
 def train():

@@ -20,24 +20,24 @@ def save_model(device_no):
         feature_matrix, label_matrix, test_size=0.2, random_state=0)
 
     # 训练和预测
-    # 加入上下床动作
-    clf = DecisionTreeClassifier(random_state=0,
-                                 max_depth=45,
-                                 max_leaf_nodes=72,
-                                 min_impurity_decrease=0.0013,
-                                 min_samples_leaf=2,
-                                 min_samples_split=6,
-                                 splitter='best',
-                                 criterion='entropy')
-    # 1105数据
+    # 11动作2特征
     # clf = DecisionTreeClassifier(random_state=0,
-    #                              max_depth=11,
-    #                              max_leaf_nodes=78,
-    #                              min_impurity_decrease=0.00032,
+    #                              max_depth=45,
+    #                              max_leaf_nodes=72,
+    #                              min_impurity_decrease=0.0013,
     #                              min_samples_leaf=2,
-    #                              min_samples_split=5,
+    #                              min_samples_split=6,
     #                              splitter='best',
     #                              criterion='entropy')
+    # 9动作2特征
+    clf = DecisionTreeClassifier(random_state=0,
+                                 max_depth=11,
+                                 max_leaf_nodes=78,
+                                 min_impurity_decrease=0.00032,
+                                 min_samples_leaf=2,
+                                 min_samples_split=5,
+                                 splitter='best',
+                                 criterion='entropy')
     # 411数据
     # clf = DecisionTreeClassifier(random_state=0,
     #                              max_depth=13,
