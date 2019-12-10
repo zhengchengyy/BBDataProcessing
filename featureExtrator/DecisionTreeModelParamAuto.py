@@ -2,7 +2,7 @@ from sklearn.tree import DecisionTreeClassifier
 import numpy as np
 
 # ————导入数据————
-device_no = 2
+device_no = 1
 feature_matrix = np.load('feature_matrixs/feature_matrix' + str(device_no) + '.npy')
 label_matrix = np.load('feature_matrixs/label_matrix' + str(device_no) + '.npy')
 
@@ -49,9 +49,11 @@ param_dist = {
         'max_depth':range(5,50),
         'min_samples_split': range(2,50),
         'min_samples_leaf': range(1,50),
-        'max_leaf_nodes': range(50,100),
-        'min_impurity_decrease':np.arange(0.0001,0.01,0.0001)
+        'max_leaf_nodes': range(2,100),
+
         }
+# 'min_impurity_decrease':np.arange(0.0001,0.01,0.0001)
+
 # param_dist = {
 #         'criterion': ['gini', 'entropy'],
 #         'splitter': ['best', 'random'],

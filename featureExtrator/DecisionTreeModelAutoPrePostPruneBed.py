@@ -11,8 +11,8 @@ import os
 
 # 导入数据
 device_no = 1
-feature_matrix = np.load('feature_matrixs/feature_matrix' + str(device_no) + '.npy')
-label_matrix = np.load('feature_matrixs/label_matrix' + str(device_no) + '.npy')
+feature_matrix = np.load('feature_matrixs/feature_matrix_bed' + str(device_no) + '.npy')
+label_matrix = np.load('feature_matrixs/label_matrix_bed' + str(device_no) + '.npy')
 # print(feature_matrix)
 
 # 定义训练集和测试集
@@ -23,9 +23,14 @@ X_train, X_test, y_train, y_test = train_test_split(
 print("训练集长度:", len(X_train), len(y_train))
 print("测试集长度：", len(X_test), len(y_test))
 
+# feature_names = ["MeanModule", "SDModule"]
+# class_names = ["turn_over", "legs_stretch", "hands_stretch",
+#                "legs_twitch", "hands_twitch", "head_move", "grasp", "kick"]
+
 # 导入全局变量
 import GlobalVariable as gv
-class_names = gv.action_names
+# class_names = gv.action_names
+class_names = ["get_up", "go_to_bed"]
 feature_names = gv.feature_names
 
 # 删除名字后缀
@@ -252,23 +257,6 @@ def predict(json_model, feature_names, class_names, test_item):
 
 
 def precision_compute(json_model, X_test, y, feature_names, class_names):
-    action_classify = {"get_up":0, "go_to_bed":0,"turn_over": 0,
-                       "legs_stretch": 1, "hands_stretch": 1,
-                       "head_move":2, "legs_move": 2, "hands_move": 2,
-                       "kick": 3, "legs_tremble": 3, "hands_tremble": 3}
-    action_abnormal = {"get_up":0, "go_to_bed":0,"turn_over": 0,
-                       "legs_stretch": 0, "hands_stretch": 0,
-                       "head_move":0, "legs_move": 0, "hands_move": 0,
-                       "kick": 1, "legs_tremble": 2, "hands_tremble": 3}
-    bed_state = {"get_up":0, "go_to_bed":1,"turn_over": 2,
-                 "legs_stretch": 2, "hands_stretch": 2,
-                 "head_move":2, "legs_move": 2, "hands_move": 2,
-                 "kick": 2, "legs_tremble": 2, "hands_tremble": 2}
-    bed_state = {"get_up": 0, "go_to_bed": 1, "turn_over": 1,
-                 "legs_stretch": 1, "hands_stretch": 1,
-                 "head_move": 1, "legs_move": 1, "hands_move": 1,
-                 "kick": 1, "legs_tremble": 1, "hands_tremble": 1}
-
     count_right = 0.0
     X_test = np.array(X_test)
     X_test = X_test.tolist()
@@ -276,17 +264,7 @@ def precision_compute(json_model, X_test, y, feature_names, class_names):
     for index, item in enumerate(X_test):
         predict_result, class_name_index = predict(json_model, feature_names, class_names, item)
         # if class_names[class_name_index] == str(y[index]):  #原代码比较的是名称
-        # if class_name_index == y[index]:
-
-        # if action_classify[class_names[class_name_index]] == \
-        #         action_classify[class_names[y[index]]]:  #分类
-
-        if action_abnormal[class_names[class_name_index]] == \
-                action_abnormal[class_names[y[index]]]:  # 异常动作
-
-        # if bed_state[class_names[class_name_index]] == \
-        #         bed_state[class_names[y[index]]]:  # 床上是否有人监测
-
+        if class_name_index == y[index]:
             count_right += 1
     #     else:
     #         print"测试失败数据为：",item

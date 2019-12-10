@@ -19,7 +19,7 @@ label_matrix = np.load('feature_matrixs/label_matrix' + str(device_no) + '.npy')
 from sklearn.model_selection import train_test_split
 
 X_train, X_test, y_train, y_test = train_test_split(
-    feature_matrix, label_matrix, test_size=0.25, random_state=0)
+    feature_matrix, label_matrix, test_size=0.2, random_state=0)
 print("训练集长度:", len(X_train), len(y_train))
 print("测试集长度：", len(X_test), len(y_test))
 
@@ -36,12 +36,13 @@ feature_names = gv.feature_names
 feature_names = [feature[:-6] for feature in feature_names]
 
 def model_json():
+    # 9动作2特征
     clf = DecisionTreeClassifier(random_state=0,
-                                 max_depth=45,
-                                 max_leaf_nodes=72,
-                                 min_impurity_decrease=0.0013,
+                                 max_depth=11,
+                                 max_leaf_nodes=78,
+                                 min_impurity_decrease=0.00032,
                                  min_samples_leaf=2,
-                                 min_samples_split=6,
+                                 min_samples_split=5,
                                  splitter='best',
                                  criterion='entropy')
     # clf = DecisionTreeClassifier(random_state=0,

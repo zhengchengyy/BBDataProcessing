@@ -8,8 +8,8 @@ end = ndevices
 
 def save_model(device_no):
     # 导入数据
-    feature_matrix = np.load('feature_matrixs/feature_matrix' + str(device_no) + '.npy')
-    label_matrix = np.load('feature_matrixs/label_matrix' + str(device_no) + '.npy')
+    feature_matrix = np.load('feature_matrixs/feature_matrix_bed' + str(device_no) + '.npy')
+    label_matrix = np.load('feature_matrixs/label_matrix_bed' + str(device_no) + '.npy')
     # print(feature_matrix)
 
     # 定义训练集和测试集
@@ -36,15 +36,16 @@ def save_model(device_no):
     print("叶子数量：", tree_.n_leaves)
 
     # 保存模型
-    # import pickle
-    # feature_num = feature_matrix.shape[1]
-    # with open('models/' + 'device_' + str(device_no) + 'Acc_' + str(round(test_score, 3))
-    #            + 'Fea_' + str(feature_num) + '.pickle', 'wb') as f:
-    #     pickle.dump(clf, f)
+    import pickle
+    feature_num = feature_matrix.shape[1]
+    with open('models/' + 'device_' + str(device_no) + 'Acc_' + str(round(test_score, 3))
+               + 'Fea_' + str(feature_num) + '_bed.pickle', 'wb') as f:
+        pickle.dump(clf, f)
 
     # 导入全局变量
     import GlobalVariable as gv
-    action_names = gv.action_names
+    # action_names = gv.action_names
+    action_names = ["get_up", "go_to_bed"]
     feature_names = gv.feature_names
     # 删除名字后缀
     feature_names = [feature[:-6] for feature in feature_names]
@@ -66,8 +67,8 @@ def save_model(device_no):
     graph = pydotplus.graph_from_dot_data(dot_data)
     # graph.write_pdf('trees/' + 'device_' + str(device_no) + 'Acc_' + str(round(test_score, 3))
     #            + 'Fea_' + str(feature_num) + '.pdf')
-    # graph.write_png('tree_images/' + 'device_' + str(device_no) + 'Acc_' + str(round(test_score, 3))
-    #            + 'Fea_' + str(feature_num) + '.png')
+    graph.write_png('tree_images/' + 'device_' + str(device_no) + 'Acc_' + str(round(test_score, 3))
+               + 'Fea_' + str(feature_num) + '_bed.png')
 
     # 直接画出决策树，但是很小看不清
     # from sklearn.tree import plot_tree
