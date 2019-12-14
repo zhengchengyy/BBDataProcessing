@@ -1,4 +1,6 @@
+# 画出特征重要性的盒图，注意！决策树的最大深度最好设置，防止过拟合
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -13,10 +15,10 @@ color_list = ['r', 'm', 'c', 'b', 'g', 'lime', 'y', 'peru', 'navy', 'orange', 'd
 
 # 定义特征阈值
 # importance_threshold = 1 / len(feature_names)
-importance_threshold = 0.1
+importance_threshold = 0.2
 
 # ————导入数据————
-device_no = 2
+device_no = 5
 feature_matrix = np.load('feature_matrixs/feature_matrix'+str(device_no)+'.npy')
 label_matrix = np.load('feature_matrixs/label_matrix'+str(device_no)+'.npy')
 
@@ -27,18 +29,11 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 # 训练和预测
 def train():
-    clf = DecisionTreeClassifier()
+    clf = DecisionTreeClassifier(max_depth=50)
+    # clf = RandomForestClassifier(n_estimators=20)
     clf.fit(X_train, y_train)
     test_score = clf.score(X_test, y_test)
     print('device_' + str(device_no) + '\'s test score:', test_score, round(test_score, 3))
-
-    # 保存模型
-    # import pickle
-    # feature_num = feature_matrix.shape[1]
-    # with open('models/' + 'device_' + str(device_no) + 'Acc_' + str(round(test_score, 3))
-    #           + 'Fea_' + str(feature_num) + '.pickle', 'wb') as f:
-    #     pickle.dump(clf, f)
-
     return clf
 
 feature_importances = []

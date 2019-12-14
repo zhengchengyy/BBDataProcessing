@@ -35,6 +35,7 @@ action_names = [
 
 feature_names = ["MeanModule", "SDModule"]
 
+# 不同设备特征重要性分布不一样
 # feature_names = ["RangeModule", "MeanModule", "SDModule", "EnergyModule", "FDEModule",
 #                  "RMSModule"]
 

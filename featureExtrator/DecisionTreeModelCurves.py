@@ -88,7 +88,17 @@ plt.show()
 from sklearn.ensemble import GradientBoostingClassifier
 title = "Learning Curves (GradientBoosting)"
 # cv = ShuffleSplit(n_splits=10, test_size=0.1, random_state=0)
-estimator = GradientBoostingClassifier(n_estimators=100)  # 建模，速度有点慢
+estimator = GradientBoostingClassifier(n_estimators=20)  # 建模，速度有点慢
+# plot_learning_curve(estimator, title, X, y, cv=10, n_jobs=1)  #到达0.9
+plt.show()
+
+# ★随机森林
+from sklearn.ensemble import RandomForestClassifier
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning, module="sklearn", lineno=196)
+title = "Learning Curves (RandomForest)"
+# cv = ShuffleSplit(n_splits=10, test_size=0.1, random_state=0)
+estimator = RandomForestClassifier(n_estimators=20)  # 森林里决策树的数目
 # plot_learning_curve(estimator, title, X, y, cv=10, n_jobs=1)  #到达0.9
 plt.show()
 
@@ -99,7 +109,7 @@ from sklearn.neighbors import KNeighborsClassifier
 title = "Learning Curves (KNN)"
 cv = ShuffleSplit(n_splits=10, test_size=0.1, random_state=0)
 estimator = KNeighborsClassifier()  # 建模
-# plot_learning_curve(estimator, title, X, y, cv=10, n_jobs=1)
+# plot_learning_curve(estimator, title, X, y, cv=10, n_jobs=1)  #接近0.9
 plt.show()
 
 # 线性回归分类
@@ -107,16 +117,6 @@ from sklearn.linear_model import LinearRegression
 title = "Learning Curves (KNN)"
 cv = ShuffleSplit(n_splits=10, test_size=0.1, random_state=0)
 estimator = LinearRegression()  # 建模
-# plot_learning_curve(estimator, title, X, y, cv=10, n_jobs=1)
-plt.show()
-
-# ★随机森林
-from sklearn.ensemble import RandomForestClassifier
-import warnings
-warnings.filterwarnings("ignore", category=FutureWarning, module="sklearn", lineno=196)
-title = "Learning Curves (RandomForest)"
-cv = ShuffleSplit(n_splits=10, test_size=0.1, random_state=0)
-estimator = RandomForestClassifier(n_estimators=8)  # 建模，必须初始化n_estimators，否则报错
 # plot_learning_curve(estimator, title, X, y, cv=10, n_jobs=1)
 plt.show()
 

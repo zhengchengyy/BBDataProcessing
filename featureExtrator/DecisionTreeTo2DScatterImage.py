@@ -9,7 +9,7 @@ feature_names = gv.feature_names
 feature_names = [feature[:-6] for feature in feature_names]
 
 # 导入数据
-device_no = 2
+device_no = 5
 feature_matrix = np.load('feature_matrixs/feature_matrix'+str(device_no)+'.npy')
 label_matrix = np.load('feature_matrixs/label_matrix'+str(device_no)+'.npy')
 
@@ -44,8 +44,8 @@ from sklearn.manifold import TSNE
 # X_train = min_max_scaler.fit_transform(X_train)
 
 # 增加噪音
-X_train = np.random.normal(X_train, scale=0.002)
-X_test = np.random.normal(X_test, scale=0.002)
+# X_train = np.random.normal(X_train, scale=0.002)
+# X_test = np.random.normal(X_test, scale=0.002)
 # X_train = np.random.normal(X_train, scale=0.05)
 # print(X_train)
 
@@ -53,7 +53,7 @@ X_test = np.random.normal(X_test, scale=0.002)
 # ax.legend(labels = action_names, loc='upper right')
 
 # 画训练数据的二维散点图
-n_classes = 8
+n_classes = len(action_names)
 plot_colors = ['r', 'm', 'c', 'b', 'g', 'lime', 'y', 'peru', 'navy', 'orange']
 plot_markers = ['*', 'o', ',', 'v', 'D', 'h', 'd', 'p', 'H', 's']
 

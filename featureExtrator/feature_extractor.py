@@ -52,9 +52,7 @@ class ProcessModule(ABC):
         if value['time'] - self.queue.queue[0]['time'] >= self.interval:
             result = self.processFullQueue()
             t = value['time']
-            t_0 = self.queue.queue[0]['time']
-            t_interval = self.interval - self.rate
-            while value['time'] - self.queue.queue[0]['time'] > self.interval - self.rate:
+            while (value['time'] - self.queue.queue[0]['time']) > (self.interval - self.rate):
                 self.queue.get()
                 self.size -= 1
             return result

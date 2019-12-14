@@ -14,7 +14,7 @@ from scipy import interp
 import matplotlib.pyplot as plt
 
 # 导入数据
-device_no = 2
+device_no = 1
 feature_matrix = np.load('feature_matrixs/feature_matrix' + str(device_no) + '.npy')
 label_matrix = np.load('feature_matrixs/label_matrix' + str(device_no) + '.npy')
 # print(feature_matrix)
@@ -36,15 +36,22 @@ print("测试集长度：", len(X_test), len(y_test))
 feature_names = [feature[:-6] for feature in feature_names]
 
 def model_json():
-    # 9动作2特征
     clf = DecisionTreeClassifier(random_state=0,
-                                 max_depth=11,
-                                 max_leaf_nodes=78,
-                                 min_impurity_decrease=0.00032,
-                                 min_samples_leaf=2,
-                                 min_samples_split=5,
                                  splitter='best',
-                                 criterion='entropy')
+                                 min_samples_split=15,
+                                 min_samples_leaf=5,
+                                 max_leaf_nodes=98,
+                                 max_depth=33,
+                                 criterion='gini')
+    # # 9动作2特征
+    # clf = DecisionTreeClassifier(random_state=0,
+    #                              max_depth=11,
+    #                              max_leaf_nodes=78,
+    #                              min_impurity_decrease=0.00032,
+    #                              min_samples_leaf=2,
+    #                              min_samples_split=5,
+    #                              splitter='best',
+    #                              criterion='entropy')
     # clf = DecisionTreeClassifier(random_state=0,
     #                              max_depth=13,
     #                              max_leaf_nodes=24,
