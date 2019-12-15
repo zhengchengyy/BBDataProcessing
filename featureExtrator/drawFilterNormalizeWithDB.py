@@ -109,7 +109,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
     title = config['volt_collection'][6:] + "" + action + "_filter_normalization"
     # fig = plt.figure(title, figsize=(6, 8))
     fig = plt.figure(title)
-    fig.suptitle(action + "_filter_normalization")
+    # fig.suptitle(action + "_filter_normalization")
 
     # plot the data that is of a certain action one by one
     for tag in tag_collection.find({'tag': action}):
@@ -139,8 +139,8 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
 
         ax = fig.add_subplot(ntags, 1, tag_acc)
         plt.subplots_adjust(hspace=0.5)  # 函数中的wspace是子图之间的垂直间距，hspace是子图的上下间距
-        ax.set_title("Person" + subtitle[tag_acc - 1] + ": " + timeToFormat(inittime + offset)
-                     + " ~ " + timeToFormat(termtime + offset))
+        # ax.set_title("Person" + subtitle[tag_acc - 1] + ": " + timeToFormat(inittime + offset)
+        #              + " ~ " + timeToFormat(termtime + offset))
         ax.set_xlim(inittime, termtime)
 
         # 自定义y轴的区间范围，可以使图放大或者缩小
@@ -174,7 +174,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
                     color=colors[i - 1], alpha=0.9)
         # ax.grid()
 
-        ax.grid(linestyle=':')
+        # ax.grid(linestyle=':')
         if tag_acc == 1:
             ax.legend(loc='upper right')
         if tag_acc == ntags:

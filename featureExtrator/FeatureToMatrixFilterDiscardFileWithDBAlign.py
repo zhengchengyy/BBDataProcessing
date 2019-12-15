@@ -1,3 +1,4 @@
+# 把得到特征存入np矩阵文件中，但是不同设备的数量不一定相同，因为有可能网络阻塞,设备没有采集到数据
 from feature_modules import *
 from feature_extractor import FeatureExtractor
 import time
@@ -27,6 +28,7 @@ config = {'db': 'beaglebone',
 import GlobalVariable as gv
 
 action_names = gv.action_names
+# action_names = ["turn_over"]
 feature_names = gv.feature_names
 
 
@@ -83,8 +85,8 @@ def fft_filter(data, sampling_frequency, threshold_frequency):
 
 
 def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=27017,
-                           host='localhost', ndevices=3, offset=0, action_num=0,
-                           interval=1, rate=1):
+                          host='localhost', ndevices=3, offset=0, action_num=0,
+                          interval = 1, rate = 1):
     # 根据时间采集数据，基本单位为s，比如1s、10s、30s、60s
     # interval表示每次分析的时间跨度，rate表示间隔多长时间进行一次分析
     # print(interval,rate)
@@ -118,12 +120,12 @@ def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=270
         extractor.register(module)
 
     # 丢弃数据
-    discard = {"get_up": [], "go_to_bed": [],
-               "turn_over": [2, 4, 5, 6, 9], "legs_stretch": [2, 5, 7, 8, 9, 11],
-               "hands_stretch": [7, 8, 9], "legs_tremble": [3, 6, 9, 10, 11, 12],
-               "hands_tremble": [2, 3, 7, 8, 9, 11], "body_tremble": [1, 2, 3, 6, 7, 8, 9],
-               "head_move": [3, 9, 12], "legs_move": [1, 3, 4, 6, 9], "hands_move": [3, 6, 9],
-               "hands_rising": [4, 5, 7, 8, 9], "kick": [2, 4, 5, 6, 7, 8, 9, 11, 12]
+    discard = {"get_up":[],"go_to_bed":[],
+               "turn_over":[2,4,5,6,9],"legs_stretch":[2,5,7,8,9,11],
+               "hands_stretch":[7,8,9],"legs_tremble":[3,6,9,10,11,12],
+               "hands_tremble":[2,3,7,8,9,11],"body_tremble":[1,2,3,6,7,8,9],
+               "head_move":[3,9,12],"legs_move":[1,3,4,6,9],"hands_move":[3,6,9],
+               "hands_rising":[4,5,7,8,9],"kick":[2,4,5,6,7,8,9,11,12]
                }
 
     # read the data that is of a certain action one by one
@@ -131,8 +133,8 @@ def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=270
         tag_acc += 1
         if (tag_acc > ntags):
             break
-        # if(tag_acc in discard[action]):
-        if (tag_acc == 9 or tag_acc == 11):  # don't discard data
+        if(tag_acc in discard[action]):
+        # if(tag_acc == 9 or tag_acc == 11):  #don't discard data
             continue
         print("people_" + str(tag_acc))
         inittime, termtime = tag['inittime'], tag['termtime']
@@ -219,15 +221,37 @@ def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=270
             if (os.path.exists("feature_matrixs/feature_matrix" + str(i) + ".npy")):
                 feature_matrix = np.load("feature_matrixs/feature_matrix" + str(i) + ".npy")
                 label_matrix = np.load("feature_matrixs/label_matrix" + str(i) + ".npy")
-                temp_matrix = np.zeros((len(feature_times[i]), nfeatures), dtype=float)
+                temp_matrix = np.zeros((len(feature_times[1]), nfeatures), dtype=float)
 
                 os.remove("feature_matrixs/feature_matrix" + str(i) + ".npy")
                 os.remove("feature_matrixs/label_matrix" + str(i) + ".npy")
 
-                for j in range(len(feature_times[i])):
-                    for k in range(nfeatures):
-                        temp_matrix[j][k] = feature_values[i][feature_type[k]][j]
-                    label_matrix = np.append(label_matrix, [action_num])
+                # 当为第一个设备时直接存入特征矩阵
+                if (i == 1):
+                    for j in range(len(feature_times[i])):
+                        for k in range(nfeatures):
+                            temp_matrix[j][k] = feature_values[i][feature_type[k]][j]
+                        label_matrix = np.append(label_matrix, [action_num])
+                #  当为第二个及其以上设备时,需要插值处理缺失数据,两种策略:1.pos位置插入前一个值,2.pos位置插入0
+                else:
+                    pos = 0
+                    for j in range(len(feature_times[1])):
+                        device1_time = int(feature_times[1][j] - inittime)
+                        if (pos < len(feature_times[i])):
+                            devicei_time = int(feature_times[i][pos] - inittime)
+                            # 设备的最后一个特征数据的时间不存在时,直接判断赋值-1表示不等
+                        else:
+                            devicei_time = -1
+                        if (devicei_time == device1_time):
+                            for k in range(nfeatures):
+                                temp_matrix[j][k] = feature_values[i][feature_type[k]][pos]
+                            pos += 1
+                            label_matrix = np.append(label_matrix, [action_num])
+                        else:
+                            for k in range(nfeatures):
+                                temp_matrix[j][k] = feature_values[i][feature_type[k]][pos - 1]
+                                # feature_matrix[j][k] = 0
+                            label_matrix = np.append(label_matrix, [action_num])
 
                 # np.append(feature_matrixs, [temp_matrix], axis=0)
                 feature_matrix = np.insert(feature_matrix, feature_matrix.shape[0],
@@ -241,15 +265,39 @@ def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=270
 
                 feature_matrixs[i] = feature_matrix
 
+
             # 如果文件不存在，则定义特征矩阵和标签矩阵
             else:
-                feature_matrix = np.zeros((len(feature_times[i]), nfeatures), dtype=float)
-                label_matrix = np.zeros((len(feature_times[i]), 1), dtype=int)
+                feature_matrix = np.zeros((len(feature_times[1]), nfeatures), dtype=float)
+                label_matrix = np.zeros((len(feature_times[1]), 1), dtype=int)
 
-                for j in range(len(feature_times[i])):
-                    for k in range(nfeatures):
-                        feature_matrix[j][k] = feature_values[i][feature_type[k]][j]
-                    label_matrix[j] = action_num
+                # 当为第一个设备时直接存入特征矩阵
+                if(i==1):
+                    for j in range(len(feature_times[i])):
+                        for k in range(nfeatures):
+                            feature_matrix[j][k] = feature_values[i][feature_type[k]][j]
+                        label_matrix[j] = action_num
+                #  当为第二个及其以上设备时,需要插值处理缺失数据,两种策略:1.pos位置插入前一个值,2.pos位置插入0
+                else:
+                    pos = 0
+                    for j in range(len(feature_times[1])):
+                        device1_time = int(feature_times[1][j] - inittime)
+                        if(pos < len(feature_times[i])):
+                            devicei_time = int(feature_times[i][pos] - inittime)
+                        # 设备的最后一个特征数据的时间不存在时,直接判断赋值-1表示不等
+                        else:
+                            devicei_time = -1
+                        if(devicei_time == device1_time):
+                            for k in range(nfeatures):
+                                feature_matrix[j][k] = feature_values[i][feature_type[k]][pos]
+                            pos += 1
+                            label_matrix[j] = action_num
+                        else:
+                            for k in range(nfeatures):
+                                feature_matrix[j][k] = feature_values[i][feature_type[k]][pos-1]
+                                # feature_matrix[j][k] = 0
+                            label_matrix[j] = action_num
+
                 # np.save保存时自动为8位小数
                 np.save('feature_matrixs/feature_matrix' + str(i), feature_matrix)
                 np.save('feature_matrixs/label_matrix' + str(i), label_matrix)
@@ -258,6 +306,15 @@ def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=270
                 print("label_matrix" + str(i) + ":" + str(label_matrix.shape))
 
                 feature_matrixs[i] = feature_matrix
+
+        # 测试用
+        # for i in range(start, end + 1):
+        #     for fea_time in feature_times[i]:
+        #         print(fea_time, end=" ")
+        #         print(int(fea_time - inittime), end=" ")
+        #     for fea_matrix in feature_matrixs[i]:
+        #         print(fea_matrix, end=" ")
+        #     print()
 
 
 if __name__ == '__main__':
@@ -272,11 +329,11 @@ if __name__ == '__main__':
     for i in range(len(action_names)):
         print("---------" + action_names[i] + "---------")
         feature_to_matrix_file(action=action_names[i],
-                               db=config['db'],
-                               tag_collection=config['tag_collection'],
-                               volt_collection=config['volt_collection'],
-                               ndevices=config['device_num'],
-                               offset=config['offset'],
-                               action_num=i,
-                               interval=config['interval'],
-                               rate=config['rate'])
+                              db=config['db'],
+                              tag_collection=config['tag_collection'],
+                              volt_collection=config['volt_collection'],
+                              ndevices=config['device_num'],
+                              offset=config['offset'],
+                              action_num=i,
+                              interval=config['interval'],
+                              rate=config['rate'])

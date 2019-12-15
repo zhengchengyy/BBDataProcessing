@@ -19,7 +19,7 @@ config = {'action': action[1],
           'volt_collection': 'volts_424',
           'offset': 0}
 
-config = {'action': "head_move",
+config = {'action': "turn_over",
           'db': 'beaglebone',
           'tag_collection': 'tags_1105',
           'volt_collection': 'volts_1105',
@@ -29,7 +29,7 @@ config = {'action': "head_move",
 
 
 # feature_names = ["RangeModule", "EnergyModule", "RMSModule", "FDEModule","SamplingFreqModule"]
-feature_names = ["SamplingFreqModule"]
+feature_names = ["SamplingFreqModule", "ThresholdCounterModule"]
 
 
 def timeToFormat(t):
@@ -57,7 +57,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
 
     # ntags表示总标签数，即人数；tag_acc表示累加计数
     ntags = tag_collection.count_documents({'tag': action})
-    ntags = 8
+    ntags = 1
     tag_acc = 0
 
     title = config['volt_collection'][6:] + "" + action + "_features"
@@ -65,7 +65,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
 
     # 根据时间采集数据，基本单位为s，比如1s、10s、30s、60s
     # interval表示每次分析的时间跨度，rate表示间隔多长时间进行一次分析
-    interval = 1
+    interval = 2
     rate = 1
     fig.suptitle(action + " (" + "interval:" + str(interval) + "s, " + "stepsize:" + str(rate) + "s)")
 
@@ -183,8 +183,8 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
             xticks = []
             xticklabels = []
             length = len(feature_times[i])
-            interval = length // 8 - 1
-            for k in range(0, length, interval):
+            step = length // 8 - 1
+            for k in range(0, length, step):
                 xticks.append(feature_times[i][k])
                 # xticklabels.append(timeToSecond(feature_times[i][k] + offset))
 
@@ -195,6 +195,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
             ax.set_xticklabels(xticklabels, rotation=15)
 
             # 显示网格
+            ax.grid(linestyle=':')
             # ax.grid(True, which='both')
 
     # 最大化显示图像窗口
