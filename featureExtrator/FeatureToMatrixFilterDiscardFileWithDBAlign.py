@@ -77,9 +77,8 @@ def cwt_filter(data, threshold):
 # 使用快速傅里叶变换滤波
 def fft_filter(data, sampling_frequency, threshold_frequency):
     fft_result = np.fft.fft(data)
-    freqs = np.fft.fftfreq(len(fft_result), d=sampling_frequency)
     begin = int(len(data) * threshold_frequency * sampling_frequency)
-    fft_result[begin:] = 0  # 高通滤波
+    fft_result[begin:] = 0  # 低通滤波
     filter_data = np.fft.ifft(fft_result)
     return abs(filter_data)
 
@@ -133,11 +132,12 @@ def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=270
         tag_acc += 1
         if (tag_acc > ntags):
             break
-        if(tag_acc in discard[action]):
-        # if(tag_acc == 9 or tag_acc == 11):  #don't discard data
+        # if(tag_acc in discard[action]):
+        if(tag_acc == 9 or tag_acc == 11):  #don't discard data
             continue
         print("people_" + str(tag_acc))
-        inittime, termtime = tag['inittime'], tag['termtime']
+        # inittime, termtime
+        inittime, termtime = tag['termtime'] - 30, tag['termtime']
 
         # get the arrays according to which we will plot later
         times, volts, filter_volts = {}, {}, {}
@@ -158,12 +158,8 @@ def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=270
             # 小波变换滤波
             filter_volts[i] = cwt_filter(volts[i], 0.08)
 
-            # 低通滤波器滤波
-            # b, a = signal.butter(8, 3 / 7, 'lowpass')  # 配置滤波器，8表示滤波器的阶数
-            # filter_volts[i] = signal.filtfilt(b, a, filter_volts[i])
-
             # 傅里叶变换滤波
-            filter_volts[i] = fft_filter(filter_volts[i], 1 / 70, 25)
+            # filter_volts[i] = fft_filter(filter_volts[i], 1 / 70, 25) #滤波后准确率下降
 
             # 移动平均滤波，参数可选：full, valid, same
             # filter_volts[i] = np_move_avg(filter_volts[i], 5, mode="same")
@@ -223,8 +219,9 @@ def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=270
                 label_matrix = np.load("feature_matrixs/label_matrix" + str(i) + ".npy")
                 temp_matrix = np.zeros((len(feature_times[1]), nfeatures), dtype=float)
 
-                os.remove("feature_matrixs/feature_matrix" + str(i) + ".npy")
-                os.remove("feature_matrixs/label_matrix" + str(i) + ".npy")
+                # 可以删除这部分，np.save直接覆盖原文件
+                # os.remove("feature_matrixs/feature_matrix" + str(i) + ".npy")
+                # os.remove("feature_matrixs/label_matrix" + str(i) + ".npy")
 
                 # 当为第一个设备时直接存入特征矩阵
                 if (i == 1):

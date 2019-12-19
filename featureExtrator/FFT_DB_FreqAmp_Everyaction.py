@@ -50,14 +50,6 @@ def timeToSecond(t):
     return stime
 
 
-def fft_filter(data, sampling_frequency, threshold_frequency):
-    fft_result = np.fft.fft(data)
-    begin = int(len(data) * threshold_frequency * sampling_frequency)
-    fft_result[begin:] = 0  # 高通滤波
-    filter_data = np.fft.ifft(fft_result)
-    return abs(filter_data)
-
-
 def cwt_filter(data, threshold):
     w = pywt.Wavelet('db8')  # 选用Daubechies8小波
     maxlev = pywt.dwt_max_level(len(data), w.dec_len)
@@ -72,6 +64,15 @@ def cwt_filter(data, threshold):
         data_filter = np.delete(data_filter, 0)
 
     return data_filter
+
+
+# 使用快速傅里叶变换滤波
+def fft_filter(data, sampling_frequency, threshold_frequency):
+    fft_result = np.fft.fft(data)
+    begin = int(len(data) * threshold_frequency * sampling_frequency)
+    fft_result[begin:] = 0  # 低通滤波
+    filter_data = np.fft.ifft(fft_result)
+    return abs(filter_data)
 
 
 def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='localhost',
@@ -96,10 +97,10 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
     start = 1
     end = 1
 
-    title = config['volt_collection'][6:] + "" + action + "_filter_fft_" + str(start)
+    title = config['volt_collection'][6:] + "" + action + "_fft_" + str(start)
     # fig = plt.figure(title, figsize=(6, 8))
     fig = plt.figure(title)
-    fig.suptitle(action + "_filter_fft_" + str(start))
+    fig.suptitle(action + "_fft_" + str(start))
 
     # plot the data that is of a certain action one by one
     for tag in tag_collection.find({'tag': action}):
@@ -133,8 +134,8 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
                      + " ~ " + timeToFormat(termtime + offset))
 
         # 自定义y轴的区间范围，可以使图放大或者缩小
-        # ax.set_ylim(0, 0.002)
         ax.set_ylim(0, 0.005)
+        # ax.set_ylim(0, 0.001)
         # ax.set_ylim(0, 0.0003)
         # ax.set_ylim(0, 1)
         ax.set_ylabel('Amplitude')
@@ -143,6 +144,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         for i in range(start, start + 1):
             volts_filter[i] = volts[i]
             # 小波变换滤波
+            # volts_filter[i] = cwt_filter(volts_filter[i], filter_thread[i - 1])
             volts_filter[i] = cwt_filter(volts_filter[i], 0.1)
 
             # 傅里叶变换滤波
@@ -170,8 +172,9 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
 
 
 if __name__ == '__main__':
-    plot_from_db(action=config['action'],
-                 db=config['db'],
-                 tag_collection=config['tag_collection'],
-                 volt_collection=config['volt_collection'],
-                 offset=config['offset'])
+    for i in range(len(action)):
+        plot_from_db(action=action[i],
+                     db=config['db'],
+                     tag_collection=config['tag_collection'],
+                     volt_collection=config['volt_collection'],
+                     offset=config['offset'])

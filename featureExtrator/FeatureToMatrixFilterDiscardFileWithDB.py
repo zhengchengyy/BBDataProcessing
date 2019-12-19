@@ -75,9 +75,8 @@ def cwt_filter(data, threshold):
 # 使用快速傅里叶变换滤波
 def fft_filter(data, sampling_frequency, threshold_frequency):
     fft_result = np.fft.fft(data)
-    freqs = np.fft.fftfreq(len(fft_result), d=sampling_frequency)
     begin = int(len(data) * threshold_frequency * sampling_frequency)
-    fft_result[begin:] = 0  # 高通滤波
+    fft_result[begin:] = 0  # 低通滤波
     filter_data = np.fft.ifft(fft_result)
     return abs(filter_data)
 
@@ -135,7 +134,9 @@ def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=270
         if (tag_acc == 9 or tag_acc == 11):  # don't discard data
             continue
         print("people_" + str(tag_acc))
-        inittime, termtime = tag['inittime'], tag['termtime']
+        # inittime, termtime
+        inittime, termtime = tag['termtime'] - 30, tag['termtime']
+        # inittime, termtime = tag['inittime'], tag['termtime']
 
         # get the arrays according to which we will plot later
         times, volts, filter_volts = {}, {}, {}
@@ -160,8 +161,8 @@ def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=270
             # b, a = signal.butter(8, 3 / 7, 'lowpass')  # 配置滤波器，8表示滤波器的阶数
             # filter_volts[i] = signal.filtfilt(b, a, filter_volts[i])
 
-            # 傅里叶变换滤波
-            filter_volts[i] = fft_filter(filter_volts[i], 1 / 70, 25)
+            # 傅里叶变换滤波，使用后动作识别准确率反而降低
+            # filter_volts[i] = fft_filter(filter_volts[i], 1 / 70, 25)  #滤波后准确率下降
 
             # 移动平均滤波，参数可选：full, valid, same
             # filter_volts[i] = np_move_avg(filter_volts[i], 5, mode="same")
@@ -221,8 +222,9 @@ def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=270
                 label_matrix = np.load("feature_matrixs/label_matrix" + str(i) + ".npy")
                 temp_matrix = np.zeros((len(feature_times[i]), nfeatures), dtype=float)
 
-                os.remove("feature_matrixs/feature_matrix" + str(i) + ".npy")
-                os.remove("feature_matrixs/label_matrix" + str(i) + ".npy")
+                # 可以删除这部分，np.save直接覆盖原文件
+                # os.remove("feature_matrixs/feature_matrix" + str(i) + ".npy")
+                # os.remove("feature_matrixs/label_matrix" + str(i) + ".npy")
 
                 for j in range(len(feature_times[i])):
                     for k in range(nfeatures):
@@ -258,6 +260,15 @@ def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=270
                 print("label_matrix" + str(i) + ":" + str(label_matrix.shape))
 
                 feature_matrixs[i] = feature_matrix
+
+        # 测试用
+        # for i in range(start, end + 1):
+        #     for fea_time in feature_times[i]:
+        #         # print(fea_time, end=" ")
+        #         print(int(fea_time - inittime), end=" ")
+        #     # for fea_matrix in feature_matrixs[i]:
+        #     #     print(fea_matrix, end=" ")
+        #     print()
 
 
 if __name__ == '__main__':

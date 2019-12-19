@@ -55,12 +55,12 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
 
     # ntags表示总标签数，即人数；tag_acc表示累加计数
     ntags = tag_collection.count_documents({'tag': action})
-    ntags = 1
+    # ntags = 1
     tag_acc = 0
 
     # 查看第几号设备
-    start = 2
-    end = 2
+    start = 1
+    end = ndevices
 
     title = config['volt_collection'][6:] + "" + action
     fig = plt.figure(title)
@@ -71,6 +71,8 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         tag_acc += 1
         if (tag_acc > ntags):
             break
+        if (tag_acc == 9 or tag_acc == 11):  # don't discard data
+            continue
         # inittime,termtime
         inittime, termtime = tag['termtime'] - offset - 31, tag['termtime'] - offset
         # get the arrays according to which we will plot later

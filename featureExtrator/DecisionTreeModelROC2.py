@@ -1,4 +1,4 @@
-# 训练完把测试标签和预测分数二值化后画出ROC
+# 训练完把测试标签和预测分数二值化后画出ROC，后剪枝部分采用的是该方法
 # 引入必要的库
 import numpy as np
 import matplotlib.pyplot as plt

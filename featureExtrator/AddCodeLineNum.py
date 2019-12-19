@@ -10,7 +10,7 @@ def countLine(fname):
     return count
 
 # 添加编号
-line_num = 0
+line_num = 1
 for file_line in open(file_name, encoding='UTF-8').readlines():
     if(line_num < 10):
         code = " " + str(line_num) + ": " + file_line

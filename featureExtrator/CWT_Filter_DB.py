@@ -127,6 +127,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         # 自定义y轴的区间范围，可以使图放大或者缩小
         # ax.set_ylim([0.8,1.8])
         ax.set_ylim([0.75, 0.90])
+        ax.set_ylim([0, 1])
         # ax.set_ylim([0.82, 0.83])
         ax.set_ylabel('Voltage(mv)')
 
@@ -140,7 +141,8 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
 
         ax.grid(linestyle=':')
         if tag_acc == 1:
-            ax.legend(loc='upper right')
+            # ax.legend(loc='upper right')
+            pass
         if tag_acc == ntags:
             ax.set_xlabel('Time(s)')
 

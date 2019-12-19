@@ -12,7 +12,7 @@ import GlobalVariable as gv
 action = gv.action_names
 
 
-config = {'action': action[0],
+config = {'action': action,
           'db': 'beaglebone',
           'tag_collection': 'tags_1105',
           'volt_collection': 'volts_1105',
@@ -43,8 +43,8 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
     except CollectionError as e:
         print(e.message)
 
-    # ntags = tag_collection.count_documents({'tag': action})
-    ntags = 12
+    ntags = tag_collection.count_documents({'tag': action})
+    # ntags = 12
     tag_acc = 0
 
     title = config['volt_collection'][6:] + "" + action
@@ -56,6 +56,8 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         tag_acc += 1
         if (tag_acc > ntags):
             break
+        if (tag_acc == 9 or tag_acc == 11):  # don't discard data
+            continue
         # inittime
         inittime, termtime = tag['inittime'] - offset, tag['termtime'] - offset
         # get the arrays according to which we will plot later
@@ -118,6 +120,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
 
 if __name__ == '__main__':
     for i in range(len(action)):
+        print("---------" + action_names[i] + "---------")
         plot_from_db(action=action[i],
                       db=config['db'],
                       tag_collection=config['tag_collection'],

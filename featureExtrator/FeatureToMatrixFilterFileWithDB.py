@@ -74,10 +74,10 @@ def cwt_filter(data, threshold):
 # 使用快速傅里叶变换滤波
 def fft_filter(data, sampling_frequency, threshold_frequency):
     fft_result = np.fft.fft(data)
-    freqs = np.fft.fftfreq(len(fft_result), d=sampling_frequency)
     begin = int(len(data) * threshold_frequency * sampling_frequency)
-    fft_result[begin:] = 0  # 高通滤波
-    filter_data = np.fft.ifft(fft_result)
+    fft_result_bak = fft_result
+    fft_result_bak[begin:] = 0  # 低通滤波
+    filter_data = np.fft.ifft(fft_result_bak) * 2  # 逆变换得到的值被除以2了
     return abs(filter_data)
 
 
