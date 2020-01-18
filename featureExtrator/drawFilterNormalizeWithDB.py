@@ -10,7 +10,11 @@ import pywt
 action = ["still", "turn_over", "legs_stretch", "hands_stretch",
               "legs_twitch", "hands_twitch", "head_move", "grasp", "kick"]
 
-config = {'action': action[6],
+# 导入全局变量
+import GlobalVariable as gv
+action = gv.action_names
+
+config = {'action': action[7],
           'db': 'beaglebone',
           'tag_collection': 'tags_411',
           'volt_collection': 'volts_411',
@@ -18,7 +22,7 @@ config = {'action': action[6],
           'offset': 0
           }
 
-config = {'action': "turn_over",
+config = {'action': action[8],
           'db': 'beaglebone',
           'tag_collection': 'tags_1105',
           'volt_collection': 'volts_1105',
@@ -155,10 +159,10 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         for i in range(start, end + 1):
             volts_filter[i] = volts[i]
             # 小波变换滤波
-            volts_filter[i] = cwt_filter(volts_filter[i], 0.1)
+            volts_filter[i] = cwt_filter(volts_filter[i], 0.08)
 
             # 傅里叶变换滤波
-            volts_filter[i] = fft_filter(volts_filter[i], 1 / 70, 20)
+            # volts_filter[i] = fft_filter(volts_filter[i], 1 / 70, 20)
 
             # 低通滤波器滤波
             # b, a = signal.butter(8, 3 / 7, 'lowpass')  # 配置滤波器，8表示滤波器的阶数
@@ -174,7 +178,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
                     color=colors[i - 1], alpha=0.9)
         # ax.grid()
 
-        # ax.grid(linestyle=':')
+        ax.grid(linestyle=':')
         if tag_acc == 1:
             ax.legend(loc='upper right')
         if tag_acc == ntags:

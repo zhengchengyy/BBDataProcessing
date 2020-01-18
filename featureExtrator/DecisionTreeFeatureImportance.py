@@ -24,14 +24,6 @@ from sklearn.model_selection import train_test_split
 X_train, X_test, y_train, y_test = train_test_split(
     feature_matrix, label_matrix, test_size=0.2, random_state=0)
 
-# 训练和预测
-def train():
-    clf = DecisionTreeClassifier()
-    clf.fit(X_train, y_train)
-    test_score = clf.score(X_test, y_test)
-    # print('device_' + str(device_no) + '\'s test score:', test_score, round(test_score, 3))
-    return clf
-
 def feature_extractor(feature_names, train_times, importance_thread, X_train, y_train):
     extract_feature_names = []
     feature_importances = []

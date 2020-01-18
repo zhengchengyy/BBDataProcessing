@@ -2,7 +2,7 @@ from sklearn.tree import DecisionTreeClassifier
 import numpy as np
 
 # 导入数据
-device_no = 2
+device_no = 5
 feature_matrix = np.load('feature_matrixs/feature_matrix' + str(device_no) + '.npy')
 label_matrix = np.load('feature_matrixs/label_matrix' + str(device_no) + '.npy')
 
@@ -14,13 +14,14 @@ feature_names = gv.feature_names
 # 定义训练集和测试集
 from sklearn.model_selection import train_test_split
 X_train, X_test, y_train, y_test = train_test_split(
-    feature_matrix, label_matrix, test_size=0.25, random_state=0)
-# print(y_test)
+    feature_matrix, label_matrix, test_size=0.2, random_state=0)
+# print(len(y_test))
 
 # 读取模型
 import pickle
 
-with open('models/device_1Acc_0.887Fea_2.pickle', 'rb') as f:
+# with open('models/device_1Acc_0.887Fea_2.pickle', 'rb') as f:
+with open('models/' + 'device_' + str(device_no) + '_post_prune.pickle', 'rb') as f:
     model = pickle.load(f)
 train_score = model.score(X_train, y_train)
 test_score = model.score(X_test, y_test)
@@ -31,13 +32,19 @@ print("test score:", test_score)
 from sklearn import metrics
 y_pred = model.predict(X_test)
 print(metrics.classification_report(y_test,y_pred))
+# print(metrics.balanced_accuracy_score(y_test,y_pred))  # 数据不平衡情况下
 #法二：通过混淆矩阵验证（横轴：实际值，纵轴：预测值）（理想情况下是个对角阵）
+print("混淆矩阵：")
 print(metrics.confusion_matrix(y_test, y_pred))
 
-print("精确率:", metrics.accuracy_score(y_test, y_pred))
-print("查准率:", metrics.precision_score(y_test, y_pred, average='macro'))
-print("召回率:", metrics.recall_score(y_test, y_pred, average='macro'))
-print("F1_score:", metrics.f1_score(y_test, y_pred, average='macro'))
+print("查准率:", metrics.accuracy_score(y_test, y_pred))
+print("宏精确率:", metrics.precision_score(y_test, y_pred, average='macro'))
+print("宏召回率:", metrics.recall_score(y_test, y_pred, average='macro'))
+print("宏F1_score:", metrics.f1_score(y_test, y_pred, average='macro'))
+
+print("微精确率:", metrics.precision_score(y_test, y_pred, average='micro'))
+print("微召回率:", metrics.recall_score(y_test, y_pred, average='micro'))
+print("微F1_score:", metrics.f1_score(y_test, y_pred, average='micro'))
 
 print("kappa:", metrics.cohen_kappa_score(y_test, y_pred))
 print("ham_distance:", metrics.hamming_loss(y_test, y_pred))

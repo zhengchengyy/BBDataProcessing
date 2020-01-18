@@ -55,7 +55,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
 
     # ntags表示总标签数，即人数；tag_acc表示累加计数
     ntags = tag_collection.count_documents({'tag': action})
-    # ntags = 1
+    # ntags = 11
     tag_acc = 0
 
     # 查看第几号设备
@@ -71,10 +71,13 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         tag_acc += 1
         if (tag_acc > ntags):
             break
-        if (tag_acc == 9 or tag_acc == 11):  # don't discard data
+        # if (tag_acc == 9 or tag_acc == 11):  # don't discard data
+
+        if (tag_acc == 9 or (tag_acc == 11 and action != "hands_move")):
             continue
-        # inittime,termtime
-        inittime, termtime = tag['termtime'] - offset - 31, tag['termtime'] - offset
+        # inittime, termtime
+        # inittime, termtime = tag['termtime'] - offset - 31, tag['termtime'] - offset
+        inittime, termtime = tag['inittime'], tag['termtime']
         # get the arrays according to which we will plot later
         times, volts = {}, {}
         for i in range(1, ndevices + 1):
@@ -91,9 +94,9 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         style.use('default')
         colors = ['r', 'b', 'g', 'c', 'm']  # m c
         subtitle = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'L', 'M', 'N']
+        subtitle = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14']
 
-        ax = fig.add_subplot(ntags, 1, tag_acc)
-
+        ax = fig.add_subplot(ntags, 1, tag_acc)  #可以根据图的空白知道哪些数据丢失
         plt.subplots_adjust(hspace=0.5)  # 函数中的wspace是子图之间的垂直间距，hspace是子图的上下间距
         ax.set_title("Person" + subtitle[tag_acc - 1] + ": " + timeToFormat(inittime + offset) + " ~ " + timeToFormat(
             termtime + offset))
@@ -101,7 +104,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
 
         # 自定义y轴的区间范围，可以使图放大或者缩小
         # ax.set_ylim([0.8,1.8])
-        ax.set_ylim([0.75, 0.90])
+        # ax.set_ylim([0.75, 0.90])
         # ax.set_ylim([0.82, 0.83])
         ax.set_ylabel('Voltage(mv)')
 
@@ -110,7 +113,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
             ax.plot(times[i], volts[i], label='device_' + str(i), color=colors[i - 1], alpha=0.9)
 
         ax.grid(linestyle=':')
-        if tag_acc == 1:
+        if tag_acc == ntags:
             ax.legend(loc='upper right')
         if tag_acc == ntags:
             ax.set_xlabel('Time(s)')

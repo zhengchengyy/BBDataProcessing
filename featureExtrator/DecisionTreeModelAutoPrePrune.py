@@ -1,10 +1,6 @@
 from sklearn.tree import DecisionTreeClassifier
 import numpy as np
 
-# ndevices = 3
-# start = 2
-# end = 2
-
 ndevices = 5
 start = 1
 end = ndevices
@@ -29,15 +25,106 @@ def save_model(device_no):
     #                              min_samples_split=6,
     #                              splitter='best',
     #                              criterion='entropy')
-    # 9动作2特征
-    clf = DecisionTreeClassifier(random_state=0,
-                                 max_depth=11,
-                                 max_leaf_nodes=78,
-                                 min_impurity_decrease=0.00032,
-                                 min_samples_leaf=2,
-                                 min_samples_split=5,
-                                 splitter='best',
-                                 criterion='entropy')
+    if (device_no == 1):
+        # 9动作2特征丢弃数据设备1
+        clf = DecisionTreeClassifier(random_state=0,
+                                     splitter='best',
+                                     min_samples_split=7,
+                                     min_samples_leaf=3,
+                                     max_leaf_nodes=98,
+                                     max_depth=26,
+                                     criterion='entropy',
+                                     )
+    elif (device_no == 2):
+        # 9动作2特征丢弃数据设备2
+        clf = DecisionTreeClassifier(random_state=0,
+                                     splitter='best',
+                                     min_samples_split=22,
+                                     min_samples_leaf=4,
+                                     max_leaf_nodes=99,
+                                     max_depth=23,
+                                     criterion='entropy',
+                                     )
+    elif (device_no == 3):
+        # 9动作2特征丢弃数据设备3
+        clf = DecisionTreeClassifier(random_state=0,
+                                     splitter='best',
+                                     min_samples_split=6,
+                                     min_samples_leaf=5,
+                                     max_leaf_nodes=98,
+                                     max_depth=43,
+                                     criterion='entropy',
+                                     )
+    elif (device_no == 4):
+        # 9动作2特征丢弃数据设备4
+        clf = DecisionTreeClassifier(random_state=0,
+                                     splitter='best',
+                                     min_samples_split=11,
+                                     min_samples_leaf=3,
+                                     max_leaf_nodes=98,
+                                     max_depth=37,
+                                     criterion='entropy',
+                                     )
+    elif (device_no == 5):
+        # 9动作2特征丢弃数据设备5
+        clf = DecisionTreeClassifier(random_state=0,
+                                     splitter='best',
+                                     min_samples_split=5,
+                                     min_samples_leaf=3,
+                                     max_leaf_nodes=95,
+                                     max_depth=43,
+                                     criterion='entropy',
+                                     )
+    # if(device_no == 1):
+    #     # 9动作2特征丢弃数据设备1
+    #     clf = DecisionTreeClassifier(random_state=0,
+    #                                  splitter='best',
+    #                                  min_samples_split=5,
+    #                                  min_samples_leaf=2,
+    #                                  max_leaf_nodes=78,
+    #                                  max_depth=11,
+    #                                  criterion='entropy',
+    #                                  )
+    # elif(device_no == 2):
+    #     # 9动作2特征丢弃数据设备2
+    #     clf = DecisionTreeClassifier(random_state=0,
+    #                                  splitter='best',
+    #                                  min_samples_split=8,
+    #                                  min_samples_leaf=2,
+    #                                  max_leaf_nodes=89,
+    #                                  max_depth=21,
+    #                                  criterion='entropy',
+    #                                  )
+    # elif (device_no == 3):
+    #     # 9动作2特征丢弃数据设备3
+    #     clf = DecisionTreeClassifier(random_state=0,
+    #                                  splitter='best',
+    #                                  min_samples_split=2,
+    #                                  min_samples_leaf=4,
+    #                                  max_leaf_nodes=80,
+    #                                  max_depth=26,
+    #                                  criterion='entropy',
+    #                                  )
+    # elif (device_no == 4):
+    #     # 9动作2特征丢弃数据设备4
+    #     clf = DecisionTreeClassifier(random_state=0,
+    #                                  splitter='best',
+    #                                  min_samples_split=3,
+    #                                  min_samples_leaf=1,
+    #                                  max_leaf_nodes=88,
+    #                                  max_depth=9,
+    #                                  criterion='entropy',
+    #                                  )
+    # elif (device_no == 5):
+    #     # 9动作2特征丢弃数据设备5
+    #     clf = DecisionTreeClassifier(random_state=0,
+    #                                  splitter='best',
+    #                                  min_samples_split=9,
+    #                                  min_samples_leaf=1,
+    #                                  max_leaf_nodes=98,
+    #                                  max_depth=34,
+    #                                  criterion='entropy',
+    #                                  )
     # 411数据
     # clf = DecisionTreeClassifier(random_state=0,
     #                              max_depth=13,
@@ -97,4 +184,5 @@ def save_model(device_no):
 
 
 for i in range(start, end + 1):
+    print("---------device_" + str(i) + "---------")
     save_model(i)

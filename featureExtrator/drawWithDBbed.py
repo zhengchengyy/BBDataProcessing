@@ -22,7 +22,7 @@ config = {'action': action[1],
           }
 
 
-config = {'action': "get_up",
+config = {'action': "go_to_bed",
           'db': 'beaglebone',
           'tag_collection': 'tags_1105',
           'volt_collection': 'volts_1105',

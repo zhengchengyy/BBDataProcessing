@@ -26,17 +26,18 @@ def binaryTreePaths(model, root, feature_names, action_names):
             result = " THEN action_num = " + str(idx) + ", action_proba = " + str(action_proba)
             rule_list.append("IF " + ls + val + result)
         if right != _tree.TREE_LEAF:
-            stack.append((right, ls + name + "(data_list) > " + val + " AND "))
+            stack.append((right, ls + name + " > " + val + " AND "))
         if left != _tree.TREE_LEAF:
-            stack.append((left, ls + name + "(data_list) <= " + val + " AND "))
+            stack.append((left, ls + name + " <= " + val + " AND "))
     return rule_list, node_num
 
 
 # 读取模型
 import pickle
 
+device_no = 1
 # with open('models/device_2Acc_0.984Fea_2.pickle', 'rb') as f:
-with open('models/device_1Acc_0.845Fea_2_prune.pickle', 'rb') as f:
+with open('models/' + 'device_' + str(device_no) + '_post_prune.pickle', 'rb') as f:
     model = pickle.load(f)
 
 # 导入全局变量

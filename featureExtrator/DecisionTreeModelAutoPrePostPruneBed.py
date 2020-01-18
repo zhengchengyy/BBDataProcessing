@@ -10,7 +10,7 @@ import pydotplus
 import os
 
 # 导入数据
-device_no = 1
+device_no = 5
 feature_matrix = np.load('feature_matrixs/feature_matrix_bed' + str(device_no) + '.npy')
 label_matrix = np.load('feature_matrixs/label_matrix_bed' + str(device_no) + '.npy')
 # print(feature_matrix)
@@ -30,30 +30,63 @@ print("测试集长度：", len(X_test), len(y_test))
 # 导入全局变量
 import GlobalVariable as gv
 # class_names = gv.action_names
-class_names = ["get_up", "go_to_bed"]
+class_names = ["go_to_bed", "get_up"]
 feature_names = gv.feature_names
 
 # 删除名字后缀
 feature_names = [feature[:-6] for feature in feature_names]
 
 def model_json():
-    # 9动作2特征
-    clf = DecisionTreeClassifier(random_state=0,
-                                 max_depth=11,
-                                 max_leaf_nodes=78,
-                                 min_impurity_decrease=0.00032,
-                                 min_samples_leaf=2,
-                                 min_samples_split=5,
-                                 splitter='best',
-                                 criterion='entropy')
-    # clf = DecisionTreeClassifier(random_state=0,
-    #                              max_depth=13,
-    #                              max_leaf_nodes=24,
-    #                              min_impurity_decrease=0.0003,
-    #                              min_samples_leaf=3,
-    #                              min_samples_split=7,
-    #                              splitter='best',
-    #                              criterion='entropy')
+    if (device_no == 1):
+        # 2动作2特征不丢弃数据设备1
+        clf = DecisionTreeClassifier(random_state=0,
+                                     splitter='best',
+                                     min_samples_split=4,
+                                     min_samples_leaf=1,
+                                     max_leaf_nodes=34,
+                                     max_depth=30,
+                                     criterion='entropy',
+                                     )
+    elif (device_no == 2):
+        # 2动作2特征不丢弃数据设备2
+        clf = DecisionTreeClassifier(random_state=0,
+                                     splitter='best',
+                                     min_samples_split=3,
+                                     min_samples_leaf=1,
+                                     max_leaf_nodes=45,
+                                     max_depth=45,
+                                     criterion='entropy',
+                                     )
+    elif (device_no == 3):
+        # 2动作2特征不丢弃数据设备3
+        clf = DecisionTreeClassifier(random_state=0,
+                                     splitter='best',
+                                     min_samples_split=3,
+                                     min_samples_leaf=1,
+                                     max_leaf_nodes=50,
+                                     max_depth=25,
+                                     criterion='entropy',
+                                     )
+    elif (device_no == 4):
+        # 2动作2特征不丢弃数据设备4
+        clf = DecisionTreeClassifier(random_state=0,
+                                     splitter='best',
+                                     min_samples_split=2,
+                                     min_samples_leaf=1,
+                                     max_leaf_nodes=53,
+                                     max_depth=26,
+                                     criterion='entropy',
+                                     )
+    elif (device_no == 5):
+        # 2动作2特征不丢弃数据设备5
+        clf = DecisionTreeClassifier(random_state=0,
+                                     splitter='best',
+                                     min_samples_split=4,
+                                     min_samples_leaf=1,
+                                     max_leaf_nodes=35,
+                                     max_depth=23,
+                                     criterion='entropy',
+                                     )
 
     # 直接后剪枝
     # clf = DecisionTreeClassifier(random_state=0,
@@ -264,7 +297,7 @@ def precision_compute(json_model, X_test, y, feature_names, class_names):
     for index, item in enumerate(X_test):
         predict_result, class_name_index = predict(json_model, feature_names, class_names, item)
         # if class_names[class_name_index] == str(y[index]):  #原代码比较的是名称
-        if class_name_index == y[index]:
+        if class_name_index + 9 == y[index]:
             count_right += 1
     #     else:
     #         print"测试失败数据为：",item
@@ -412,6 +445,12 @@ def CCP_validation(TreeSets, alpha_list, X_test, y_test, feature_names, class_na
         # current_tree = best_sklearn_model.tree_
         # print("Current_tree's node num = ", current_tree.node_count)
         # print("Current_tree's leaf num = ", leaf_num)
+
+        # 保存模型
+        import pickle
+        feature_num = feature_matrix.shape[1]
+        with open('models/' + 'device_' + str(device_no) + '_bed_post_prune.pickle', 'wb') as f:
+            pickle.dump(best_sklearn_model, f)
 
         # 提取后剪枝后的规则
         res, node_num = binaryTreePaths(best_sklearn_model, 0, feature_names, class_names)

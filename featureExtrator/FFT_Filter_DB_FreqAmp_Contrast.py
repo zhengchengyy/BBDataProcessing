@@ -143,7 +143,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         for i in range(start, start + 1):
             volts_filter[i] = volts[i]
             # 小波变换滤波
-            volts_filter[i] = cwt_filter(volts_filter[i], 0.1)
+            volts_filter[i] = cwt_filter(volts_filter[i], 0.08)
 
             # fft返回值实部表示
             result = np.fft.fft(volts_filter[i])
@@ -163,6 +163,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
 
             # fft返回值实部表示
             result = np.fft.fft(volts_filter[i])
+            # result = np.fft.fft(volts_filter[i]) * 2  # 不知道为啥需要乘以2才不会影响过滤的其它傅里叶系数？
             # 实数fft后会使原信号幅值翻N/2倍，直流分量即第一点翻N倍
             amplitudes = abs(result) / (len(result) / 2)  # 复数的绝对值其实就是它的模长
             amplitudes[0] /= 2

@@ -38,8 +38,7 @@ def save_model(device_no):
     # 保存模型
     import pickle
     feature_num = feature_matrix.shape[1]
-    with open('models/' + 'device_' + str(device_no) + 'Acc_' + str(round(test_score, 3))
-               + 'Fea_' + str(feature_num) + '_bed.pickle', 'wb') as f:
+    with open('models/' + 'device_' + str(device_no) + '_bed.pickle', 'wb') as f:
         pickle.dump(clf, f)
 
     # 导入全局变量

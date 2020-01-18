@@ -23,11 +23,12 @@ feature_names = gv.feature_names
 
 # 随机化和划分训练集和测试集
 X_train, X_test, y_train, y_test = train_test_split(
-    feature_matrix, label_matrix, test_size=0.25, random_state=0)
+    feature_matrix, label_matrix, test_size=0.2, random_state=0)
 
 # 使用决策树训练
+# 深度导致ROC波动很大
 clf = DecisionTreeClassifier(random_state=0,
-
+                             max_depth=10,
                              criterion='entropy')
 clf.fit(X_train, y_train)
 
@@ -36,10 +37,13 @@ test_score = clf.score(X_test, y_test)
 print('device_' + str(device_no) + '\'s train score:', train_score, round(train_score,3))
 print('device_' + str(device_no) +'\'s test score:', test_score, round(test_score,3))
 
-y_score = clf.predict(X_test)
-# 将标签类二值化,对应类的位置为1,其它位置为1,如[1,0,0],[0,1,0],[0,0,1]
+# 不能使用predict，使用结果对应位置为1表示该类，但不代表该类的概率，
+# 这里使用了影响也不大的原因是模型准确率高，predict_proba得到对应位置的概率也是1
+# y_score = clf.predict(X_test)
+y_score = clf.predict_proba(X_test)
+# 将标签类二值化,对应类的位置为1,其它位置为0,如[1,0,0],[0,1,0],[0,0,1]
 n_classes = len(action_names)
-y_score = label_binarize(y_score, classes=range(n_classes))
+# y_score = label_binarize(y_score, classes=range(n_classes))
 y_test = label_binarize(y_test, classes=range(n_classes))
 
 # 计算每一类的ROC

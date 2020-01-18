@@ -1,0 +1,65 @@
+MR1:IF SD <= 0.215 AND Mean <= 0.538 AND SD <= 0.117 AND SD <= 0.049 AND Mean <= 0.423 THEN action_num = 2, action_proba = 0.9210526315789473
+MR2:IF SD <= 0.215 AND Mean <= 0.538 AND SD <= 0.117 AND SD <= 0.049 AND Mean > 0.423 AND 0.467 THEN action_num = 8, action_proba = 0.6875
+MR3:IF SD <= 0.215 AND Mean <= 0.538 AND SD <= 0.117 AND SD > 0.049 AND Mean <= 0.026 AND SD <= 0.094 AND SD <= 0.07 AND 0.01 THEN action_num = 5, action_proba = 0.6774193548387096
+MR4:IF SD <= 0.215 AND Mean <= 0.538 AND SD <= 0.117 AND SD > 0.049 AND Mean <= 0.026 AND SD <= 0.094 AND SD > 0.07 AND SD <= 0.083 AND Mean <= 0.014 AND 0.079 THEN action_num = 8, action_proba = 0.23170731707317074
+MR5:IF SD <= 0.215 AND Mean <= 0.538 AND SD <= 0.117 AND SD > 0.049 AND Mean <= 0.026 AND SD <= 0.094 AND SD > 0.07 AND SD <= 0.083 AND Mean > 0.014 AND 0.08 THEN action_num = 5, action_proba = 0.3125
+MR6:IF SD <= 0.215 AND Mean <= 0.538 AND SD <= 0.117 AND SD > 0.049 AND Mean <= 0.026 AND SD <= 0.094 AND SD > 0.07 AND SD > 0.083 AND Mean <= 0.017 AND 0.092 THEN action_num = 0, action_proba = 0.26666666666666666
+MR7:IF SD <= 0.215 AND Mean <= 0.538 AND SD <= 0.117 AND SD > 0.049 AND Mean <= 0.026 AND SD <= 0.094 AND SD > 0.07 AND SD > 0.083 AND Mean > 0.017 AND Mean <= 0.02 AND SD <= 0.091 AND SD <= 0.088 THEN action_num = 0, action_proba = 0.37037037037037035
+MR8:IF SD <= 0.215 AND Mean <= 0.538 AND SD <= 0.117 AND SD > 0.049 AND Mean <= 0.026 AND SD <= 0.094 AND SD > 0.07 AND SD > 0.083 AND Mean > 0.017 AND Mean <= 0.02 AND SD <= 0.091 AND SD > 0.088 THEN action_num = 4, action_proba = 0.36
+MR9:IF SD <= 0.215 AND Mean <= 0.538 AND SD <= 0.117 AND SD > 0.049 AND Mean <= 0.026 AND SD <= 0.094 AND SD > 0.07 AND SD > 0.083 AND Mean > 0.017 AND Mean <= 0.02 AND SD > 0.091 THEN action_num = 2, action_proba = 0.5
+MR10:IF SD <= 0.215 AND Mean <= 0.538 AND SD <= 0.117 AND SD > 0.049 AND Mean <= 0.026 AND SD <= 0.094 AND SD > 0.07 AND SD > 0.083 AND Mean > 0.017 AND Mean > 0.02 AND 0.089 THEN action_num = 3, action_proba = 0.45454545454545453
+MR11:IF SD <= 0.215 AND Mean <= 0.538 AND SD <= 0.117 AND SD > 0.049 AND Mean <= 0.026 AND SD > 0.094 AND SD <= 0.113 AND Mean <= 0.023 AND SD <= 0.106 AND Mean <= 0.02 AND Mean <= 0.017 AND SD <= 0.099 AND 0.015 THEN action_num = 7, action_proba = 0.2903225806451613
+MR12:IF SD <= 0.215 AND Mean <= 0.538 AND SD <= 0.117 AND SD > 0.049 AND Mean <= 0.026 AND SD > 0.094 AND SD <= 0.113 AND Mean <= 0.023 AND SD <= 0.106 AND Mean <= 0.02 AND Mean <= 0.017 AND SD > 0.099 THEN action_num = 3, action_proba = 0.4
+MR13:IF SD <= 0.215 AND Mean <= 0.538 AND SD <= 0.117 AND SD > 0.049 AND Mean <= 0.026 AND SD > 0.094 AND SD <= 0.113 AND Mean <= 0.023 AND SD <= 0.106 AND Mean <= 0.02 AND Mean > 0.017 AND 0.101 THEN action_num = 1, action_proba = 0.3064516129032258
+MR14:IF SD <= 0.215 AND Mean <= 0.538 AND SD <= 0.117 AND SD > 0.049 AND Mean <= 0.026 AND SD > 0.094 AND SD <= 0.113 AND Mean <= 0.023 AND SD <= 0.106 AND Mean > 0.02 AND SD <= 0.103 AND SD <= 0.099 THEN action_num = 5, action_proba = 0.2962962962962963
+MR15:IF SD <= 0.215 AND Mean <= 0.538 AND SD <= 0.117 AND SD > 0.049 AND Mean <= 0.026 AND SD > 0.094 AND SD <= 0.113 AND Mean <= 0.023 AND SD <= 0.106 AND Mean > 0.02 AND SD <= 0.103 AND SD > 0.099 THEN action_num = 1, action_proba = 0.2857142857142857
+MR16:IF SD <= 0.215 AND Mean <= 0.538 AND SD <= 0.117 AND SD > 0.049 AND Mean <= 0.026 AND SD > 0.094 AND SD <= 0.113 AND Mean <= 0.023 AND SD <= 0.106 AND Mean > 0.02 AND SD > 0.103 THEN action_num = 7, action_proba = 0.46153846153846156
+MR17:IF SD <= 0.215 AND Mean <= 0.538 AND SD <= 0.117 AND SD > 0.049 AND Mean <= 0.026 AND SD > 0.094 AND SD <= 0.113 AND Mean <= 0.023 AND SD > 0.106 AND Mean <= 0.018 THEN action_num = 5, action_proba = 0.3076923076923077
+MR18:IF SD <= 0.215 AND Mean <= 0.538 AND SD <= 0.117 AND SD > 0.049 AND Mean <= 0.026 AND SD > 0.094 AND SD <= 0.113 AND Mean <= 0.023 AND SD > 0.106 AND Mean > 0.018 THEN action_num = 1, action_proba = 0.34545454545454546
+MR19:IF SD <= 0.215 AND Mean <= 0.538 AND SD <= 0.117 AND SD > 0.049 AND Mean <= 0.026 AND SD > 0.094 AND SD <= 0.113 AND Mean > 0.023 AND SD <= 0.104 THEN action_num = 3, action_proba = 0.3939393939393939
+MR20:IF SD <= 0.215 AND Mean <= 0.538 AND SD <= 0.117 AND SD > 0.049 AND Mean <= 0.026 AND SD > 0.094 AND SD <= 0.113 AND Mean > 0.023 AND SD > 0.104 AND 0.108 THEN action_num = 1, action_proba = 0.24489795918367346
+MR21:IF SD <= 0.215 AND Mean <= 0.538 AND SD <= 0.117 AND SD > 0.049 AND Mean <= 0.026 AND SD > 0.094 AND SD > 0.113 AND Mean <= 0.022 THEN action_num = 4, action_proba = 0.42857142857142855
+MR22:IF SD <= 0.215 AND Mean <= 0.538 AND SD <= 0.117 AND SD > 0.049 AND Mean <= 0.026 AND SD > 0.094 AND SD > 0.113 AND Mean > 0.022 THEN action_num = 8, action_proba = 0.45454545454545453
+MR23:IF SD <= 0.215 AND Mean <= 0.538 AND SD <= 0.117 AND SD > 0.049 AND Mean > 0.026 AND Mean <= 0.378 AND Mean <= 0.033 AND 0.03 THEN action_num = 5, action_proba = 0.2535211267605634
+MR24:IF SD <= 0.215 AND Mean <= 0.538 AND SD <= 0.117 AND SD > 0.049 AND Mean > 0.026 AND Mean <= 0.378 AND Mean > 0.033 AND Mean <= 0.05 AND SD <= 0.107 THEN action_num = 3, action_proba = 0.9090909090909091
+MR25:IF SD <= 0.215 AND Mean <= 0.538 AND SD <= 0.117 AND SD > 0.049 AND Mean > 0.026 AND Mean <= 0.378 AND Mean > 0.033 AND Mean <= 0.05 AND SD > 0.107 THEN action_num = 2, action_proba = 0.7142857142857143
+MR26:IF SD <= 0.215 AND Mean <= 0.538 AND SD <= 0.117 AND SD > 0.049 AND Mean > 0.026 AND Mean <= 0.378 AND Mean > 0.033 AND Mean > 0.05 AND Mean <= 0.212 THEN action_num = 7, action_proba = 1.0
+MR27:IF SD <= 0.215 AND Mean <= 0.538 AND SD <= 0.117 AND SD > 0.049 AND Mean > 0.026 AND Mean <= 0.378 AND Mean > 0.033 AND Mean > 0.05 AND Mean > 0.212 THEN action_num = 3, action_proba = 1.0
+MR28:IF SD <= 0.215 AND Mean <= 0.538 AND SD <= 0.117 AND SD > 0.049 AND Mean > 0.026 AND Mean > 0.378 AND Mean <= 0.438 THEN action_num = 4, action_proba = 0.64
+MR29:IF SD <= 0.215 AND Mean <= 0.538 AND SD <= 0.117 AND SD > 0.049 AND Mean > 0.026 AND Mean > 0.378 AND Mean > 0.438 AND Mean <= 0.464 THEN action_num = 8, action_proba = 0.5555555555555556
+MR30:IF SD <= 0.215 AND Mean <= 0.538 AND SD <= 0.117 AND SD > 0.049 AND Mean > 0.026 AND Mean > 0.378 AND Mean > 0.438 AND Mean > 0.464 THEN action_num = 5, action_proba = 1.0
+MR31:IF SD <= 0.215 AND Mean <= 0.538 AND SD > 0.117 AND SD <= 0.154 AND Mean <= 0.071 AND Mean <= 0.038 AND Mean <= 0.03 AND SD <= 0.122 THEN action_num = 6, action_proba = 0.3125
+MR32:IF SD <= 0.215 AND Mean <= 0.538 AND SD > 0.117 AND SD <= 0.154 AND Mean <= 0.071 AND Mean <= 0.038 AND Mean <= 0.03 AND SD > 0.122 AND Mean <= 0.025 AND 0.123 THEN action_num = 6, action_proba = 0.5882352941176471
+MR33:IF SD <= 0.215 AND Mean <= 0.538 AND SD > 0.117 AND SD <= 0.154 AND Mean <= 0.071 AND Mean <= 0.038 AND Mean <= 0.03 AND SD > 0.122 AND Mean > 0.025 AND SD <= 0.134 AND 0.027 THEN action_num = 7, action_proba = 0.47368421052631576
+MR34:IF SD <= 0.215 AND Mean <= 0.538 AND SD > 0.117 AND SD <= 0.154 AND Mean <= 0.071 AND Mean <= 0.038 AND Mean <= 0.03 AND SD > 0.122 AND Mean > 0.025 AND SD > 0.134 THEN action_num = 6, action_proba = 0.5555555555555556
+MR35:IF SD <= 0.215 AND Mean <= 0.538 AND SD > 0.117 AND SD <= 0.154 AND Mean <= 0.071 AND Mean <= 0.038 AND Mean > 0.03 AND SD <= 0.127 AND 0.033 THEN action_num = 2, action_proba = 0.43243243243243246
+MR36:IF SD <= 0.215 AND Mean <= 0.538 AND SD > 0.117 AND SD <= 0.154 AND Mean <= 0.071 AND Mean <= 0.038 AND Mean > 0.03 AND SD > 0.127 AND Mean <= 0.037 AND SD <= 0.143 AND Mean <= 0.034 AND 0.031 THEN action_num = 8, action_proba = 0.325
+MR37:IF SD <= 0.215 AND Mean <= 0.538 AND SD > 0.117 AND SD <= 0.154 AND Mean <= 0.071 AND Mean <= 0.038 AND Mean > 0.03 AND SD > 0.127 AND Mean <= 0.037 AND SD <= 0.143 AND Mean > 0.034 AND SD <= 0.134 THEN action_num = 2, action_proba = 0.5555555555555556
+MR38:IF SD <= 0.215 AND Mean <= 0.538 AND SD > 0.117 AND SD <= 0.154 AND Mean <= 0.071 AND Mean <= 0.038 AND Mean > 0.03 AND SD > 0.127 AND Mean <= 0.037 AND SD <= 0.143 AND Mean > 0.034 AND SD > 0.134 THEN action_num = 6, action_proba = 0.6666666666666666
+MR39:IF SD <= 0.215 AND Mean <= 0.538 AND SD > 0.117 AND SD <= 0.154 AND Mean <= 0.071 AND Mean <= 0.038 AND Mean > 0.03 AND SD > 0.127 AND Mean <= 0.037 AND SD > 0.143 AND 0.035 THEN action_num = 2, action_proba = 0.44
+MR40:IF SD <= 0.215 AND Mean <= 0.538 AND SD > 0.117 AND SD <= 0.154 AND Mean <= 0.071 AND Mean <= 0.038 AND Mean > 0.03 AND SD > 0.127 AND Mean > 0.037 AND 0.136 THEN action_num = 8, action_proba = 0.3888888888888889
+MR41:IF SD <= 0.215 AND Mean <= 0.538 AND SD > 0.117 AND SD <= 0.154 AND Mean <= 0.071 AND Mean > 0.038 AND SD <= 0.139 AND Mean <= 0.057 AND Mean <= 0.046 THEN action_num = 2, action_proba = 0.3793103448275862
+MR42:IF SD <= 0.215 AND Mean <= 0.538 AND SD > 0.117 AND SD <= 0.154 AND Mean <= 0.071 AND Mean > 0.038 AND SD <= 0.139 AND Mean <= 0.057 AND Mean > 0.046 THEN action_num = 6, action_proba = 0.42857142857142855
+MR43:IF SD <= 0.215 AND Mean <= 0.538 AND SD > 0.117 AND SD <= 0.154 AND Mean <= 0.071 AND Mean > 0.038 AND SD <= 0.139 AND Mean > 0.057 THEN action_num = 7, action_proba = 0.8888888888888888
+MR44:IF SD <= 0.215 AND Mean <= 0.538 AND SD > 0.117 AND SD <= 0.154 AND Mean <= 0.071 AND Mean > 0.038 AND SD > 0.139 AND Mean <= 0.046 AND SD <= 0.146 THEN action_num = 6, action_proba = 0.3888888888888889
+MR45:IF SD <= 0.215 AND Mean <= 0.538 AND SD > 0.117 AND SD <= 0.154 AND Mean <= 0.071 AND Mean > 0.038 AND SD > 0.139 AND Mean <= 0.046 AND SD > 0.146 THEN action_num = 0, action_proba = 0.391304347826087
+MR46:IF SD <= 0.215 AND Mean <= 0.538 AND SD > 0.117 AND SD <= 0.154 AND Mean <= 0.071 AND Mean > 0.038 AND SD > 0.139 AND Mean > 0.046 AND Mean <= 0.054 AND 0.147 THEN action_num = 4, action_proba = 0.38095238095238093
+MR47:IF SD <= 0.215 AND Mean <= 0.538 AND SD > 0.117 AND SD <= 0.154 AND Mean <= 0.071 AND Mean > 0.038 AND SD > 0.139 AND Mean > 0.046 AND Mean > 0.054 AND Mean <= 0.063 THEN action_num = 6, action_proba = 0.625
+MR48:IF SD <= 0.215 AND Mean <= 0.538 AND SD > 0.117 AND SD <= 0.154 AND Mean <= 0.071 AND Mean > 0.038 AND SD > 0.139 AND Mean > 0.046 AND Mean > 0.054 AND Mean > 0.063 THEN action_num = 3, action_proba = 0.4444444444444444
+MR49:IF SD <= 0.215 AND Mean <= 0.538 AND SD > 0.117 AND SD <= 0.154 AND Mean > 0.071 AND Mean <= 0.386 THEN action_num = 3, action_proba = 0.85
+MR50:IF SD <= 0.215 AND Mean <= 0.538 AND SD > 0.117 AND SD <= 0.154 AND Mean > 0.071 AND Mean > 0.386 AND Mean <= 0.455 THEN action_num = 4, action_proba = 0.5
+MR51:IF SD <= 0.215 AND Mean <= 0.538 AND SD > 0.117 AND SD <= 0.154 AND Mean > 0.071 AND Mean > 0.386 AND Mean > 0.455 THEN action_num = 5, action_proba = 0.625
+MR52:IF SD <= 0.215 AND Mean <= 0.538 AND SD > 0.117 AND SD > 0.154 AND SD <= 0.197 AND Mean <= 0.073 AND 0.045 THEN action_num = 1, action_proba = 0.2897196261682243
+MR53:IF SD <= 0.215 AND Mean <= 0.538 AND SD > 0.117 AND SD > 0.154 AND SD <= 0.197 AND Mean > 0.073 AND Mean <= 0.408 AND SD <= 0.189 THEN action_num = 8, action_proba = 0.47619047619047616
+MR54:IF SD <= 0.215 AND Mean <= 0.538 AND SD > 0.117 AND SD > 0.154 AND SD <= 0.197 AND Mean > 0.073 AND Mean <= 0.408 AND SD > 0.189 AND Mean <= 0.102 THEN action_num = 2, action_proba = 0.36363636363636365
+MR55:IF SD <= 0.215 AND Mean <= 0.538 AND SD > 0.117 AND SD > 0.154 AND SD <= 0.197 AND Mean > 0.073 AND Mean <= 0.408 AND SD > 0.189 AND Mean > 0.102 THEN action_num = 6, action_proba = 0.5333333333333333
+MR56:IF SD <= 0.215 AND Mean <= 0.538 AND SD > 0.117 AND SD > 0.154 AND SD <= 0.197 AND Mean > 0.073 AND Mean > 0.408 THEN action_num = 7, action_proba = 0.75
+MR57:IF SD <= 0.215 AND Mean <= 0.538 AND SD > 0.117 AND SD > 0.154 AND SD > 0.197 AND Mean <= 0.107 THEN action_num = 5, action_proba = 0.6875
+MR58:IF SD <= 0.215 AND Mean <= 0.538 AND SD > 0.117 AND SD > 0.154 AND SD > 0.197 AND Mean > 0.107 AND Mean <= 0.31 THEN action_num = 4, action_proba = 0.34210526315789475
+MR59:IF SD <= 0.215 AND Mean <= 0.538 AND SD > 0.117 AND SD > 0.154 AND SD > 0.197 AND Mean > 0.107 AND Mean > 0.31 THEN action_num = 7, action_proba = 1.0
+MR60:IF SD <= 0.215 AND Mean > 0.538 AND Mean <= 0.622 THEN action_num = 0, action_proba = 0.9615384615384616
+MR61:IF SD <= 0.215 AND Mean > 0.538 AND Mean > 0.622 THEN action_num = 1, action_proba = 0.5319148936170213
+MR62:IF SD > 0.215 AND SD <= 0.244 AND Mean <= 0.322 AND 0.119 THEN action_num = 5, action_proba = 0.8548387096774194
+MR63:IF SD > 0.215 AND SD <= 0.244 AND Mean > 0.322 THEN action_num = 7, action_proba = 1.0
+MR64:IF SD > 0.215 AND SD > 0.244 AND Mean <= 0.317 THEN action_num = 1, action_proba = 0.9545454545454546
+MR65:IF SD > 0.215 AND SD > 0.244 AND Mean > 0.317 THEN action_num = 7, action_proba = 1.0

@@ -15,24 +15,11 @@ action = ["get_up", "go_to_bed",
           "head_move", "legs_move", "hands_move",
           "hands_rising", "kick"]
 
-config = {'action': 'turn_over',
-          'db': 'beaglebone',
-          'tag_collection': 'tags_411',
-          'volt_collection': 'volts_411',
-          'ndevices': 3,
-          'offset': 0}
+# 导入全局变量
+import GlobalVariable as gv
+action = gv.action_names
 
-
-# config = {'action': "still",
-#           'db': 'beaglebone',
-#           'tag_collection': 'tags_424',
-#           'volt_collection': 'volts_424',
-#           'ndevices': 5,
-#           'offset': 0
-#           }
-
-
-config = {'action': "turn_over",
+config = {'action': action,
           'db': 'beaglebone',
           'tag_collection': 'tags_1105',
           'volt_collection': 'volts_1105',
@@ -40,6 +27,7 @@ config = {'action': "turn_over",
           'offset': 0
           }
 
+ndevices = 5
 
 def timeToFormat(t):
     ftime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t))
@@ -72,12 +60,13 @@ def fft_filter(data, sampling_frequency, threshold_frequency):
     fft_result = np.fft.fft(data)
     begin = int(len(data) * threshold_frequency * sampling_frequency)
     fft_result[begin:] = 0  # 低通滤波
+    # filter_data = np.fft.ifft(fft_result)
     filter_data = np.fft.ifft(fft_result)
-    return abs(filter_data)
+    return abs(filter_data) * 2
 
 
 def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='localhost',
-                 ndevices=5, offset=0):
+                 ndevices=3, offset=0, start=1, end=3):
     client = MongoClient(port=port, host=host)
     database = client[db]
     tag_collection = database[tag_collection]
@@ -91,21 +80,19 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
 
     # ntags表示总标签数，即人数；tag_acc表示累加计数
     ntags = tag_collection.count_documents({'tag': action})
-    ntags = 1
+    ntags = 2
     tag_acc = 0
 
-    # 用于查看几号设备的图
-    start = 1
-    end = 1
-
-    title = config['volt_collection'][6:] + "" + action + "_filter_fft_" + str(start)
+    title = config['volt_collection'][6:] + "" + action + "_filter_" + str(start)
     # fig = plt.figure(title, figsize=(6, 8))
     fig = plt.figure(title)
-    fig.suptitle(action + "_filter_fft_" + str(start))
+    fig.suptitle(action + "_filter_" + str(start))
 
     # plot the data that is of a certain action one by one
     for tag in tag_collection.find({'tag': action}):
         tag_acc += 1
+        if(tag_acc < ntags):
+            continue
         if (tag_acc > ntags):
             break
         # inittime
@@ -148,7 +135,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
             volts_filter[i] = cwt_filter(volts_filter[i], 0.08)
 
             # 傅里叶变换滤波
-            volts_filter[i] = fft_filter(volts_filter[i], 1 / 70, 25)
+            # volts_filter[i] = fft_filter(volts_filter[i], 1 / 70, 25)
 
             # fft返回值实部表示
             result = np.fft.fft(volts_filter[i])
@@ -166,15 +153,26 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         if tag_acc == ntags:
             ax.set_xlabel('Frequency')
 
+    figure = plt.gcf()  # get current figure
+    figure.set_size_inches(20, 10)
+    plt.savefig("action_images/" + title + ".png", dpi=200)
+    plt.close()
+
     # 最大化显示图像窗口
     # plt.get_current_fig_manager().window.state('zoomed')
-    plt.show()
+    # plt.show()
 
 
 if __name__ == '__main__':
-    plot_from_db(action=config['action'],
-                 db=config['db'],
-                 tag_collection=config['tag_collection'],
-                 volt_collection=config['volt_collection'],
-                 ndevices=config['ndevices'],
-                 offset=config['offset'])
+    for i in range(len(action)):
+        print("---------" + action[i] + "---------")
+        for j in range(1, ndevices+1):
+            print("---------device_" + str(j) + "---------")
+            plot_from_db(action=action[i],
+                          db=config['db'],
+                          tag_collection=config['tag_collection'],
+                          volt_collection=config['volt_collection'],
+                          ndevices=5,
+                          offset=config['offset'],
+                          start=j,
+                          end=j)

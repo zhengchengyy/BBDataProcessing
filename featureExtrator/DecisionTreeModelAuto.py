@@ -75,4 +75,5 @@ def save_model(device_no):
 
 
 for i in range(start, end + 1):
+    print("---------device_" + str(i) + "---------")
     save_model(i)

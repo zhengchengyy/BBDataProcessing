@@ -27,8 +27,7 @@ config = {'db': 'beaglebone',
 # 导入全局变量
 import GlobalVariable as gv
 
-action_names = gv.action_names
-# action_names = ["turn_over"]
+action_names = ["go_to_bed", "get_up"]
 feature_names = gv.feature_names
 
 
@@ -102,7 +101,7 @@ def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=270
 
     # ntags表示总标签数，即人数；tag_acc表示累加计数
     ntags = tag_collection.count_documents({'tag': action})
-    ntags = 12
+    # ntags = 12
     tag_acc = 0
 
     title = config['volt_collection'][6:] + "" + action + "_features"
@@ -132,14 +131,6 @@ def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=270
         tag_acc += 1
         if (tag_acc > ntags):
             break
-        # 有些数据丢失需要删除
-        # if(tag_acc in discard[action]):
-        # if (tag_acc == 9 or tag_acc == 11):
-
-        if (tag_acc == 9 or (tag_acc == 11 and action != "hands_move")):
-        # if(tag_acc == 9 or (tag_acc == 11 and action == "legs_tremble") or
-        #     (tag_acc == 12 and action != "legs_tremble")):
-            continue
         print("people_" + str(tag_acc))
         # inittime, termtime
         inittime, termtime = tag['inittime'], tag['termtime']
@@ -220,9 +211,9 @@ def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=270
         for i in range(start, end + 1):
 
             # 如果文件存在，则以添加的方式打开
-            if (os.path.exists("feature_matrixs/feature_matrix" + str(i) + ".npy")):
-                feature_matrix = np.load("feature_matrixs/feature_matrix" + str(i) + ".npy")
-                label_matrix = np.load("feature_matrixs/label_matrix" + str(i) + ".npy")
+            if (os.path.exists("feature_matrixs/feature_matrix_bed" + str(i) + ".npy")):
+                feature_matrix = np.load("feature_matrixs/feature_matrix_bed" + str(i) + ".npy")
+                label_matrix = np.load("feature_matrixs/label_matrix_bed" + str(i) + ".npy")
                 temp_matrix = np.zeros((len(feature_times[1]), nfeatures), dtype=float)
 
                 # 可以删除这部分，np.save直接覆盖原文件
@@ -260,11 +251,11 @@ def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=270
                 feature_matrix = np.insert(feature_matrix, feature_matrix.shape[0],
                                            values=temp_matrix, axis=0)
 
-                np.save('feature_matrixs/feature_matrix' + str(i), feature_matrix)
-                np.save('feature_matrixs/label_matrix' + str(i), label_matrix)
+                np.save('feature_matrixs/feature_matrix_bed' + str(i), feature_matrix)
+                np.save('feature_matrixs/label_matrix_bed' + str(i), label_matrix)
 
-                print("feature_matrix" + str(i) + ":" + str(feature_matrix.shape))
-                print("label_matrix" + str(i) + ":" + str(label_matrix.shape))
+                print("feature_matrix_bed" + str(i) + ":" + str(feature_matrix.shape))
+                print("label_matrix_bed" + str(i) + ":" + str(label_matrix.shape))
 
                 feature_matrixs[i] = feature_matrix
 
@@ -302,11 +293,11 @@ def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=270
                             label_matrix[j] = action_num
 
                 # np.save保存时自动为8位小数
-                np.save('feature_matrixs/feature_matrix' + str(i), feature_matrix)
-                np.save('feature_matrixs/label_matrix' + str(i), label_matrix)
+                np.save('feature_matrixs/feature_matrix_bed' + str(i), feature_matrix)
+                np.save('feature_matrixs/label_matrix_bed' + str(i), label_matrix)
 
-                print("feature_matrix" + str(i) + ":" + str(feature_matrix.shape))
-                print("label_matrix" + str(i) + ":" + str(label_matrix.shape))
+                print("feature_matrix_bed" + str(i) + ":" + str(feature_matrix.shape))
+                print("label_matrix_bed" + str(i) + ":" + str(label_matrix.shape))
 
                 feature_matrixs[i] = feature_matrix
 
@@ -325,9 +316,9 @@ if __name__ == '__main__':
     start = 1
     end = config['device_num']
     for i in range(start, end + 1):
-        if (os.path.exists("feature_matrixs/feature_matrix" + str(i) + ".npy")):
-            os.remove("feature_matrixs/feature_matrix" + str(i) + ".npy")
-            os.remove("feature_matrixs/label_matrix" + str(i) + ".npy")
+        if (os.path.exists("feature_matrixs/feature_matrix_bed" + str(i) + ".npy")):
+            os.remove("feature_matrixs/feature_matrix_bed" + str(i) + ".npy")
+            os.remove("feature_matrixs/label_matrix_bed" + str(i) + ".npy")
 
     for i in range(len(action_names)):
         print("---------" + action_names[i] + "---------")
@@ -337,6 +328,6 @@ if __name__ == '__main__':
                               volt_collection=config['volt_collection'],
                               ndevices=config['device_num'],
                               offset=config['offset'],
-                              action_num=i,
+                              action_num=i+9,
                               interval=config['interval'],
                               rate=config['rate'])

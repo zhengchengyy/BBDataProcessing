@@ -32,7 +32,7 @@ config = {'action': 'turn_over',
 #           }
 
 
-config = {'action': "turn_over",
+config = {'action': "legs_stretch",
           'db': 'beaglebone',
           'tag_collection': 'tags_1105',
           'volt_collection': 'volts_1105',
@@ -72,8 +72,9 @@ def fft_filter(data, sampling_frequency, threshold_frequency):
     fft_result = np.fft.fft(data)
     begin = int(len(data) * threshold_frequency * sampling_frequency)
     fft_result[begin:] = 0  # 低通滤波
+    # filter_data = np.fft.ifft(fft_result)
     filter_data = np.fft.ifft(fft_result)
-    return abs(filter_data)
+    return abs(filter_data) * 2
 
 
 def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='localhost',
@@ -98,10 +99,10 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
     start = 1
     end = 1
 
-    title = config['volt_collection'][6:] + "" + action + "_filter_fft_" + str(start)
+    title = config['volt_collection'][6:] + "" + action + "_filter_" + str(start)
     # fig = plt.figure(title, figsize=(6, 8))
     fig = plt.figure(title)
-    fig.suptitle(action + "_filter_fft_" + str(start))
+    fig.suptitle(action + "_filter_" + str(start))
 
     # plot the data that is of a certain action one by one
     for tag in tag_collection.find({'tag': action}):
@@ -148,7 +149,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
             volts_filter[i] = cwt_filter(volts_filter[i], 0.08)
 
             # 傅里叶变换滤波
-            volts_filter[i] = fft_filter(volts_filter[i], 1 / 70, 25)
+            # volts_filter[i] = fft_filter(volts_filter[i], 1 / 70, 25)
 
             # fft返回值实部表示
             result = np.fft.fft(volts_filter[i])

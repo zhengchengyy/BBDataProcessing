@@ -29,7 +29,8 @@ config = {'action': "turn_over",
 
 
 # feature_names = ["RangeModule", "EnergyModule", "RMSModule", "FDEModule","SamplingFreqModule"]
-feature_names = ["SamplingFreqModule", "ThresholdCounterModule"]
+# feature_names = ["SamplingFreqModule", "ThresholdCounterModule"]
+feature_names = ["MeanModule"]
 
 
 def timeToFormat(t):
@@ -57,7 +58,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
 
     # ntags表示总标签数，即人数；tag_acc表示累加计数
     ntags = tag_collection.count_documents({'tag': action})
-    ntags = 1
+    ntags = 5
     tag_acc = 0
 
     title = config['volt_collection'][6:] + "" + action + "_features"

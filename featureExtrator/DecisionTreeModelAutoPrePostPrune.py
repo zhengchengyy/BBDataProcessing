@@ -10,7 +10,8 @@ import pydotplus
 import os
 
 # 导入数据
-device_no = 1
+device_no = 2
+print("---------device_" + str(device_no) + "---------")
 feature_matrix = np.load('feature_matrixs/feature_matrix' + str(device_no) + '.npy')
 label_matrix = np.load('feature_matrixs/label_matrix' + str(device_no) + '.npy')
 # print(feature_matrix)
@@ -36,13 +37,106 @@ feature_names = gv.feature_names
 feature_names = [feature[:-6] for feature in feature_names]
 
 def model_json():
-    clf = DecisionTreeClassifier(random_state=0,
-                                 splitter='best',
-                                 min_samples_split=15,
-                                 min_samples_leaf=5,
-                                 max_leaf_nodes=98,
-                                 max_depth=33,
-                                 criterion='gini')
+    if (device_no == 1):
+        # 9动作2特征丢弃数据设备1
+        clf = DecisionTreeClassifier(random_state=0,
+                                     splitter='best',
+                                     min_samples_split=7,
+                                     min_samples_leaf=3,
+                                     max_leaf_nodes=98,
+                                     max_depth=26,
+                                     criterion='entropy',
+                                     )
+    elif (device_no == 2):
+        # 9动作2特征丢弃数据设备2
+        clf = DecisionTreeClassifier(random_state=0,
+                                     splitter='best',
+                                     min_samples_split=22,
+                                     min_samples_leaf=4,
+                                     max_leaf_nodes=99,
+                                     max_depth=23,
+                                     criterion='entropy',
+                                     )
+    elif (device_no == 3):
+        # 9动作2特征丢弃数据设备3
+        clf = DecisionTreeClassifier(random_state=0,
+                                     splitter='best',
+                                     min_samples_split=6,
+                                     min_samples_leaf=5,
+                                     max_leaf_nodes=98,
+                                     max_depth=43,
+                                     criterion='entropy',
+                                     )
+    elif (device_no == 4):
+        # 9动作2特征丢弃数据设备4
+        clf = DecisionTreeClassifier(random_state=0,
+                                     splitter='best',
+                                     min_samples_split=11,
+                                     min_samples_leaf=3,
+                                     max_leaf_nodes=98,
+                                     max_depth=37,
+                                     criterion='entropy',
+                                     )
+    elif (device_no == 5):
+        # 9动作2特征丢弃数据设备5
+        clf = DecisionTreeClassifier(random_state=0,
+                                     splitter='best',
+                                     min_samples_split=5,
+                                     min_samples_leaf=3,
+                                     max_leaf_nodes=95,
+                                     max_depth=43,
+                                     criterion='entropy',
+                                     )
+    # if (device_no == 1):
+    #     # 9动作2特征丢弃数据设备1
+    #     clf = DecisionTreeClassifier(random_state=0,
+    #                                  splitter='best',
+    #                                  min_samples_split=5,
+    #                                  min_samples_leaf=2,
+    #                                  max_leaf_nodes=78,
+    #                                  max_depth=11,
+    #                                  criterion='entropy',
+    #                                  )
+    # elif (device_no == 2):
+    #     # 9动作2特征丢弃数据设备2
+    #     clf = DecisionTreeClassifier(random_state=0,
+    #                                  splitter='best',
+    #                                  min_samples_split=8,
+    #                                  min_samples_leaf=2,
+    #                                  max_leaf_nodes=89,
+    #                                  max_depth=21,
+    #                                  criterion='entropy',
+    #                                  )
+    # elif (device_no == 3):
+    #     # 9动作2特征丢弃数据设备3
+    #     clf = DecisionTreeClassifier(random_state=0,
+    #                                  splitter='best',
+    #                                  min_samples_split=2,
+    #                                  min_samples_leaf=4,
+    #                                  max_leaf_nodes=80,
+    #                                  max_depth=26,
+    #                                  criterion='entropy',
+    #                                  )
+    # elif (device_no == 4):
+    #     # 9动作2特征丢弃数据设备4
+    #     clf = DecisionTreeClassifier(random_state=0,
+    #                                  splitter='best',
+    #                                  min_samples_split=3,
+    #                                  min_samples_leaf=1,
+    #                                  max_leaf_nodes=88,
+    #                                  max_depth=9,
+    #                                  criterion='entropy',
+    #                                  )
+    # elif (device_no == 5):
+    #     # 9动作2特征丢弃数据设备5
+    #     clf = DecisionTreeClassifier(random_state=0,
+    #                                  splitter='best',
+    #                                  min_samples_split=9,
+    #                                  min_samples_leaf=1,
+    #                                  max_leaf_nodes=98,
+    #                                  max_depth=34,
+    #                                  criterion='entropy',
+    #                                  )
     # 9动作2特征
     # clf = DecisionTreeClassifier(random_state=0,
     #                              max_depth=11,
@@ -93,7 +187,7 @@ def binaryTreePaths(model, root, feature_names, action_names):
     ]
     if root == _tree.TREE_UNDEFINED:
         return []
-    res, stack = [], [(root, "")]
+    rule_list, stack = [], [(root, "")]
     node_num = 0
     while stack:
         node, ls = stack.pop()
@@ -104,13 +198,16 @@ def binaryTreePaths(model, root, feature_names, action_names):
         name = feature_name[node]
         if left == _tree.TREE_LEAF and right == _tree.TREE_LEAF:
             idx = np.argmax(tree_.value[node])
-            result = " THEN action = " + action_names[idx]
-            res.append("IF " + ls + val + result)
+            value = tree_.value[node]
+            action_proba = value[0][idx] / sum(value[0])
+            # result = " THEN action = " + action_names[idx] + ", action_proba = " + str(action_proba)
+            result = " THEN action_num = " + str(idx) + ", action_proba = " + str(action_proba)
+            rule_list.append("IF " + ls + val + result)
         if right != _tree.TREE_LEAF:
             stack.append((right, ls + name + " > " + val + " AND "))
         if left != _tree.TREE_LEAF:
             stack.append((left, ls + name + " <= " + val + " AND "))
-    return res, node_num
+    return rule_list, node_num
 
 
 def rules(clf, features, labels, node_index=0):
@@ -419,6 +516,12 @@ def CCP_validation(TreeSets, alpha_list, X_test, y_test, feature_names, class_na
         # print("Current_tree's node num = ", current_tree.node_count)
         # print("Current_tree's leaf num = ", leaf_num)
 
+        # 保存模型
+        import pickle
+        feature_num = feature_matrix.shape[1]
+        with open('models/' + 'device_' + str(device_no) + '_post_prune.pickle', 'wb') as f:
+            pickle.dump(best_sklearn_model, f)
+
         # 提取后剪枝后的规则
         res, node_num = binaryTreePaths(best_sklearn_model, 0, feature_names, class_names)
         print("剪枝后节点总数：", node_num)
@@ -460,13 +563,14 @@ def CCP_top(prune=True, b_SE=True):
                                                          class_names,
                                                          copy.deepcopy(clf),
                                                          b_SE)
+        print("train_unpruned_precision=", train_unpruned_precision)
+        print("unpruned_precision=", unpruned_precision)
+
         # print("Best_tree=", Best_tree)
         print("best_alpha=", best_alpha)
         print("train_pruned_precision=", train_pruned_precision)
         print("pruned_precision=", pruned_precision)
 
-        print("train_unpruned_precision=", train_unpruned_precision)
-        print("unpruned_precision=", unpruned_precision)
         return Best_tree, best_alpha, pruned_precision, unpruned_precision
 
 

@@ -102,7 +102,7 @@ def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=270
 
     # ntags表示总标签数，即人数；tag_acc表示累加计数
     ntags = tag_collection.count_documents({'tag': action})
-    ntags = 12
+    # ntags = 1
     tag_acc = 0
 
     title = config['volt_collection'][6:] + "" + action + "_features"
@@ -132,18 +132,14 @@ def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=270
         tag_acc += 1
         if (tag_acc > ntags):
             break
-        # 有些数据丢失需要删除
         # if(tag_acc in discard[action]):
-        # if (tag_acc == 9 or tag_acc == 11):
-
+        # if(tag_acc == 9 or tag_acc == 11):  #don't discard data
         if (tag_acc == 9 or (tag_acc == 11 and action != "hands_move")):
-        # if(tag_acc == 9 or (tag_acc == 11 and action == "legs_tremble") or
-        #     (tag_acc == 12 and action != "legs_tremble")):
             continue
         print("people_" + str(tag_acc))
         # inittime, termtime
         inittime, termtime = tag['inittime'], tag['termtime']
-        # inittime, termtime = tag['termtime'] - 31, tag['termtime']
+        # inittime, termtime = tag['termtime'] - 30, tag['termtime']
 
         # get the arrays according to which we will plot later
         times, volts, filter_volts = {}, {}, {}
@@ -152,12 +148,18 @@ def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=270
             volts[i] = []
             filter_volts[i] = []
 
+        amplitude_factor = 1 # 表示缩减amplitude_factor倍
+        sampling_factor = 2  # 表示sampling_factor个数据只下采样一个数据
+        sampling_counter = sampling_factor  # 初始采样计数
         for volt in volt_collection.find({'time': {'$gt': inittime, '$lt': termtime}}):
-            device_no = int(volt['device_no'])
-            v = volt['voltage']
-            t = volt['time']
-            times[device_no].append(t)
-            volts[device_no].append(v)
+            if (sampling_counter % sampling_factor == 0):
+                device_no = int(volt['device_no'])
+                v = volt['voltage'] / amplitude_factor
+                time = volt['time']
+                times[device_no].append(time)
+                volts[device_no].append(v)
+                sampling_counter = 1
+            sampling_counter += 1
 
         for i in range(1, ndevices + 1):
             filter_volts[i] = volts[i]

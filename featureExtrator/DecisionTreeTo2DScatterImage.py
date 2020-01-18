@@ -9,14 +9,14 @@ feature_names = gv.feature_names
 feature_names = [feature[:-6] for feature in feature_names]
 
 # 导入数据
-device_no = 5
+device_no = 1
 feature_matrix = np.load('feature_matrixs/feature_matrix'+str(device_no)+'.npy')
 label_matrix = np.load('feature_matrixs/label_matrix'+str(device_no)+'.npy')
 
 # 定义训练集和测试集
 from sklearn.model_selection import train_test_split
 X_train, X_test, y_train, y_test = train_test_split(
-    feature_matrix, label_matrix, test_size=0.25, random_state=0)
+    feature_matrix, label_matrix, test_size=0.2, random_state=0)
 
 # 画二维散点图
 import matplotlib.pyplot as plt
@@ -27,8 +27,10 @@ from sklearn import preprocessing
 from sklearn.manifold import TSNE
 
 # 如果超过二维则降维到二维数据
-# x_reduced = PCA(n_components=2).fit_transform(X_train)
-# x_reduced = TSNE(n_components=2).fit_transform(X_train)
+if(X_train.shape[1] > 2):
+    # x_reduced = PCA(n_components=3).fit_transform(X_train)
+    X_train = PCA(n_components=3).fit_transform(X_train)
+    # x_reduced = TSNE(n_components=3).fit_transform(X_train)
 
 # 数据旋转
 # import math
@@ -65,6 +67,8 @@ for i in range(n_classes):
     idx = np.where(y_train == i)  # 返回满足条件的索引
     plt.scatter(X_train[idx, 0], X_train[idx, 1], s=30,
                 c=plot_colors[i], label=action_names[i], marker=plot_markers[i])
+    # plt.scatter(x_reduced[idx, 0], x_reduced[idx, 1], s=30,
+    #             c=plot_colors[i], label=action_names[i], marker=plot_markers[i])
 plt.legend(loc='upper right')
 plt.xlabel(feature_names[0])
 plt.ylabel(feature_names[1])
@@ -81,7 +85,7 @@ for i in range(n_classes):
 plt.legend(loc='upper right')
 plt.xlabel(feature_names[0])
 plt.ylabel(feature_names[1])
-plt.show()
+# plt.show()
 
 # 使用seaborn库画散点图
 # import seaborn as sns

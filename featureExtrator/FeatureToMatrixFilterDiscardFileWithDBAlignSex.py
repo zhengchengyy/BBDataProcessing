@@ -127,6 +127,9 @@ def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=270
                "hands_rising":[4,5,7,8,9],"kick":[2,4,5,6,7,8,9,11,12]
                }
 
+    male = []
+    female = []
+
     # read the data that is of a certain action one by one
     for tag in tag_collection.find({'tag': action}):
         tag_acc += 1

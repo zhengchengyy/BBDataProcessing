@@ -27,17 +27,11 @@ label_matrix = label_binarize(label_matrix, classes=range(n_classes))
 
 # 随机化和划分训练集和测试集
 X_train, X_test, y_train, y_test = train_test_split(
-    feature_matrix, label_matrix, test_size=0.25, random_state=0)
+    feature_matrix, label_matrix, test_size=0.2, random_state=0)
 
 # 使用决策树训练
 clf = DecisionTreeClassifier(random_state=0,
-                                 max_depth=45,
-                                 max_leaf_nodes=72,
-                                 min_impurity_decrease=0.0013,
-                                 min_samples_leaf=2,
-                                 min_samples_split=6,
-                                 splitter='best',
-                                 criterion='entropy')
+                             criterion='entropy')
 # clf = DecisionTreeClassifier(random_state=0,
 #                              max_depth=13,
 #                              max_leaf_nodes=24,
@@ -52,7 +46,8 @@ test_score = clf.score(X_test, y_test)
 print('device_' + str(device_no) + '\'s train score:', train_score, round(train_score,3))
 print('device_' + str(device_no) +'\'s test score:', test_score, round(test_score,3))
 
-y_score = clf.predict(X_test)
+y_score = clf.predict(X_test) #shape=(566,9)
+# y_score2 = clf.predict_proba(X_test) #shape=(9,566,2)
 
 # 计算每一类的ROC
 fpr = dict()
@@ -63,7 +58,7 @@ for i in range(n_classes):
     roc_auc[i] = auc(fpr[i], tpr[i])
 
 # Compute micro-average ROC curve and ROC area（方法二）
-fpr["micro"], tpr["micro"], _ = roc_curve(y_test.ravel(), y_score.ravel())
+fpr["micro"], tpr["micro"], thresholds = roc_curve(y_test.ravel(), y_score.ravel())
 roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
 
 # Compute macro-average ROC curve and ROC area（方法一）

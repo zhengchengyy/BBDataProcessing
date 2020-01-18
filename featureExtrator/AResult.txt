@@ -1,13 +1,13 @@
  1: for i in range(len(feature_names)):
  2:     feature_importances.append([])
- 3: for i in range(train_time):
- 4:     model = DecisionTreeClassifier()
- 5:     model.fit(X_train, y_train)
- 6:     temp = model.feature_importances_
+ 3: for i in range(train_times):
+ 4:     model = DecisionTreeClassifier() //select decision tree model
+ 5:     model.fit(X_train, y_train)  //begin to train
+ 6:     temp = model.feature_importances_  //get feature importances from model
  7:     for j in range(len(temp)):
  8:         feature_importances[j].append(temp[j])
  9: for i in range(len(feature_importances)):
 10:     importances = feature_importances[i]
-11:     if(np.median(importances) > importance_thread):
-12:         extract_feature_names.append(feature_names[i])
-13: return extract_feature_names
+11:     if np.median(importances) > importance_threshold :
+12:         select_feature_names.append(feature_names[i])
+13: return select_feature_names

@@ -131,7 +131,8 @@ def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=270
         if (tag_acc > ntags):
             break
         # if(tag_acc in discard[action]):
-        if (tag_acc == 9 or tag_acc == 11):  # don't discard data
+        # if (tag_acc == 9 or tag_acc == 11):
+        if (tag_acc == 9 or (tag_acc == 11 and action != "hands_move")):
             continue
         print("people_" + str(tag_acc))
         # inittime, termtime
@@ -158,7 +159,7 @@ def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=270
             filter_volts[i] = cwt_filter(volts[i], 0.08)
 
             # 低通滤波器滤波
-            # b, a = signal.butter(8, 3 / 7, 'lowpass')  # 配置滤波器，8表示滤波器的阶数
+            # b, a = signal.butter(8, 4 / 7, 'lowpass')  # 配置滤波器，8表示滤波器的阶数
             # filter_volts[i] = signal.filtfilt(b, a, filter_volts[i])
 
             # 傅里叶变换滤波，使用后动作识别准确率反而降低

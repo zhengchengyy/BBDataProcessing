@@ -18,7 +18,7 @@ color_list = ['r', 'm', 'c', 'b', 'g', 'lime', 'y', 'peru', 'navy', 'orange', 'd
 importance_threshold = 0.2
 
 # ————导入数据————
-device_no = 5
+device_no = 4
 feature_matrix = np.load('feature_matrixs/feature_matrix'+str(device_no)+'.npy')
 label_matrix = np.load('feature_matrixs/label_matrix'+str(device_no)+'.npy')
 
@@ -49,7 +49,7 @@ for i in range(100):
 
 # 画出盒图
 fig = plt.figure('device'+str(device_no)+'_feature_importance')
-bplt = plt.boxplot(feature_importances, notch=False, sym='o', vert=True, patch_artist=True)
+bplt = plt.boxplot(feature_importances, notch=False, sym='.', vert=True, patch_artist=True)
 plt.axhline(y=importance_threshold, ls=":", color='r')
 plt.xticks([x+1 for x in range(len(feature_names))], feature_names)
 plt.xlabel('Features')  # x轴标题
