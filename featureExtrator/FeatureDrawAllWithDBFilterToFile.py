@@ -19,7 +19,11 @@ config = {'action': action[1],
           'volt_collection': 'volts_424',
           'offset': 0}
 
-config = {'action': "turn_over",
+# 导入全局变量
+import GlobalVariable as gv
+action = gv.action_names
+
+config = {'action': action,
           'db': 'beaglebone',
           'tag_collection': 'tags_1105',
           'volt_collection': 'volts_1105',
@@ -27,10 +31,14 @@ config = {'action': "turn_over",
           'offset': 0
           }
 
+ndevices = 5
+start = 1
+end = ndevices
 
 # feature_names = ["RangeModule", "EnergyModule", "RMSModule", "FDEModule","SamplingFreqModule"]
 # feature_names = ["SamplingFreqModule", "ThresholdCounterModule"]
-feature_names = ["MeanModule", "SDModule"]
+# feature_names = ["MeanModule", "SDModule"]
+feature_names = ["RangeModule", "MeanModule", "SDModule", "EnergyModule", "FDEModule", "RMSModule"]
 
 
 def timeToFormat(t):
@@ -78,8 +86,7 @@ def getNormalization(li):
     return temp
 
 
-def draw_features_from_db(action, db, volt_collection, tag_collection, port=27017,
-                          host='localhost', ndevices=5, offset=0):
+def draw_features_from_db(action, db, volt_collection, tag_collection, port=27017, host='localhost', ndevices=3, offset=0):
     client = MongoClient(port=port, host=host)
     database = client[db]
     tag_collection = database[tag_collection]
@@ -120,7 +127,8 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
         tag_acc += 1
         if(tag_acc > ntags):
             break
-        inittime, termtime = tag['inittime'], tag['termtime']
+        # inittime, termtime = tag['inittime'], tag['termtime']
+        inittime, termtime = tag['termtime'] - 31, tag['termtime']
 
         # get the arrays according to which we will plot later
         times, volts, filter_volts = {}, {}, {}
@@ -137,7 +145,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
             volts[device_no].append(v)
 
         # 滤波
-        for i in range(1, ndevices + 1):
+        for i in range(start, end + 1):
             # 小波变换滤波
             filter_volts[i] = cwt_filter(volts[i], 0.08)
 
@@ -149,16 +157,12 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
 
         # 定义存储时间、特征列表
         feature_times, feature_values = {}, {}
-        for i in range(1, ndevices + 1):
+        for i in range(start, end + 1):
             feature_times[i] = []
             from collections import defaultdict
             feature_values[i] = defaultdict(list)
             for feature in feature_names:
                 feature_values[i][feature[:-6]] = []
-
-        # 提取第几个设备的特征
-        start = 1
-        end = ndevices
 
         # 对每个采集设备进行特征提取 ndevices
         for i in range(start, end + 1):
@@ -232,11 +236,10 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
             xticks = []
             xticklabels = []
             length = len(feature_times[i])
-            step = length // 5 - 1
+            step = 2
             for k in range(0, length, step):
                 xticks.append(feature_times[i][k])
                 # xticklabels.append(timeToSecond(feature_times[i][k] + offset))
-
                 xticklabels.append(int(feature_times[i][k] - inittime))  # 图中的开始时间表示时间间隔interval
             # 设定标签的实际数字，数据类型必须和原数据一致
             ax.set_xticks(xticks)
@@ -247,9 +250,14 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
             ax.grid(linestyle=':')
             # ax.grid(True, which='both')
 
+    figure = plt.gcf()  # get current figure
+    figure.set_size_inches(20, 10)
+    plt.savefig("feature_images/" + title + ".png", dpi=200)
+    plt.close()
+
     # 最大化显示图像窗口
     # plt.get_current_fig_manager().window.state('zoomed')
-    plt.show()
+    # plt.show()
 
 
 if __name__ == '__main__':

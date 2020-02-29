@@ -58,10 +58,6 @@ def drawROC(device_no):
         fpr[i], tpr[i], _ = roc_curve(y_test[:, i], y_score[:, i])
         roc_auc[i] = auc(fpr[i], tpr[i])
 
-    # Compute micro-average ROC curve and ROC area（方法二）
-    fpr["micro"], tpr["micro"], _ = roc_curve(y_test.ravel(), y_score.ravel())
-    roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
-
     # Compute macro-average ROC curve and ROC area（方法一）
     # First aggregate all false positive rates
     all_fpr = np.unique(np.concatenate([fpr[i] for i in range(n_classes)]))
@@ -75,19 +71,23 @@ def drawROC(device_no):
     tpr["macro"] = mean_tpr
     roc_auc["macro"] = auc(fpr["macro"], tpr["macro"])
 
+    # Compute micro-average ROC curve and ROC area（方法二）
+    fpr["micro"], tpr["micro"], _ = roc_curve(y_test.ravel(), y_score.ravel())
+    roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
+
     # Plot all ROC curves
     lw = 1.5  # the width of line
     title = "ROC" + "_device_" + str(device_no)
     plt.figure(title)
-    plt.plot(fpr["micro"], tpr["micro"],
-             label='micro-average ROC curve (AUC = {0:0.3f})'
-                   ''.format(roc_auc["micro"]),
-             color='deeppink', linestyle=':', linewidth=4)
-
     plt.plot(fpr["macro"], tpr["macro"],
              label='macro-average ROC curve (AUC = {0:0.3f})'
                    ''.format(roc_auc["macro"]),
              color='navy', linestyle=':', linewidth=4)
+
+    plt.plot(fpr["micro"], tpr["micro"],
+             label='micro-average ROC curve (AUC = {0:0.3f})'
+                   ''.format(roc_auc["micro"]),
+             color='deeppink', linestyle=':', linewidth=4)
 
     # colors = cycle(['aqua', 'darkorange', 'cornflowerblue'])
     plot_colors = ['r', 'm', 'c', 'b', 'g', 'lime', 'y', 'peru', 'navy', 'orange']

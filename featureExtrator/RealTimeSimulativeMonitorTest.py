@@ -1,3 +1,4 @@
+# 实时准确率为什么很多人的动作为0
 from feature_modules import *
 from feature_extractor import FeatureExtractor
 import time
@@ -11,15 +12,11 @@ from matplotlib import style
 import numpy as np
 import os
 
-from scipy import signal
-
 config = {'db': 'beaglebone',
           'tag_collection': 'tags_411',
           'volt_collection': 'volts_411',
-          'device_num': 3,
-          'offset': 0,
-          'interval': 1,
-          'rate': 1}
+          'offset': 0}
+
 config = {'db': 'beaglebone',
           'tag_collection': 'tags_1105',
           'volt_collection': 'volts_1105',
@@ -27,6 +24,7 @@ config = {'db': 'beaglebone',
           'offset': 0,
           'interval': 2,
           'rate': 1}
+
 
 # 导入全局变量
 import GlobalVariable as gv
@@ -44,7 +42,7 @@ def getNormalization(li):
     return temp
 
 
-# 使用小波变换滤波
+# 使用小波滤波
 def cwt_filter(data, threshold):
     w = pywt.Wavelet('db8')  # 选用Daubechies8小波
     maxlev = pywt.dwt_max_level(len(data), w.dec_len)
@@ -73,13 +71,6 @@ def fft_filter(data, sampling_frequency, threshold_frequency):
 def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=27017,
                           host='localhost', ndevices=3, offset=0, action_num=0,
                           interval = 2, rate = 1):
-    # 根据时间采集数据，基本单位为s，比如1s、10s、30s、60s
-    # interval表示每次分析的时间跨度，rate表示间隔多长时间进行一次分析
-    # print(interval,rate)
-    # 针对不同动作,设置不同时间窗口
-    # if(action == "turn_over"):
-    #     interval = 2
-    #     rate = 1
     client = MongoClient(port=port, host=host)
     database = client[db]
     tag_collection = database[tag_collection]
@@ -92,9 +83,6 @@ def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=270
         print(e.message)
 
     ntags = tag_collection.count_documents({'tag': action})
-    # 提取第几个设备的特征
-    start = 1
-    end = ndevices
 
     # 定义特征提取器
     extractor = FeatureExtractor()
@@ -116,9 +104,18 @@ def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=270
         print("people_" + str(tag_acc))
         inittime, termtime = tag['inittime'], tag['termtime']
 
+        # 提取第几个设备的特征
+        start = 1
+        end = ndevices
+
+        # 定义总特征计数
+        feature_acc = 0
+        # 定义准确率计数
+        accuracy_acc = 0
+
         # get the arrays according to which we will plot later
         times, volts, filter_volts, normalize_volts = {}, {}, {}, {}
-        for i in range(start, ndevices + 1):
+        for i in range(start, end + 1):
             times[i] = []
             volts[i] = []
             filter_volts[i] = []
@@ -131,9 +128,7 @@ def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=270
             times[device_no].append(t)
             volts[device_no].append(v)
 
-
-        filter_thread = [0.2, 0.06, 0.08]
-        for i in range(start, end + 1):
+        for i in range(1, ndevices + 1):
             filter_volts[i] = volts[i]
             # 小波变换滤波
             filter_volts[i] = cwt_filter(volts[i], 0.08)
@@ -141,16 +136,8 @@ def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=270
             # 傅里叶变换滤波
             # filter_volts[i] = fft_filter(filter_volts[i], 1 / 70, 15)
 
-            # 低通滤波器滤波
-            # b, a = signal.butter(8, 3 / 7, 'lowpass')  # 配置滤波器，8表示滤波器的阶数
-            # filter_volts[i] = signal.filtfilt(b, a, filter_volts[i])
-
-            # 移动平均滤波，参数可选：full, valid, same
-            # filter_volts[i] = np_move_avg(filter_volts[i], 5, mode="same")
-
             # 归一化数据
             normalize_volts[i] = getNormalization(filter_volts[i])
-
 
         # 定义存储时间、特征列表
         feature_times, feature_values = {}, {}
@@ -161,9 +148,13 @@ def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=270
             for feature in feature_names:
                 feature_values[i][feature[:-6]] = []
 
-
-        # 对每个采集设备进行特征提取
+        # 对每个采集设备进行特征提取 ndevices
         for i in range(start, end + 1):
+            import pickle
+            with open('models/' + 'device_' + str(i) + '_model.pickle', 'rb') as f:
+                model = pickle.load(f)
+
+            result = []
             for j in range(len(normalize_volts[i])):
                 value = {
                     "time": times[i][j],
@@ -171,6 +162,7 @@ def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=270
                 }
                 output = extractor.process(value)
                 if (output):
+                    feature_acc += 1
                     features = {
                         "device_no": i,
                         "feature_time": times[i][j],
@@ -178,86 +170,42 @@ def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=270
                         "interval": interval,
                         "rate": rate
                     }
-                    feature_times[i].append(features['feature_time'])
+                    feature_temp = []  #存储实时计算的一条特征数据
                     for feature_type in feature_values[i].keys():
-                        feature_values[i][feature_type].append(features['feature_value'][feature_type])
+                        # print(feature_type, features['feature_value'][feature_type])
+                        feature_temp.append(features['feature_value'][feature_type])
 
+                    # print(feature_temp)
+
+                    # feature_app = []
+                    # for f in feature_temp:
+                    #     feature_app.append(round(f, 8))
+                    # print(feature_app)
+
+                    predict_result = model.predict([feature_temp])
+                    predict_proba = model.predict_proba([feature_temp])
+                    print(predict_result, predict_proba)
+                    result.append(predict_result)
+                    format_result = "person" + str(tag_acc) + " " + "device_" + str(i)
+                    # print(format_result, action_names[predict_result[0]])
+                    if(predict_result[0]==action_num):
+                        accuracy_acc += 1
+            # print(result)
             # 清理所有模块，防止过期数据
             extractor.clear()
-        extractor.clear()
 
-        # 定义特征数量
-        nfeatures = len(feature_values[1])
-
-        # 定义特征类型
-        feature_type = list(feature_values[1].keys())  # keys()方法虽然返回的是列表，但是不可以索引
-
-        for i in range(start, end + 1):
-
-            # 如果文件存在，则以添加的方式打开
-            if (os.path.exists("feature_matrixs/feature_matrix" + str(i) + ".npy")):
-                feature_matrix = np.load("feature_matrixs/feature_matrix" + str(i) + ".npy")
-                label_matrix = np.load("feature_matrixs/label_matrix" + str(i) + ".npy")
-                temp_matrix = np.zeros((len(feature_times[i]), nfeatures), dtype=float)
-
-                os.remove("feature_matrixs/feature_matrix" + str(i) + ".npy")
-                os.remove("feature_matrixs/label_matrix" + str(i) + ".npy")
-
-                for j in range(len(feature_times[i])):
-                    for k in range(nfeatures):
-                        temp_matrix[j][k] = feature_values[i][feature_type[k]][j]
-                    label_matrix = np.append(label_matrix, [action_num])
-
-                # np.append(feature_matrixs, [temp_matrix], axis=0)
-                feature_matrix = np.insert(feature_matrix, feature_matrix.shape[0],
-                                           values=temp_matrix, axis=0)
-
-                np.save('feature_matrixs/feature_matrix' + str(i), feature_matrix)
-                np.save('feature_matrixs/label_matrix' + str(i), label_matrix)
-                np.set_printoptions(suppress=True)
-                np.savetxt('feature_matrixs/feature_matrix' + str(device_no) + '.txt', feature_matrix,
-                           fmt="%.18f,%.18f")
-
-                print("feature_matrix" + str(i) + ":" + str(feature_matrix.shape))
-
-
-            # 如果文件不存在，则定义特征矩阵和标签矩阵
-            else:
-                feature_matrix = np.zeros((len(feature_times[i]), nfeatures), dtype=float)
-                label_matrix = np.zeros((len(feature_times[i]), 1), dtype=int)
-
-                for j in range(len(feature_times[i])):
-                    for k in range(nfeatures):
-                        feature_matrix[j][k] = feature_values[i][feature_type[k]][j]
-                    label_matrix[j] = action_num
-                # np.save保存时自动为8位小数
-                np.save('feature_matrixs/feature_matrix' + str(i), feature_matrix)
-                np.save('feature_matrixs/label_matrix' + str(i), label_matrix)
-
-                np.set_printoptions(suppress=True)
-                np.savetxt('feature_matrixs/feature_matrix' + str(device_no) + '.txt', feature_matrix,
-                           fmt="%.18f,%.18f")
-
-                print("feature_matrix" + str(i) + ":" + str(feature_matrix.shape))
+        print("action:", action_names[action_num])
+        print("person" + str(tag_acc) + "的准确率：", accuracy_acc/feature_acc)
 
 
 if __name__ == '__main__':
-    # 清除文件
-    start = 1
-    end = config['device_num']
-    for i in range(start, end + 1):
-        if (os.path.exists("feature_matrixs/feature_matrix" + str(i) + ".npy")):
-            os.remove("feature_matrixs/feature_matrix" + str(i) + ".npy")
-            os.remove("feature_matrixs/label_matrix" + str(i) + ".npy")
-
     for i in range(len(action_names)):
-        print("---------" + action_names[i] + "---------")
         feature_to_matrix_file(action=action_names[i],
-                               db=config['db'],
-                               tag_collection=config['tag_collection'],
-                               volt_collection=config['volt_collection'],
-                               ndevices=config['device_num'],
-                               offset=config['offset'],
-                               action_num=i,
-                               interval=config['interval'],
-                               rate=config['rate'])
+                           db=config['db'],
+                           tag_collection=config['tag_collection'],
+                           volt_collection=config['volt_collection'],
+                           ndevices=config['device_num'],
+                           offset=config['offset'],
+                           action_num=i,
+                           interval=config['interval'],
+                           rate=config['rate'])

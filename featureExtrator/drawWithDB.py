@@ -21,8 +21,8 @@ config = {'action': action[1],
           'offset': 0
           }
 
-
-config = {'action': "turn_over",
+action = "zheng"
+config = {'action': action,
           'db': 'beaglebone',
           'tag_collection': 'tags_1105',
           'volt_collection': 'volts_1105',
@@ -55,7 +55,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
 
     # ntags表示总标签数，即人数；tag_acc表示累加计数
     ntags = tag_collection.count_documents({'tag': action})
-    # ntags = 11
+    ntags = 1
     tag_acc = 0
 
     # 查看第几号设备
@@ -103,7 +103,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         ax.set_xlim(inittime, termtime)
 
         # 自定义y轴的区间范围，可以使图放大或者缩小
-        # ax.set_ylim([0.8,1.8])
+        ax.set_ylim([0,1])
         # ax.set_ylim([0.75, 0.90])
         # ax.set_ylim([0.82, 0.83])
         ax.set_ylabel('Voltage(mv)')
@@ -122,13 +122,13 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         xticks = []
         xticklabels = []
         length = len(times[1])
-        interval = length // 15 - 1
+        interval = length // 30 - 1
         for i in range(0, length, interval):
             xticks.append(times[1][i])
-            # xticklabels.append(timeToSecond(times[1][i] + offset))
-            xticklabels.append(int(times[1][i] - inittime))  # 图中的开始时间表示时间间隔interval
+            xticklabels.append(timeToSecond(times[1][i] + offset))
+            # xticklabels.append(int(times[1][i] - inittime))  # 图中的开始时间表示时间间隔interval
         ax.set_xticks(xticks)  # 设定标签的实际数字，数据类型必须和原数据一致
-        ax.set_xticklabels(xticklabels, rotation=15)  # 设定我们希望它显示的结果，xticks和xticklabels的元素一一对应
+        ax.set_xticklabels(xticklabels, rotation=70)  # 设定我们希望它显示的结果，xticks和xticklabels的元素一一对应
 
     # 最大化显示图像窗口
     # plt.get_current_fig_manager().window.state('zoomed')

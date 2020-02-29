@@ -17,6 +17,12 @@ config = {'db': 'beaglebone',
           'device_num': 3,
           'offset': 0}
 
+config = {'db': 'beaglebone',
+          'tag_collection': 'tags_1105',
+          'volt_collection': 'volts_1105',
+          'device_num': 5,
+          'offset': 0}
+
 
 # 导入全局变量
 import GlobalVariable as gv
@@ -54,7 +60,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
 
     # 根据时间采集数据，基本单位为s，比如1s、10s、30s、60s
     # interval表示每次分析的时间跨度，rate表示间隔多长时间进行一次分析
-    interval = 1
+    interval = 2
     rate = 1
     fig.suptitle(action + " (" + "interval:" + str(interval) + "s, " + "stepsize:" + str(rate) + "s)")
 
@@ -176,7 +182,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
 if __name__ == '__main__':
     # 清除文件
     start = 1
-    for i in range(start, 3 + 1):
+    for i in range(start, 5 + 1):
         if (os.path.exists("feature_matrixs/feature_matrix" + str(i) + ".npy")):
             os.remove("feature_matrixs/feature_matrix" + str(i) + ".npy")
             os.remove("feature_matrixs/label_matrix" + str(i) + ".npy")

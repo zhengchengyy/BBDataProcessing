@@ -121,7 +121,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
     plt.close()
 
     # 最大化显示图像窗口
-    # plt.get_current_fig_manager().window.showMaximized()
+    # plt.get_current_fig_manager().window.state('zoomed')
     # plt.show()
 
 

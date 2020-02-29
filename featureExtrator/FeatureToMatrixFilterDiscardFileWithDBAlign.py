@@ -301,7 +301,7 @@ def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=270
                                 # feature_matrix[j][k] = 0
                             label_matrix[j] = action_num
 
-                # np.save保存时自动为8位小数
+                # np.save保存时自动为8位小数，但是通过np.savetxt存成文本后又不丢失多余小数位
                 np.save('feature_matrixs/feature_matrix' + str(i), feature_matrix)
                 np.save('feature_matrixs/label_matrix' + str(i), label_matrix)
 

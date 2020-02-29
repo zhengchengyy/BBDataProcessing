@@ -39,11 +39,12 @@ print(metrics.confusion_matrix(y_test, y_pred))
 
 print("查准率:", metrics.accuracy_score(y_test, y_pred))
 print("宏精确率:", metrics.precision_score(y_test, y_pred, average='macro'))
-print("宏召回率:", metrics.recall_score(y_test, y_pred, average='macro'))
-print("宏F1_score:", metrics.f1_score(y_test, y_pred, average='macro'))
-
 print("微精确率:", metrics.precision_score(y_test, y_pred, average='micro'))
+
+print("宏召回率:", metrics.recall_score(y_test, y_pred, average='macro'))
 print("微召回率:", metrics.recall_score(y_test, y_pred, average='micro'))
+
+print("宏F1_score:", metrics.f1_score(y_test, y_pred, average='macro'))
 print("微F1_score:", metrics.f1_score(y_test, y_pred, average='micro'))
 
 print("kappa:", metrics.cohen_kappa_score(y_test, y_pred))

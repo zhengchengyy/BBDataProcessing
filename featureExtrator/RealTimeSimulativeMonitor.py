@@ -29,6 +29,7 @@ config = {'db': 'beaglebone',
 # 导入全局变量
 import GlobalVariable as gv
 action_names = gv.action_names
+action_names_copy = action_names
 feature_names = gv.feature_names
 
 
@@ -78,9 +79,9 @@ def fft_filter(data, sampling_frequency, threshold_frequency):
     return abs(filter_data)
 
 
-def draw_features_from_db(action, db, volt_collection, tag_collection, port=27017,
-                           host='localhost', ndevices=3, offset=0, action_num=0,
-                           interval=1, rate=1):
+def feature_to_matrix_file(action, db, volt_collection, tag_collection, port=27017,
+                          host='localhost', ndevices=3, offset=0, action_num=0,
+                          interval = 2, rate = 1):
     client = MongoClient(port=port, host=host)
     database = client[db]
     tag_collection = database[tag_collection]
@@ -92,6 +93,8 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
     except CollectionError as e:
         print(e.message)
 
+    ntags = tag_collection.count_documents({'tag': action})
+
     # 定义特征提取器
     extractor = FeatureExtractor()
 
@@ -101,40 +104,28 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
         # 注册特征提取模块
         extractor.register(module)
 
-    # ntags表示总标签数，即人数；tag_acc表示累加计数
-    ntags = tag_collection.count_documents({'tag': action})
-    # ntags = 1
+    # 定义画布左右位置的计数：标签累加，即人数累加
     tag_acc = 0
-
-    # 读取模型
-    start = 1
-    end = start
-    device_no = 1
-    import pickle
-    with open('models/' + 'device_' + str(device_no) + '_post_prune.pickle', 'rb') as f:
-        model = pickle.load(f)
 
     # read the data that is of a certain action one by one
     for tag in tag_collection.find({'tag': action}):
         tag_acc += 1
-        if (tag_acc > ntags):
+        if(tag_acc > 8):
             break
-        # if(tag_acc in discard[action]):
-        # if (tag_acc == 9 or tag_acc == 11):
-        if (tag_acc == 9 or (tag_acc == 11 and action != "hands_move")):
-            continue
+        print("people_" + str(tag_acc))
         inittime, termtime = tag['inittime'], tag['termtime']
-        # 定义总特征计数
-        feature_acc = 0
-        # 定义准确率计数
-        accuracy_acc = 0
+
+        # 提取第几个设备的特征
+        start = 1
+        end = ndevices
 
         # get the arrays according to which we will plot later
-        times, volts, filter_volts = {}, {}, {}
-        for i in range(1, ndevices + 1):
+        times, volts, filter_volts, normalize_volts = {}, {}, {}, {}
+        for i in range(start, end + 1):
             times[i] = []
             volts[i] = []
             filter_volts[i] = []
+            normalize_volts[i] = []
 
         for volt in volt_collection.find({'time': {'$gt': inittime, '$lt': termtime}}):
             device_no = int(volt['device_no'])
@@ -143,21 +134,16 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
             times[device_no].append(t)
             volts[device_no].append(v)
 
-        for i in range(start, end + 1):
+        for i in range(1, ndevices + 1):
             filter_volts[i] = volts[i]
             # 小波变换滤波
             filter_volts[i] = cwt_filter(volts[i], 0.08)
 
-            # 低通滤波器滤波
-            # b, a = signal.butter(8, 4 / 7, 'lowpass')  # 配置滤波器，8表示滤波器的阶数
-            # filter_volts[i] = signal.filtfilt(b, a, filter_volts[i])
+            # 傅里叶变换滤波
+            # filter_volts[i] = fft_filter(filter_volts[i], 1 / 70, 15)
 
-            # 傅里叶变换滤波，使用后动作识别准确率反而降低
-            # filter_volts[i] = fft_filter(filter_volts[i], 1 / 70, 25)  #滤波后准确率下降
-
-            # 除以体重，归一化数据
-            # filter_volts[i] = list(map(lambda x: x / weights[tag_acc - 1], filter_volts[i]))
-            filter_volts[i] = getNormalization(filter_volts[i])
+            # 归一化数据
+            normalize_volts[i] = getNormalization(filter_volts[i])
 
         # 定义存储时间、特征列表
         feature_times, feature_values = {}, {}
@@ -170,15 +156,18 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
 
         # 对每个采集设备进行特征提取 ndevices
         for i in range(start, end + 1):
+            import pickle
+            with open('models/' + 'device_' + str(i) + '_post_prune.pickle', 'rb') as f:
+                model = pickle.load(f)
+
             result = []
-            for j in range(len(filter_volts[i])):
+            for j in range(len(normalize_volts[i])):
                 value = {
                     "time": times[i][j],
-                    "volt": filter_volts[i][j]
+                    "volt": normalize_volts[i][j]
                 }
                 output = extractor.process(value)
                 if (output):
-                    feature_acc += 1
                     features = {
                         "device_no": i,
                         "feature_time": times[i][j],
@@ -191,27 +180,22 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
                         # print(feature_type, features['feature_value'][feature_type])
                         feature_temp.append(features['feature_value'][feature_type])
 
-                    print(feature_temp)
-
                     predict_result = model.predict([feature_temp])
-                    result.append(predict_result)
-                    format_result = "person" + str(tag_acc) + " " + "device_" + str(i)
-                    # print(format_result, action_names[predict_result[0]])
-                    if(predict_result[0]==action_num):
-                        accuracy_acc += 1
-            print(result)
+
+                    predict_proba = max(model.predict_proba([feature_temp])[0])
+                    print(timeToSecond(times[i][j]), action_names_copy[predict_result[0]],
+                          predict_proba)
+                    # print(action_names[predict_result], predict_proba)
+
+
             # 清理所有模块，防止过期数据
             extractor.clear()
 
-        print("action:", action_names[action_num])
-        print("person" + str(tag_acc) + "的准确率：", accuracy_acc/feature_acc)
-
 
 if __name__ == '__main__':
-
-    # for i in range(len(action_names)):
-    i = 0
-    draw_features_from_db(action=action_names[i],
+    action_names = ["zheng"]
+    for i in range(len(action_names)):
+        feature_to_matrix_file(action=action_names[i],
                            db=config['db'],
                            tag_collection=config['tag_collection'],
                            volt_collection=config['volt_collection'],

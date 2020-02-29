@@ -15,7 +15,7 @@ action = ["still", "turn_over", "legs_stretch", "hands_stretch",
 # 小动作：头部微小移动(head_move)、腿部微小移动(legs_move)、手部微小移动(hands_move)
 # 其它动作：手部抬起(hands_rising)、踢踹(kick)
 
-config = {'action': "head_move",
+config = {'action': "still",
           'db': 'beaglebone',
           'tag_collection': 'tags_1105',
           'volt_collection': 'volts_1105',
@@ -52,7 +52,7 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
     n = 1
 
     title = config['volt_collection'][6:] + "" + action
-    fig = plt.figure(title, figsize=(6, 8))
+    fig = plt.figure(title)
     fig.suptitle(action)
 
     # plot the data that is of a certain action one by one
@@ -61,7 +61,8 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         if(tag_acc > ntags):
             break
         # inittime
-        inittime, termtime = tag['inittime'] - offset, tag['termtime'] - offset
+        inittime, termtime = tag['inittime'] - offset, tag['inittime'] - offset + 30
+        # inittime, termtime = tag['inittime'] - offset - 30, tag['inittime'] - offset
         # get the arrays according to which we will plot later
         times, volts = {}, {}
         for i in range(1, ndevices + 1):
@@ -89,8 +90,8 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         # ax.set_ylim([0.8,1.8])
         # ax.set_ylim([0.75, 0.90])
         # ax.set_ylim([0.82, 0.92])  #三个设备时
-        ax.set_ylim([0.85, 1.04])  #五个设备时
-        ax.set_ylabel('Voltage(mv)')
+        ax.set_ylim([0.845, 1.025])  #五个设备时
+        ax.set_ylabel('Voltage(mV)')
 
         # 查看第几号设备
         start = 1
@@ -114,16 +115,17 @@ def plot_from_db(action, db, volt_collection, tag_collection, port=27017, host='
         xticks = []
         xticklabels = []
         length = len(times[1])
-        interval = length // 8 - 1
+        interval = length // 15
+        # interval = length // 7
         for i in range(0, length, interval):
-            xticks.append(times[1][i])
-            xticklabels.append(timeToSecond(times[1][i] + offset))
+                xticks.append(times[1][i])
+                xticklabels.append(timeToSecond(times[1][i] + offset))
+            # xticklabels.append(int(times[1][i] - inittime))  # 图中的开始时间表示时间间隔interval
         ax.set_xticks(xticks)  # 设定标签的实际数字，数据类型必须和原数据一致
-        ax.set_xticklabels(xticklabels, rotation=15)  # 设定我们希望它显示的结果，xticks和xticklabels的元素一一对应
-
+        ax.set_xticklabels(xticklabels, rotation=60)  # 设定我们希望它显示的结果，xticks和xticklabels的元素一一对应
 
     # 最大化显示图像窗口
-    plt.get_current_fig_manager().window.showMaximized()
+    # plt.get_current_fig_manager().window.state('zoomed')
     plt.show()
 
 

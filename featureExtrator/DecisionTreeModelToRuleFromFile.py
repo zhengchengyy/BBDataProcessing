@@ -77,9 +77,10 @@ def extractRule(device_no):
         print("R" + str(i + 1) + ":" + rule_list[i].replace("AND -2.0 ", ""))  # 过滤最后叶子节点的值
 
     # 把规则存入文件
-    file_write_obj = open("rules/rule" + 'device_' + str(device_no) + '_post_prune.png', 'w')
+    file_write_obj = open("rules/rule" + '_device_' + str(device_no) + '.txt', 'w')
     for i in range(len(rule_list)):
         file_write_obj.write("R" + str(i + 1) + ":" + rule_list[i].replace("AND -2.0 ", ""))
+        file_write_obj.write('\n')
         file_write_obj.write('\n')
 
     file_write_obj.close()
