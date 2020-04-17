@@ -2,7 +2,7 @@ from sklearn.tree import DecisionTreeClassifier
 import numpy as np
 
 # 导入数据
-device_no = 5
+device_no = 1
 feature_matrix = np.load('feature_matrixs/feature_matrix' + str(device_no) + '.npy')
 label_matrix = np.load('feature_matrixs/label_matrix' + str(device_no) + '.npy')
 
@@ -31,13 +31,18 @@ print("test score:", test_score)
 # 模型评估
 from sklearn import metrics
 y_pred = model.predict(X_test)
-print(metrics.classification_report(y_test,y_pred))
+# 微平均值：micro average，所有数据结果的平均值
+# 宏平均值：macro average，所有标签结果的平均值
+# 加权平均值：weighted average，所有标签结果的加权平均值
+print(metrics.classification_report(y_test, y_pred, digits=4, target_names=action_names))
 # print(metrics.balanced_accuracy_score(y_test,y_pred))  # 数据不平衡情况下
 #法二：通过混淆矩阵验证（横轴：实际值，纵轴：预测值）（理想情况下是个对角阵）
-print("混淆矩阵：")
-print(metrics.confusion_matrix(y_test, y_pred))
+matrix = metrics.confusion_matrix(y_test, y_pred)
+print("混淆矩阵：\n", matrix)
+accuracy_everyclass = matrix.diagonal()/matrix.sum(axis=1)
+print("每一类的准确率:", accuracy_everyclass)
 
-print("查准率:", metrics.accuracy_score(y_test, y_pred))
+print("准确率:", metrics.accuracy_score(y_test, y_pred))
 print("宏精确率:", metrics.precision_score(y_test, y_pred, average='macro'))
 print("微精确率:", metrics.precision_score(y_test, y_pred, average='micro'))
 

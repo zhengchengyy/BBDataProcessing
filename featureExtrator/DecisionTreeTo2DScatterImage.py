@@ -85,7 +85,7 @@ for i in range(n_classes):
 plt.legend(loc='upper right')
 plt.xlabel(feature_names[0])
 plt.ylabel(feature_names[1])
-# plt.show()
+plt.show()
 
 # 使用seaborn库画散点图
 # import seaborn as sns

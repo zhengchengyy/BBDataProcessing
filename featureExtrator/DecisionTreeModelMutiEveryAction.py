@@ -121,10 +121,12 @@ def combine(model_list, X_test_list):
         correct = correct_count / count
         sum += correct
         print(str(correct) +"≈" + str(round(correct, 3)),end="")
-        print(str("(") + str(correct_count) + ":" + str(count) + str(")"))
+        print(str("(") + str(correct_count) + ":" + str(count) + str(")"), end="")
+        print(str(round(correct * 100, 1)) + "%")
 
     average_accuracy = sum / len(action_names)
-    print("平均识别准确率: " + str(average_accuracy))
+    print("平均识别准确率: " + str(average_accuracy), end=" ")
+    print(str(round(average_accuracy * 100, 1)) + "%")
 
 
 combine(["model1"], ["X_test1"])

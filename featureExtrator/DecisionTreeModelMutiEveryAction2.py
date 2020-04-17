@@ -9,16 +9,18 @@ start = 1
 end = ndevices
 
 action_names = gv.action_names
-action_names = [
-          "turn_over","legs_stretch","hands_stretch",
-          "head_move","legs_move","hands_move",
-          "kick","legs_tremble","hands_tremble"]
+# action_names = [
+#           "turn_over","legs_stretch","hands_stretch",
+#           "head_move","legs_move","hands_move",
+#           "kick","legs_tremble","hands_tremble"]
 feature_names = gv.feature_names
 feature_num = len(feature_names)
 
 
 model_list = ["model1","model2","model3","model4","model5"]
+X_train_list = ["X_train1","X_train2","X_train3","X_train4","X_train5"]
 X_test_list = ["X_test1","X_test2","X_test3","X_test4","X_test5"]
+
 
 
 def loadModel(device_no):
@@ -73,7 +75,7 @@ for device_no in range(start, end+1):
 # 所有的测试集标签一样
 y_test = y_test1
 print("------------------规则2：不同推理机动作结论概率和的最大值为最终结论的准确率------------------------")
-def combine2(model_list, X_test_list):
+def combine2(model_list, X_test_list, y_test):
     result = []
     action_proba_list = []
     com_name = ""
@@ -133,9 +135,14 @@ def combine2(model_list, X_test_list):
         correct = correct_count / count
         sum += correct
         print(str(correct) +"≈" + str(round(correct, 3)), end="")
-        print(str("(") + str(correct_count) + ":" + str(count) + str(")"))
+        print(str("(") + str(correct_count) + ":" + str(count) + str(")"), end="")
+        print(str(round(correct * 100, 1)) + "%")
 
     average_accuracy = sum / len(action_names)
-    print("动作的平均识别准确率: " + str(average_accuracy))
+    print("平均识别准确率: " + str(average_accuracy), end=" ")
+    print(str(round(average_accuracy * 100, 1)) + "%")
 
-combine2(model_list, X_test_list)
+print("-------------------------train data-------------------------")
+combine2(model_list, X_train_list, y_train)
+print("-------------------------test data-------------------------")
+combine2(model_list, X_test_list, y_test)
