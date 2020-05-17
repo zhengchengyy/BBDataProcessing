@@ -35,6 +35,3 @@ for device_no in range(start, end + 1):
     get_count(label_matrix)
     print("测试数")
     get_count(y_test)
-
-
-

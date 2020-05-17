@@ -10,16 +10,14 @@ from matplotlib import pyplot as plt
 from matplotlib import style
 import numpy as np
 
-# 导入全局变量
-import GlobalVariable as gv
-action_names = gv.action_names
+
 action_names = [
           "turn_over","legs_stretch","hands_stretch",
           "head_move","legs_move","hands_move",
           "kick","legs_tremble","hands_tremble"]
 
 
-config = {'action': action_names[7],
+config = {'action': action_names,
           'db': 'beaglebone',
           'tag_collection': 'tags_1105',
           'volt_collection': 'volts_1105',
@@ -59,7 +57,7 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
     ntags = 8
     tag_acc = 0
 
-    title = config['volt_collection'][6:] + "" + action + "_features"
+    title = config['volt_collection'][6:] + "" + action + "_sampling_feature"
     fig = plt.figure(title, figsize=(6, 8))
 
     # 根据时间采集数据，基本单位为s，比如1s、10s、30s、60s
@@ -200,14 +198,21 @@ def draw_features_from_db(action, db, volt_collection, tag_collection, port=2701
             # ax.grid(True, which='both')
 
     # 最大化显示图像窗口
-    plt.get_current_fig_manager().window.state('zoomed')
-    plt.show()
+    # plt.get_current_fig_manager().window.state('zoomed')
+    # plt.show()
+
+    figure = plt.gcf()  # get current figure
+    figure.set_size_inches(20, 10)
+    plt.savefig("feature_images/" + title + str(start) + ".png", dpi=200)
+    plt.close()
 
 
 if __name__ == '__main__':
-    draw_features_from_db(action=config['action'],
-                          db=config['db'],
-                          tag_collection=config['tag_collection'],
-                          volt_collection=config['volt_collection'],
-                          ndevices=config['ndevices'],
-                          offset=config['offset'])
+    for i in range(len(action_names)):
+        print("---------" + action_names[i] + "---------")
+        draw_features_from_db(action=action_names[i],
+                              db=config['db'],
+                              tag_collection=config['tag_collection'],
+                              volt_collection=config['volt_collection'],
+                              ndevices=config['ndevices'],
+                              offset=config['offset'])
